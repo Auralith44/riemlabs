@@ -11,35 +11,50 @@ const STATS = [
   { value: "0", label: "Missed Deadlines" },
 ];
 
+type Variant = "base" | "reveal" | "trail";
+
 /**
- * Home-page studio summary, rendered twice.
+ * Home-page studio summary, rendered three times — one layer per phase of the
+ * wipe's passage over it.
  *
- * `base` is the real, interactive section. `reveal` is a visually identical
- * copy living inside the wipe's accent veil.
+ *   base    the real, interactive section. Defines the section's height and
+ *           carries the real links and headings for assistive tech. While the
+ *           wipe is running it is held at opacity 0 (see `.wipe-base`) and
+ *           never paints; it is still hit-testable, which is what lets the
+ *           reveal copy mirror its hover. On any viewport the wipe does not
+ *           run on — narrow, short, reduced-motion — the flag is absent and
+ *           this is simply the section, painted normally.
  *
- * The headline, lede and stats deliberately do NOT flip colour between the two
- * layers. The base copy is marked `wipe-copy-base` and never paints at all on
- * viewports that get the wipe, so the veil's white mirror is the only visible
- * copy of that text: the words exist exactly where the blue is and nowhere
- * else. The base copy stays in the DOM — hidden with opacity, not removed — so
- * assistive tech and no-JS visitors still read the real section.
+ *   reveal   the white-on-accent mirror inside the veil. Visible only in the
+ *            band the blue currently covers.
  *
- * The capability card is the standing exception and does not participate at
- * all: one light card with dark ink, identical in both layers, so the wipe's
- * clip edge can sweep straight through it without splitting it in two.
+ *   trail    a dark mirror clipped to the region the blue has already vacated,
+ *            so copy the wipe has finished with returns to normal dark-on-light
+ *            instead of staying blank. Without it the exit left the stat rules
+ *            standing over empty columns.
  *
- * The reveal copy is static: no RevealSection, no Fade. Its scroll animation
- * would run on a separate timeline from the base layer's and tear the two
+ * The net effect for every element: nothing before the blue arrives, white
+ * while it is overhead, dark once it has gone.
+ *
+ * The capability card is the one exception — it is painted by the reveal layer
+ * alone, so it exists only for as long as the blue is actually over it, and is
+ * absent both before and after. base and trail still lay it out (hidden, with
+ * `invisible`) so all three layers stay in pixel register.
+ *
+ * Both mirrors are static: no RevealSection, no Fade. Their scroll animations
+ * would run on separate timelines from the base layer's and tear the layers
  * apart mid-wipe.
  */
 export default function AboutSection({
   variant = "base",
 }: {
-  variant?: "base" | "reveal";
+  variant?: Variant;
 }) {
   const isReveal = variant === "reveal";
+  // Both mirrors are inert copies: no reveal timeline, no focusable controls.
+  const isMirror = variant !== "base";
 
-  // Fade on the base layer, a plain div on the mirror.
+  // Fade on the base layer, a plain element on the mirrors.
   const Block = ({
     children,
     className = "",
@@ -49,7 +64,7 @@ export default function AboutSection({
     className?: string;
     as?: ElementType;
   }) => {
-    if (isReveal) {
+    if (isMirror) {
       const Tag = as ?? "div";
       return <Tag className={className}>{children}</Tag>;
     }
@@ -60,12 +75,7 @@ export default function AboutSection({
     );
   };
 
-  const Shell = isReveal ? "div" : RevealSection;
-
-  // Copy that lives only inside the veil. The base layer keeps its dark tone
-  // purely as the fallback for viewports the wipe never runs on; where the
-  // wipe IS running, `wipe-copy-base` zeroes its opacity outright.
-  const onlyInWipe = isReveal ? "" : "wipe-copy-base";
+  const Shell = isMirror ? "div" : RevealSection;
 
   const headTone = isReveal ? "text-canvas" : "text-ink";
   const bodyTone = isReveal ? "text-canvas/80" : "text-ink/55";
@@ -76,23 +86,21 @@ export default function AboutSection({
   const eyebrowSlash = isReveal ? "text-canvas/40" : "text-ink/25";
   const eyebrowLink = isReveal ? "text-canvas/70" : "text-ink/50";
 
-  // The standing exception to the colour inversion: one light card with dark
-  // ink, in BOTH layers. It used to be a dark card on the base and a light one
-  // on the mirror, so the exit's clip edge cut it into a black top half and a
-  // white bottom half as it swept down through the card's own box. Identical
-  // on both sides, that seam has nothing left to reveal.
+  // One light card with dark ink, painted by the reveal layer only, so it
+  // exists for exactly as long as the blue is over it and is absent either
+  // side of that.
   //
-  // The hairline border is what keeps it reading as a card once the blue has
-  // lifted entirely and it sits white-on-white against the canvas.
-  const cardSurface = "border border-hairline bg-canvas text-ink";
-  const cardMuted = "text-ink/50";
-  const cardBody = "text-ink/80";
-  const cardRule = "border-ink/15";
-  const cardFaint = "text-ink/40";
-  const cardStatus = "text-ink/70";
+  // Only the trail needs hiding: it lays the card out to stay in register with
+  // the other two layers, but must never paint it. The base needs no hide of
+  // its own — `.wipe-base` already zeroes that whole layer whenever the wipe
+  // is running, and on a viewport where it is NOT running the base is the only
+  // layer there is and must show the card normally.
+  const cardSurface = `border border-hairline bg-canvas text-ink ${
+    variant === "trail" ? "invisible" : ""
+  }`;
 
   return (
-    <Shell className={isReveal ? "" : "bg-canvas"}>
+    <Shell className={isMirror ? "" : "wipe-base bg-canvas"}>
       <div className="shell py-section">
         {/* Eyebrow row */}
         <div
@@ -103,7 +111,7 @@ export default function AboutSection({
             <span className={eyebrowSlash}>/</span>
             <span className={headTone}>About Us</span>
           </p>
-          {isReveal ? (
+          {isMirror ? (
             <span className={`meta inline-flex items-center gap-2 ${eyebrowLink}`}>
               Full Studio <span aria-hidden="true">→</span>
             </span>
@@ -126,14 +134,11 @@ export default function AboutSection({
         <div className="mt-16 grid gap-x-gutter gap-y-14 lg:grid-cols-5">
           {/* ── Left: copy, stats, CTA ─────────────────────────────── */}
           <div className="lg:col-span-3">
-            <Block
-              as="h2"
-              className={`max-w-[18ch] text-headline font-medium ${headTone} ${onlyInWipe}`}
-            >
+            <Block as="h2" className={`max-w-[18ch] text-headline font-medium ${headTone}`}>
               From first pixel to shipped product — we build it right.
             </Block>
 
-            <Block as="p" className={`mt-8 max-w-intro text-lede ${bodyTone} ${onlyInWipe}`}>
+            <Block as="p" className={`mt-8 max-w-intro text-lede ${bodyTone}`}>
               Riem Labs is a small studio based in Nairobi. We design and build full-stack
               products, design systems, and technical execution for teams who need it done
               properly the first time.
@@ -146,26 +151,26 @@ export default function AboutSection({
                   className={`py-8 ${i > 0 ? `border-l pl-6 ${ruleTone}` : "pr-6"}`}
                 >
                   <p
-                    className={`font-medium tracking-[-0.03em] ${statTone} ${onlyInWipe}`}
+                    className={`font-medium tracking-[-0.03em] ${statTone}`}
                     style={{ fontSize: "clamp(2.2rem, 3.5vw, 3.2rem)", lineHeight: "1" }}
                   >
                     {stat.value}
                   </p>
-                  <p className={`micro mt-4 ${statLabel} ${onlyInWipe}`}>{stat.label}</p>
+                  <p className={`micro mt-4 ${statLabel}`}>{stat.label}</p>
                 </div>
               ))}
             </Block>
 
             <Block className="mt-12">
-              {/* The real link sits under an opaque veil for as long as the
-                  section is blue, so its own :hover paints nothing anyone can
-                  see. `data-about-cta` lets the stylesheet mirror the hover
-                  onto this white copy and invert it to a filled panel — the one
-                  treatment that cannot dissolve into the field behind it, the
-                  way hovering to the accent colour did. */}
-              {isReveal ? (
+              {/* The real link spends the whole blue phase underneath an opaque
+                  veil, so its own :hover paints nothing anyone can see — and on
+                  the light background it is deliberately inert to the pointer.
+                  `data-about-cta` lets the stylesheet mirror the hover onto the
+                  white copy and invert it to a filled panel, the one treatment
+                  that cannot dissolve into the field behind it. */}
+              {isMirror ? (
                 <span
-                  data-about-cta="reveal"
+                  data-about-cta={isReveal ? "reveal" : undefined}
                   className={`inline-flex items-center gap-3 border px-7 py-4 font-mono text-sm uppercase tracking-[0.1em] transition-colors duration-400 ease-expo ${ruleTone} ${headTone}`}
                 >
                   Read Our Story
@@ -180,12 +185,12 @@ export default function AboutSection({
                 <Link
                   href="/about"
                   data-about-cta="base"
-                  className="cta-box group inline-flex items-center gap-3 border border-hairline px-7 py-4 font-mono text-sm uppercase tracking-[0.1em] transition-colors duration-400 ease-expo hover:border-accent hover:text-accent"
+                  className="group inline-flex items-center gap-3 border border-hairline px-7 py-4 font-mono text-sm uppercase tracking-[0.1em]"
                 >
                   Read Our Story
                   <span
                     aria-hidden="true"
-                    className="transition-transform duration-400 ease-expo group-hover:translate-x-1"
+                    className="transition-transform duration-400 ease-expo"
                   >
                     →
                   </span>
@@ -205,28 +210,26 @@ export default function AboutSection({
               >
                 RL
               </p>
-              <p className={`micro mt-5 ${cardMuted}`}>Riem Labs</p>
+              <p className="micro mt-5 text-ink/50">Riem Labs</p>
 
               <ul className="mt-12 space-y-4">
                 {services.map((service) => (
                   <li key={service.index} className="flex items-baseline gap-4 text-sm">
                     <span aria-hidden="true" className="h-px w-4 shrink-0 bg-accent" />
-                    <span className={cardBody}>{service.title}</span>
+                    <span className="text-ink/80">{service.title}</span>
                   </li>
                 ))}
               </ul>
 
-              <div
-                className={`mt-auto flex items-end justify-between gap-6 border-t pt-6 ${cardRule}`}
-              >
+              <div className="mt-auto flex items-end justify-between gap-6 border-t border-ink/15 pt-6">
                 <div>
-                  <p className={`micro ${cardFaint}`}>Based in</p>
-                  <p className={`mt-2 text-sm ${cardBody}`}>
+                  <p className="micro text-ink/40">Based in</p>
+                  <p className="mt-2 text-sm text-ink/80">
                     {site.city}, {site.country}
                   </p>
                 </div>
 
-                <p className={`micro flex items-center gap-2 ${cardStatus}`}>
+                <p className="micro flex items-center gap-2 text-ink/70">
                   <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse-dot" />
                   Available
                 </p>

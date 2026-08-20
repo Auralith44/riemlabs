@@ -37,6 +37,7 @@ export default function HomePage() {
         id="about"
         className="bg-canvas"
         reveal={<AboutSection variant="reveal" />}
+        trail={<AboutSection variant="trail" />}
       >
         <AboutSection />
       </SectionWipe>

@@ -12,6 +12,14 @@ import { legalLinks, navigation } from "@/lib/site";
 const AXIS_CLOSED = "calc(100% - 7rem)";
 const AXIS_OPEN = "calc(100% - 25rem)";
 
+/**
+ * How close to the literal top counts as "back at the hero".
+ *
+ * A couple of pixels of slack, not a range — the bar is meant to return only
+ * once the page is actually at rest at the top.
+ */
+const REST_ZONE = 4;
+
 export default function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -39,6 +47,12 @@ export default function Header() {
    * Pages with no hero (`[data-hero]` is the home page's alone) keep the bar
    * throughout, because they have no equivalent section to bound it to and
    * would otherwise be left with no navigation at all.
+   *
+   * Going away and coming back are deliberately not symmetrical. It leaves
+   * when the hero does, but it only comes back at the very top — scrolling up
+   * far enough to re-enter the hero's range is not enough, because the
+   * entrance wipe is still mid-flight through most of that range and the bar
+   * would reappear over a transition that has not finished.
    */
   useEffect(() => {
     setPastHero(false);
@@ -51,8 +65,16 @@ export default function Header() {
       start: "top top",
       end: "bottom top",
       invalidateOnRefresh: true,
+      // Leaving the hero downward hides it.
       onLeave: () => setPastHero(true),
-      onEnterBack: () => setPastHero(false),
+      // Note the absence of onEnterBack. That fires the instant you cross back
+      // over `end` — the hero's *bottom* edge — which is where the bar used to
+      // pop back with the wipe still ~40% expanded. The only thing that brings
+      // it back is arriving at `start`.
+      onUpdate: (self) => {
+        if (self.scroll() <= REST_ZONE) setPastHero(false);
+      },
+      // Above the top (overscroll) is unambiguously the top.
       onLeaveBack: () => setPastHero(false),
     });
 
@@ -163,11 +185,27 @@ export default function Header() {
         <HeaderBar variant="base" {...barProps} />
       </header>
 
-      {/* Inverted header copy, clipped to the cursor band. */}
+      {/* Inverted header copy, clipped to the cursor band.
+
+          The accent fill belongs to the bar's own row, NOT to this panel. The
+          panel keeps its padding because clip-path clips to the border box and
+          the availability badge hangs below the row on `top-full` — without the
+          padding the badge falls outside the box and is clipped away. But when
+          the padding also carried `bg-accent`, those 56px painted as an opaque
+          blue slab with nothing drawn in it, stretched the full width at
+          z-[51]. The hero's own footer row passes under exactly that strip on
+          the way into About Us, and the slab masked the top of "Based in
+          Nairobi" and "Let's talk" — which is why they read as smudges rather
+          than the bright white their reveal copies actually compute to.
+
+          The badge needs no fill of its own: the band that reveals this panel
+          is the same band that turns the hero (and then the veil) blue
+          underneath it, so there is always accent behind the badge wherever
+          this copy is visible at all. */}
       <div
         aria-hidden="true"
         inert
-        className={`reveal-clip pointer-events-none fixed inset-x-0 top-0 z-[51] bg-accent pb-14 ${chromeMotion} ${chromeState}`}
+        className={`reveal-clip pointer-events-none fixed inset-x-0 top-0 z-[51] pb-14 ${chromeMotion} ${chromeState}`}
       >
         <HeaderBar variant="reveal" open={open} bandVisible={bandVisible} />
       </div>

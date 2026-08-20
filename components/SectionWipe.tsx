@@ -29,12 +29,19 @@ const clamp = (min: number, max: number, v: number) => Math.min(max, Math.max(mi
 export default function SectionWipe({
   children,
   reveal,
+  trail,
   className = "",
   id,
 }: {
   children: ReactNode;
   /** Inverted mirror of `children`, painted inside the accent veil. */
   reveal?: ReactNode;
+  /**
+   * Normal-tone mirror of `children`, clipped to the region the veil has
+   * already receded past. Gives the section somewhere to land once the blue
+   * has gone, instead of leaving the base layer's hidden copy on screen.
+   */
+  trail?: ReactNode;
   className?: string;
   id?: string;
 }) {
@@ -45,6 +52,16 @@ export default function SectionWipe({
     const section = sectionRef.current;
     const veil = veilRef.current;
     if (!section || !veil) return;
+
+    /**
+     * The clip geometry is published on the SECTION, not on the veil.
+     *
+     * Three layers read it now — the veil, the trail, and nothing else may
+     * disagree about where the blue's edge is. Writing it once on their common
+     * ancestor and letting it inherit is what guarantees they cannot; writing
+     * it on the veil alone left the trail with no way to see it.
+     */
+    const clipHost = section;
 
     const root = document.documentElement;
     const gate = window.matchMedia(ENABLE_QUERY);
@@ -69,10 +86,10 @@ export default function SectionWipe({
       root.dataset.sectionWipe = "true";
 
       const setClip = (top: number, right: number, bottom: number, left: number) => {
-        veil.style.setProperty("--section-clip-top", `${top.toFixed(2)}px`);
-        veil.style.setProperty("--section-clip-right", `${right.toFixed(2)}px`);
-        veil.style.setProperty("--section-clip-bottom", `${bottom.toFixed(2)}px`);
-        veil.style.setProperty("--section-clip-left", `${left.toFixed(2)}px`);
+        clipHost.style.setProperty("--section-clip-top", `${top.toFixed(2)}px`);
+        clipHost.style.setProperty("--section-clip-right", `${right.toFixed(2)}px`);
+        clipHost.style.setProperty("--section-clip-bottom", `${bottom.toFixed(2)}px`);
+        clipHost.style.setProperty("--section-clip-left", `${left.toFixed(2)}px`);
       };
 
       /**
@@ -105,10 +122,10 @@ export default function SectionWipe({
       };
 
       const collapse = () => {
-        veil.style.setProperty("--section-clip-top", "0px");
-        veil.style.setProperty("--section-clip-right", "50%");
-        veil.style.setProperty("--section-clip-bottom", "0px");
-        veil.style.setProperty("--section-clip-left", "50%");
+        clipHost.style.setProperty("--section-clip-top", "0px");
+        clipHost.style.setProperty("--section-clip-right", "50%");
+        clipHost.style.setProperty("--section-clip-bottom", "0px");
+        clipHost.style.setProperty("--section-clip-left", "50%");
         delete root.dataset.wipeCover;
       };
 
@@ -278,6 +295,18 @@ export default function SectionWipe({
       className={`relative overflow-hidden ${className}`}
     >
       {children}
+
+      {/* Everything the blue has finished with, in normal tone. Sits below the
+          veil so the two never fight over the same strip of screen. */}
+      {trail ? (
+        <div
+          aria-hidden="true"
+          inert
+          className="section-trail pointer-events-none absolute inset-0 z-10"
+        >
+          {trail}
+        </div>
+      ) : null}
 
       <div
         ref={veilRef}

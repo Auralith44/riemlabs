@@ -272,19 +272,43 @@
     );
   }
 
-  /* Copy that exists only inside the wipe.
+  /* ---- A wiped section's three phases ----------------------------------
 
-     About Us's headline, lede and stat figures are not recoloured by the
-     wipe — they are absent from the page until the accent field arrives and
-     paints them in white. The base layer still carries the real text for
-     screen readers, no-JS visitors, and any viewport the wipe never runs on,
-     which is why it is hidden with opacity rather than removed.
+     Every element in About Us passes through the same three states as the
+     blue crosses it: nothing before it arrives, white while it is overhead,
+     normal dark once it has gone. Three stacked copies divide that up.
 
-     !important is load-bearing: these elements are `[data-reveal-fade]`
-     targets, and the reveal timeline tweens `opacity` as an inline style. A
-     plain class would lose to it the moment the section scrolled into view. */
-  html[data-section-wipe="true"] .wipe-copy-base {
-    opacity: 0 !important;
+     1. The base layer is the real section — real links, real headings, the
+        thing that defines the section's height. While the wipe runs it never
+        paints. It stays hit-testable (opacity, not visibility), which is what
+        lets the reveal copy mirror its hover, and it stays in the a11y tree.
+
+     2. The veil (.section-sticky) paints the white copy in the band the blue
+        currently covers.
+
+     3. The trail paints the dark copy in the band the blue has already left,
+        clipped to everything above the receding edge. Without it the exit
+        left the base layer's hidden copy on screen — stat rules standing over
+        empty columns, which is what "half-rendered" looked like.
+
+     All three read one set of --section-clip-* values, published on their
+     common ancestor by SectionWipe. */
+  html[data-section-wipe="true"] .wipe-base {
+    opacity: 0;
+  }
+
+  /* Above the blue's top edge — the part of the section it has finished with.
+     At rest --section-clip-top is 0, so the bottom inset is the full height
+     and the trail paints nothing; it only opens up as the exit sweeps down. */
+  .section-trail {
+    clip-path: inset(0 0 calc(100% - var(--section-clip-top, 0px)) 0);
+  }
+
+  /* No wipe on this viewport means no trail: the base layer is painting the
+     section normally and a second dark copy over it would only double-strike
+     the text. */
+  html:not([data-section-wipe="true"]) .section-trail {
+    display: none;
   }
 
   /* The About Us CTA spends the whole blue phase underneath an opaque veil,

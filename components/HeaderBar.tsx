@@ -92,7 +92,11 @@ export default function HeaderBar({
   );
 
   return (
-    <div className="flex h-[var(--header-h)] items-center justify-between gap-6 px-gutter">
+    <div
+      className={`flex h-[var(--header-h)] items-center justify-between gap-6 px-gutter ${
+        isReveal ? "bg-accent" : ""
+      }`}
+    >
       {isReveal ? (
         <span className="flex items-center">
           {/* brightness-0 invert renders the mark and wordmark pure white. */}
