@@ -36,10 +36,10 @@ type Variant = "base" | "reveal" | "trail";
  * The net effect for every element: nothing before the blue arrives, white
  * while it is overhead, dark once it has gone.
  *
- * The capability card is the one exception — it is painted by the reveal layer
- * alone, so it exists only for as long as the blue is actually over it, and is
- * absent both before and after. base and trail still lay it out (hidden, with
- * `invisible`) so all three layers stay in pixel register.
+ * The capability card keeps ONE treatment throughout — dark panel, light ink —
+ * in every layer. It does not invert with the wipe and it does not disappear
+ * behind it: the clip edge sweeping through it reveals identical pixels either
+ * side, so there is no seam to see.
  *
  * Both mirrors are static: no RevealSection, no Fade. Their scroll animations
  * would run on separate timelines from the base layer's and tear the layers
@@ -86,18 +86,19 @@ export default function AboutSection({
   const eyebrowSlash = isReveal ? "text-canvas/40" : "text-ink/25";
   const eyebrowLink = isReveal ? "text-canvas/70" : "text-ink/50";
 
-  // One light card with dark ink, painted by the reveal layer only, so it
-  // exists for exactly as long as the blue is over it and is absent either
-  // side of that.
+  // The card is the one element the wipe does not recolour. It keeps its own
+  // dark panel and light ink whatever is behind it — blue mid-wipe, white once
+  // the blue has gone — so it stays put through the whole passage instead of
+  // dropping out of the layout when the section returns to white.
   //
-  // Only the trail needs hiding: it lays the card out to stay in register with
-  // the other two layers, but must never paint it. The base needs no hide of
-  // its own — `.wipe-base` already zeroes that whole layer whenever the wipe
-  // is running, and on a viewport where it is NOT running the base is the only
-  // layer there is and must show the card normally.
-  const cardSurface = `border border-hairline bg-canvas text-ink ${
-    variant === "trail" ? "invisible" : ""
-  }`;
+  // Identical in all three layers is what makes that safe: the clip edge can
+  // cut straight through the card and both sides match.
+  const cardSurface = "bg-ink text-canvas";
+  const cardMuted = "text-canvas/50";
+  const cardBody = "text-canvas/80";
+  const cardRule = "border-canvas/15";
+  const cardFaint = "text-canvas/40";
+  const cardStatus = "text-canvas/70";
 
   return (
     <Shell className={isMirror ? "" : "wipe-base bg-canvas"}>
@@ -210,26 +211,28 @@ export default function AboutSection({
               >
                 RL
               </p>
-              <p className="micro mt-5 text-ink/50">Riem Labs</p>
+              <p className={`micro mt-5 ${cardMuted}`}>Riem Labs</p>
 
               <ul className="mt-12 space-y-4">
                 {services.map((service) => (
                   <li key={service.index} className="flex items-baseline gap-4 text-sm">
                     <span aria-hidden="true" className="h-px w-4 shrink-0 bg-accent" />
-                    <span className="text-ink/80">{service.title}</span>
+                    <span className={cardBody}>{service.title}</span>
                   </li>
                 ))}
               </ul>
 
-              <div className="mt-auto flex items-end justify-between gap-6 border-t border-ink/15 pt-6">
+              <div
+                className={`mt-auto flex items-end justify-between gap-6 border-t pt-6 ${cardRule}`}
+              >
                 <div>
-                  <p className="micro text-ink/40">Based in</p>
-                  <p className="mt-2 text-sm text-ink/80">
+                  <p className={`micro ${cardFaint}`}>Based in</p>
+                  <p className={`mt-2 text-sm ${cardBody}`}>
                     {site.city}, {site.country}
                   </p>
                 </div>
 
-                <p className="micro flex items-center gap-2 text-ink/70">
+                <p className={`micro flex items-center gap-2 ${cardStatus}`}>
                   <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse-dot" />
                   Available
                 </p>

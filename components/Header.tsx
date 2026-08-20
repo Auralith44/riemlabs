@@ -13,12 +13,15 @@ const AXIS_CLOSED = "calc(100% - 7rem)";
 const AXIS_OPEN = "calc(100% - 25rem)";
 
 /**
- * How close to the literal top counts as "back at the hero".
+ * Scroll distance the bar is driven over, in px.
  *
- * A couple of pixels of slack, not a range — the bar is meant to return only
- * once the page is actually at rest at the top.
+ * Kept equal to --nav-travel (6.5rem) so the bar rises exactly one pixel per
+ * pixel of scroll. That 1:1 relationship is the whole point: it makes the bar
+ * read as part of the hero, scrolling away with it, rather than as a fixed
+ * element playing an exit animation. Scrolling back up brings it down at the
+ * same rate, for free, because it is the same mapping in reverse.
  */
-const REST_ZONE = 4;
+const NAV_TRAVEL = 104;
 
 export default function Header() {
   const pathname = usePathname();
@@ -26,105 +29,64 @@ export default function Header() {
   const [hovered, setHovered] = useState(false);
   const [keyboardFocus, setKeyboardFocus] = useState(false);
   const [hash, setHash] = useState("");
-  const [pastHero, setPastHero] = useState(false);
+  const [navGone, setNavGone] = useState(false);
   const { stop, start, scrollTo } = useSmoothScroll();
 
   const panelRef = useRef<HTMLElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const goneRef = useRef(false);
 
   const close = useCallback(() => setOpen(false), []);
 
   useEffect(() => setOpen(false), [pathname]);
 
   /**
-   * The bar belongs to the hero, not to the document.
+   * The bar leaves at scroll pace and comes back the same way.
    *
-   * It stays `fixed` so it can sit over the hero's own reveal band, but it is
-   * only *present* while the hero is on screen — scroll past and it goes, the
-   * same as any other content that has scrolled out of view, and it comes back
-   * only on returning to the hero itself.
+   * --nav-exit is published on <html> and read by BOTH the real bar and its
+   * inverted reveal copy, so the two can never travel by different amounts or
+   * in different frames. Everything the bar contains — wordmark, toggle,
+   * availability badge — sits inside those two elements and therefore moves as
+   * one piece.
    *
-   * Pages with no hero (`[data-hero]` is the home page's alone) keep the bar
-   * throughout, because they have no equivalent section to bound it to and
-   * would otherwise be left with no navigation at all.
-   *
-   * Going away and coming back are deliberately not symmetrical. It leaves
-   * when the hero does, but it only comes back at the very top — scrolling up
-   * far enough to re-enter the hero's range is not enough, because the
-   * entrance wipe is still mid-flight through most of that range and the bar
-   * would reappear over a transition that has not finished.
+   * The React state is only for `inert`; it flips once at the end of the
+   * travel rather than on every scroll frame, so this does not re-render the
+   * drawer sixty times a second.
    */
   useEffect(() => {
-    setPastHero(false);
+    const root = document.documentElement;
+    const write = (p: number) => root.style.setProperty("--nav-exit", p.toFixed(4));
 
-    const hero = document.querySelector<HTMLElement>("[data-hero]");
-    if (!hero) return;
+    const settle = (value: boolean) => {
+      if (goneRef.current === value) return;
+      goneRef.current = value;
+      setNavGone(value);
+    };
+
+    const apply = (p: number) => {
+      write(p);
+      settle(p > 0.98);
+    };
+
+    apply(Math.min(1, Math.max(0, window.scrollY / NAV_TRAVEL)));
 
     const trigger = ScrollTrigger.create({
-      trigger: hero,
-      start: "top top",
-      end: "bottom top",
+      start: 0,
+      end: NAV_TRAVEL,
       invalidateOnRefresh: true,
-      // Leaving the hero downward hides it.
-      onLeave: () => setPastHero(true),
-      // Note the absence of onEnterBack. That fires the instant you cross back
-      // over `end` — the hero's *bottom* edge — which is where the bar used to
-      // pop back with the wipe still ~40% expanded. The only thing that brings
-      // it back is arriving at `start`.
-      onUpdate: (self) => {
-        if (self.scroll() <= REST_ZONE) setPastHero(false);
-      },
-      // Above the top (overscroll) is unambiguously the top.
-      onLeaveBack: () => setPastHero(false),
+      onUpdate: (self) => apply(self.progress),
+      // onUpdate only fires inside the range; the ends have to be pinned or the
+      // bar would freeze at whatever fraction it held when it left.
+      onLeave: () => apply(1),
+      onLeaveBack: () => apply(0),
+      onEnterBack: (self) => apply(self.progress),
     });
 
-    // A mid-page reload starts already past the hero, and ScrollTrigger only
-    // reports transitions — not the state it began in.
-    setPastHero(hero.getBoundingClientRect().bottom <= 0);
-
-    return () => trigger.kill();
-  }, [pathname]);
-
-  useEffect(() => {
-    const read = () => setHash(window.location.hash);
-    read();
-    window.addEventListener("hashchange", read);
-    return () => window.removeEventListener("hashchange", read);
-  }, [pathname]);
-
-  // Freeze the page, wire Escape, and flag the open state on <html> so both
-  // reveal layers suppress themselves behind the scrim.
-  useEffect(() => {
-    if (!open) {
-      delete document.documentElement.dataset.menuOpen;
-      start();
-      return;
-    }
-
-    document.documentElement.dataset.menuOpen = "true";
-    stop();
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-    };
-    window.addEventListener("keydown", onKey);
-
-    const first = panelRef.current?.querySelector<HTMLAnchorElement>("a[href]");
-    first?.focus();
-
     return () => {
-      document.body.style.overflow = previous;
-      window.removeEventListener("keydown", onKey);
-
-      // Never leave focus stranded inside a panel that is about to become
-      // aria-hidden and non-interactive.
-      if (panelRef.current?.contains(document.activeElement)) {
-        toggleRef.current?.focus({ preventScroll: true });
-      }
+      trigger.kill();
+      root.style.removeProperty("--nav-exit");
     };
-  }, [open, stop, start]);
+  }, [pathname]);
 
   const isActive = (href: string) => {
     if (href.startsWith("/#")) return pathname === "/" && hash === href.slice(1);
@@ -153,16 +115,11 @@ export default function Header() {
   // screen after the drawer closes.
   const bandVisible = open || hovered || keyboardFocus;
 
-  // Hidden bar, hidden band: the inverted copy is painted from the same
-  // geometry, so leaving it behind would park a blue slab over the sections
-  // below. `inert` follows the opacity so a keyboard user never tabs into a
-  // bar that is not on screen.
-  const hidden = pastHero && !open;
-  const chromeState = hidden
-    ? "pointer-events-none -translate-y-full opacity-0"
-    : "translate-y-0 opacity-100";
-  const chromeMotion =
-    "transition-[opacity,transform] duration-520 ease-expo will-change-transform";
+  // `inert` follows the travel so a keyboard user never tabs into a bar that
+  // has scrolled off the top. Never while the drawer is open — the toggle has
+  // to stay reachable to close it.
+  const hidden = navGone && !open;
+  const chromeState = hidden ? "pointer-events-none" : "";
 
   const barProps = {
     open,
@@ -180,7 +137,7 @@ export default function Header() {
     <>
       <header
         inert={hidden}
-        className={`fixed inset-x-0 top-0 z-50 ${chromeMotion} ${chromeState}`}
+        className={`nav-chrome fixed inset-x-0 top-0 z-50 ${chromeState}`}
       >
         <HeaderBar variant="base" {...barProps} />
       </header>
@@ -205,7 +162,7 @@ export default function Header() {
       <div
         aria-hidden="true"
         inert
-        className={`reveal-clip pointer-events-none fixed inset-x-0 top-0 z-[51] pb-14 ${chromeMotion} ${chromeState}`}
+        className="nav-chrome reveal-clip pointer-events-none fixed inset-x-0 top-0 z-[51] pb-14"
       >
         <HeaderBar variant="reveal" open={open} bandVisible={bandVisible} />
       </div>

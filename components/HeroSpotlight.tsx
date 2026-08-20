@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import HeroContent from "@/components/HeroContent";
+import { ScrollTrigger } from "@/lib/gsap";
 
 /** How much of the gap to close each frame — lower trails the cursor further. */
 const LERP = 0.12;
@@ -20,6 +21,14 @@ const HALF_BAND = 56;
 
 /** Desktop, real cursor only. */
 const ENABLE_QUERY = "(min-width: 64rem) and (hover: hover) and (pointer: fine)";
+
+/**
+ * Fraction of the hero's height over which its copy leaves.
+ *
+ * Deliberately not the whole hero: the copy should be gone while the section
+ * is still on screen, not race the section boundary.
+ */
+const COPY_EXIT = 0.5;
 
 export default function HeroSpotlight() {
   const layerRef = useRef<HTMLDivElement>(null);
@@ -218,6 +227,43 @@ export default function HeroSpotlight() {
       stop();
       enabled.removeEventListener("change", sync);
       reduced.removeEventListener("change", sync);
+    };
+  }, []);
+
+  /**
+   * Drive the hero copy's scroll-linked exit.
+   *
+   * Published on the section, not on <html>, because both layers that read it
+   * live inside the section — and because it is the section's own height the
+   * distance is measured against.
+   *
+   * Kept out of the pointer-spotlight effect above on purpose: that one is
+   * gated to desktop with a real cursor, and the copy has to leave on every
+   * device.
+   */
+  useEffect(() => {
+    const hero = sectionRef.current;
+    if (!hero) return;
+
+    const write = (p: number) => hero.style.setProperty("--hero-exit", p.toFixed(4));
+    write(0);
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const trigger = ScrollTrigger.create({
+      trigger: hero,
+      start: "top top",
+      end: () => `+=${Math.max(1, Math.round(hero.offsetHeight * COPY_EXIT))}`,
+      invalidateOnRefresh: true,
+      onUpdate: (self) => write(self.progress),
+      onLeave: () => write(1),
+      onLeaveBack: () => write(0),
+      onEnterBack: (self) => write(self.progress),
+    });
+
+    return () => {
+      trigger.kill();
+      hero.style.removeProperty("--hero-exit");
     };
   }, []);
 

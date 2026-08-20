@@ -31,6 +31,27 @@
   initial-value: 0px;
 }
 
+/**
+ * Scroll progress, 0 to 1, for the two things that leave the hero as you go
+ * down it: the bar at the top, and the hero's own copy.
+ *
+ * Both are published as inherited custom properties rather than driven per
+ * element, because each has two stacked copies — the real one and its reveal
+ * mirror — that must move by the identical amount in the identical frame. One
+ * value read by both layers cannot desync; two JS writers can.
+ */
+@property --nav-exit {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --hero-exit {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
 @property --overlay-axis-left {
   syntax: "<length-percentage>";
   inherits: false;
@@ -67,6 +88,12 @@
     --overlay-axis-right: 0px;
 
     --reveal-axis-width: 7rem;
+
+    /* How far the bar travels before it is clear of the viewport. Enough to
+       take the availability badge with it, not just the row. Kept equal to the
+       scroll distance it is driven over, which is what makes the movement read
+       as 1:1 with the page rather than as an animation. */
+    --nav-travel: 6.5rem;
 
     /* Pointer drift for the hero CTA, published where the reveal mirror can
        read it. See --site-button-bracket-* under .magnetic. */
@@ -260,6 +287,29 @@
       0 calc(100% - var(--reveal-position) - var(--reveal-width) / 2) 0
         calc(var(--reveal-position) - var(--reveal-width) / 2)
     );
+  }
+
+  /* ---- Hero chrome and copy leave at scroll pace -----------------------
+
+     The bar slides straight up, one pixel per pixel of scroll, so it behaves
+     like part of the hero rather than a fixed element that animates out — it
+     is gone long before the headline reaches the top. The hero's copy drifts
+     up and fades over the first half of the hero.
+
+     Both rules are applied to the base layer AND its reveal mirror, and both
+     read a property that inherits from a common ancestor, so the black copy
+     and the white copy always move as one. */
+  .nav-chrome {
+    transform: translateY(calc(var(--nav-exit, 0) * -1 * var(--nav-travel)));
+    will-change: transform;
+  }
+
+  /* The 8vh bias is the hero's original lower-middle framing, folded into the
+     same transform so the two cannot fight over the property. */
+  .hero-copy {
+    transform: translateY(calc(8vh - var(--hero-exit, 0) * 2.5rem));
+    opacity: calc(1 - var(--hero-exit, 0));
+    will-change: transform, opacity;
   }
 
   /* ---- Scroll-driven section wipe --------------------------------------

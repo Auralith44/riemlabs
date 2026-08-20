@@ -28,9 +28,14 @@ export default function HeroContent({ variant }: { variant: "base" | "reveal" })
     <div className="flex h-full min-h-[100svh] flex-col px-gutter pb-8 pt-[var(--header-h)]">
       {/* Centred in the space above the footer row, then biased down 8vh so it
           reads as lower-middle. translate-y is a pure paint offset, so it
-          can't shift the footer row or the centring maths. */}
+          can't shift the footer row or the centring maths.
+
+          `hero-copy` folds that bias together with the scroll-linked exit, so
+          the headline and lede drift up and fade as the page moves. Both hero
+          layers carry this same class and read the same --hero-exit, which is
+          what keeps the black copy and the white copy leaving as one. */}
       <div className="flex flex-1 flex-col justify-center">
-        <div className="translate-y-[8vh]">
+        <div className="hero-copy">
           <Heading
             className={`hero-rise hero-headline max-w-[24ch] ${headingTone}`}
             style={{ animationDelay: "0.08s" }}
