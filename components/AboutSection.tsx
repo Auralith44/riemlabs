@@ -36,10 +36,11 @@ type Variant = "base" | "reveal" | "trail";
  * The net effect for every element: nothing before the blue arrives, white
  * while it is overhead, dark once it has gone.
  *
- * The capability card keeps ONE treatment throughout — dark panel, light ink —
- * in every layer. It does not invert with the wipe and it does not disappear
- * behind it: the clip edge sweeping through it reveals identical pixels either
- * side, so there is no seam to see.
+ * The capability card inverts against whatever field is behind it: a light
+ * panel with dark ink where the blue is, a dark panel with light ink where the
+ * page is white. That is the same flip the rest of the section's copy makes, so
+ * the card reads as part of it rather than an exception — and like the copy, it
+ * is present in all three layers and never drops out of the layout.
  *
  * Both mirrors are static: no RevealSection, no Fade. Their scroll animations
  * would run on separate timelines from the base layer's and tear the layers
@@ -86,19 +87,17 @@ export default function AboutSection({
   const eyebrowSlash = isReveal ? "text-canvas/40" : "text-ink/25";
   const eyebrowLink = isReveal ? "text-canvas/70" : "text-ink/50";
 
-  // The card is the one element the wipe does not recolour. It keeps its own
-  // dark panel and light ink whatever is behind it — blue mid-wipe, white once
-  // the blue has gone — so it stays put through the whole passage instead of
-  // dropping out of the layout when the section returns to white.
-  //
-  // Identical in all three layers is what makes that safe: the clip edge can
-  // cut straight through the card and both sides match.
-  const cardSurface = "bg-ink text-canvas";
-  const cardMuted = "text-canvas/50";
-  const cardBody = "text-canvas/80";
-  const cardRule = "border-canvas/15";
-  const cardFaint = "text-canvas/40";
-  const cardStatus = "text-canvas/70";
+  // The card inverts with the field behind it, the opposite way round to the
+  // copy: light panel on the blue, dark panel on the white. Both the base and
+  // the trail are dark, because both sit on the white page — the base before
+  // the blue arrives, the trail after it has gone — and only the reveal copy,
+  // which lives inside the veil, goes light.
+  const cardSurface = isReveal ? "bg-canvas text-ink" : "bg-ink text-canvas";
+  const cardMuted = isReveal ? "text-ink/50" : "text-canvas/50";
+  const cardBody = isReveal ? "text-ink/80" : "text-canvas/80";
+  const cardRule = isReveal ? "border-ink/15" : "border-canvas/15";
+  const cardFaint = isReveal ? "text-ink/40" : "text-canvas/40";
+  const cardStatus = isReveal ? "text-ink/70" : "text-canvas/70";
 
   return (
     <Shell className={isMirror ? "" : "wipe-base bg-canvas"}>

@@ -32,21 +32,14 @@
 }
 
 /**
- * Scroll progress, 0 to 1, for the two things that leave the hero as you go
- * down it: the bar at the top, and the hero's own copy.
+ * Scroll progress, 0 to 1, for the bar's exit.
  *
- * Both are published as inherited custom properties rather than driven per
- * element, because each has two stacked copies — the real one and its reveal
- * mirror — that must move by the identical amount in the identical frame. One
- * value read by both layers cannot desync; two JS writers can.
+ * Published as an inherited custom property rather than driven per element,
+ * because the bar has two stacked copies — the real one and its reveal mirror
+ * — that must move by the identical amount in the identical frame. One value
+ * read by both layers cannot desync; two JS writers can.
  */
 @property --nav-exit {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 0;
-}
-
-@property --hero-exit {
   syntax: "<number>";
   inherits: true;
   initial-value: 0;
@@ -289,27 +282,18 @@
     );
   }
 
-  /* ---- Hero chrome and copy leave at scroll pace -----------------------
+  /* ---- The bar leaves at scroll pace ------------------------------------
 
-     The bar slides straight up, one pixel per pixel of scroll, so it behaves
-     like part of the hero rather than a fixed element that animates out — it
-     is gone long before the headline reaches the top. The hero's copy drifts
-     up and fades over the first half of the hero.
+     One pixel per pixel of scroll, so it behaves like part of the hero rather
+     than a fixed element that animates out — gone long before the headline
+     reaches the top. Applied to the real bar AND its reveal mirror, both
+     reading one inherited property, so the two always travel as one.
 
-     Both rules are applied to the base layer AND its reveal mirror, and both
-     read a property that inherits from a common ancestor, so the black copy
-     and the white copy always move as one. */
+     The hero's copy deliberately does NOT do this. It stays exactly where the
+     page puts it and simply inverts as the band passes over it. */
   .nav-chrome {
     transform: translateY(calc(var(--nav-exit, 0) * -1 * var(--nav-travel)));
     will-change: transform;
-  }
-
-  /* The 8vh bias is the hero's original lower-middle framing, folded into the
-     same transform so the two cannot fight over the property. */
-  .hero-copy {
-    transform: translateY(calc(8vh - var(--hero-exit, 0) * 2.5rem));
-    opacity: calc(1 - var(--hero-exit, 0));
-    will-change: transform, opacity;
   }
 
   /* ---- Scroll-driven section wipe --------------------------------------
