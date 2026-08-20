@@ -1,0 +1,141 @@
+import ProjectVisual from "@/components/ProjectVisual";
+import type { Project } from "@/lib/projects";
+
+type ProjectCardProps = {
+  project: Project;
+  layout?: "card" | "row";
+  /**
+   * When supplied, the cover plate opens an in-page preview instead of the
+   * live site. The title still links out, so both routes stay reachable.
+   */
+  onPreview?: (project: Project) => void;
+  /** Adds the reveal hook attribute so a parent RevealSection staggers it in. */
+  reveal?: boolean;
+};
+
+export default function ProjectCard({
+  project,
+  layout = "card",
+  onPreview,
+  reveal = true,
+}: ProjectCardProps) {
+  const revealAttr = reveal ? { "data-reveal-fade": "" } : {};
+
+  if (layout === "row") {
+    return (
+      <article {...revealAttr} className="group relative hairline-b">
+        <a
+          href={project.href}
+          target="_blank"
+          rel="noreferrer noopener"
+          className="grid grid-cols-12 items-center gap-x-gutter gap-y-4 py-7 md:py-9"
+        >
+          <span className="meta tnum col-span-2 text-ink/35 transition-colors duration-400 ease-expo group-hover:text-accent md:col-span-1">
+            {project.index}
+          </span>
+
+          <h3 className="col-span-10 text-title font-medium transition-[color,transform] duration-600 ease-expo group-hover:translate-x-2 group-hover:text-accent md:col-span-4">
+            {project.title}
+          </h3>
+
+          <p className="meta col-span-6 text-ink/45 md:col-span-3">{project.client}</p>
+
+          <p className="meta col-span-4 text-ink/45 md:col-span-2">{project.category}</p>
+
+          <div className="col-span-2 flex items-center justify-end gap-4 md:col-span-2">
+            <span className="meta tnum text-ink/35">{project.year}</span>
+            <span
+              aria-hidden="true"
+              className="-translate-x-2 text-accent opacity-0 transition-all duration-600 ease-expo group-hover:translate-x-0 group-hover:opacity-100"
+            >
+              ↗
+            </span>
+          </div>
+        </a>
+
+        {/* Hover plate — clipped open from the centre. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute right-gutter top-1/2 hidden h-28 w-40 -translate-y-1/2 overflow-hidden border border-hairline opacity-0 [clip-path:inset(50%_0%)] transition-all duration-800 ease-expo group-hover:opacity-100 group-hover:[clip-path:inset(0%_0%)] lg:block"
+        >
+          <ProjectVisual variant={project.visual} className="h-full w-full" />
+        </div>
+      </article>
+    );
+  }
+
+  const plate = (
+    <>
+      <div className="absolute inset-0 [clip-path:inset(7%)] transition-[clip-path,transform] duration-800 ease-expo group-hover:scale-[1.02] group-hover:[clip-path:inset(0%)]">
+        <ProjectVisual variant={project.visual} className="h-full w-full" />
+      </div>
+
+      <span className="meta absolute left-4 top-4 bg-canvas px-2 py-1 text-ink/60">
+        {project.category}
+      </span>
+
+      <span className="meta absolute bottom-4 right-4 translate-y-3 bg-accent px-2.5 py-1.5 text-canvas opacity-0 transition-all duration-600 ease-expo group-hover:translate-y-0 group-hover:opacity-100">
+        {onPreview ? "Preview" : "View ↗"}
+      </span>
+    </>
+  );
+
+  const plateClass =
+    "relative block aspect-[4/3] w-full overflow-hidden border border-hairline bg-bone text-left transition-colors duration-600 ease-expo group-hover:border-accent";
+
+  return (
+    <article {...revealAttr} className="group">
+      {onPreview ? (
+        <button
+          type="button"
+          onClick={() => onPreview(project)}
+          aria-label={`Preview ${project.title}`}
+          className={plateClass}
+        >
+          {plate}
+        </button>
+      ) : (
+        <a
+          href={project.href}
+          target="_blank"
+          rel="noreferrer noopener"
+          className={plateClass}
+        >
+          {plate}
+        </a>
+      )}
+
+      <div className="mt-5 flex items-start justify-between gap-6">
+        <div>
+          <h3 className="text-title font-medium">
+            <a
+              href={project.href}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="transition-colors duration-400 ease-expo hover:text-accent group-hover:text-accent"
+            >
+              {project.title}
+            </a>
+          </h3>
+          <p className="meta mt-2 text-ink/45">{project.client}</p>
+        </div>
+        <span className="meta tnum shrink-0 text-ink/35">{project.year}</span>
+      </div>
+
+      <p className="mt-4 max-w-prose text-sm leading-relaxed text-ink/55">
+        {project.summary}
+      </p>
+
+      <ul className="mt-5 flex flex-wrap gap-2">
+        {project.stack.map((tag) => (
+          <li
+            key={tag}
+            className="micro border border-hairline px-2 py-1 text-ink/50 transition-colors duration-400 ease-expo group-hover:border-accent/30"
+          >
+            {tag}
+          </li>
+        ))}
+      </ul>
+    </article>
+  );
+}

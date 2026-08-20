@@ -1,0 +1,491 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * Registered custom properties.
+ *
+ * Registering these gives the browser a type to interpolate, so the reveal
+ * band's position and width can transition on independent curves from one
+ * clip-path declaration. Without @property they still work — they just snap
+ * instead of easing.
+ */
+@property --reveal-position {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 50%;
+}
+
+/**
+ * Fully collapsed means zero, not a hairline — a 1px initial value renders as
+ * a visible blue line at rest.
+ *
+ * Width and position are both written by the same rAF tick in HeroSpotlight,
+ * in the same paint frame, with no CSS transition on either. A CSS-eased width
+ * against a JS-lerped position is what produced ghosting between the base and
+ * reveal layers during fast pointer movement.
+ */
+@property --reveal-width {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+@property --overlay-axis-left {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+
+@property --overlay-axis-right {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+@layer base {
+  :root {
+    --canvas: #ffffff;
+    --bone: #f4f4f0;
+    --ink: #0d0d0d;
+    --hairline: #e0e0dc;
+    --accent: #1b17ff;
+    --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-magnet: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+    /* Hero type scale */
+    --hero-headline-size: clamp(2.5rem, 0.75rem + 9.1vw, 5.25rem);
+    --hero-heading-tracking: -0.04em;
+    --hero-headline-line-height: 0.94;
+    --hero-body-tracking: -0.005em;
+    --hero-body-line-height: 1.56;
+    --hero-description-size: clamp(1rem, 0.925rem + 0.32vw, 1.125rem);
+
+    --header-h: 60px;
+    /* Drawer closed: only the right 7rem band of the panel is visible. */
+    --overlay-axis-left: calc(100% - 7rem);
+    --overlay-axis-right: 0px;
+
+    --reveal-axis-width: 7rem;
+
+    /* Pointer drift for the hero CTA, published where the reveal mirror can
+       read it. See --site-button-bracket-* under .magnetic. */
+    --mirror-bracket-x: 0px;
+    --mirror-bracket-y: 0px;
+  }
+
+  /* Desktop override for the headline — the base clamp above is the mobile
+     rule. Lands in the 72–96px band at desktop widths. */
+  @media (min-width: 75rem) and ((min-height: 42rem) or ((hover: hover) and (pointer: fine))) {
+    :root {
+      --hero-headline-size: clamp(4.5rem, 5vw, 6rem);
+    }
+  }
+
+  * {
+    @apply border-hairline;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Lenis drives scroll position; the native smooth behaviour must stay off. */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
+  body {
+    @apply bg-canvas text-ink font-sans antialiased;
+    font-feature-settings: "ss01" 1, "cv05" 1, "tnum" 1;
+  }
+
+  ::selection {
+    background-color: var(--accent);
+    color: #ffffff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  /* Numeric UI (clocks, indices, counters) must never reflow while ticking. */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+}
+
+@layer components {
+  /* ---- Structural grid ------------------------------------------------ */
+  .shell {
+    @apply mx-auto w-full max-w-grid px-gutter;
+  }
+
+  .hairline-t {
+    @apply border-t border-hairline;
+  }
+  .hairline-b {
+    @apply border-b border-hairline;
+  }
+
+  /* ---- Editorial meta type -------------------------------------------- */
+  .meta {
+    @apply font-mono text-meta uppercase tracking-[0.14em];
+  }
+  .micro {
+    @apply font-mono text-micro uppercase tracking-[0.18em];
+  }
+
+  /* ---- Line-reveal primitive ------------------------------------------ */
+  .reveal-line {
+    @apply block overflow-hidden;
+  }
+  .reveal-line > span {
+    @apply block will-change-transform;
+  }
+  /* Pre-hidden only when JS is confirmed present, so no-JS renders fine. */
+  .js .reveal-line > span {
+    transform: translateY(110%);
+    opacity: 0;
+  }
+  .js [data-reveal-fade] {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  /* ---- Underline that wipes in from the left -------------------------- */
+  .link-wipe {
+    @apply relative inline-block transition-colors duration-400 ease-expo;
+  }
+  .link-wipe::after {
+    content: "";
+    @apply absolute -bottom-0.5 left-0 h-px w-full origin-right scale-x-0 bg-accent;
+    transition: transform 0.5s var(--ease-expo);
+  }
+  .link-wipe:hover {
+    @apply text-accent;
+  }
+  .link-wipe:hover::after {
+    @apply origin-left scale-x-100;
+  }
+
+  /* ---- Hero entrance ---------------------------------------------------
+     Deliberately CSS, not GSAP. Both hero layers run the same keyframes and
+     mount in the same commit, so they stay frame-synced — a JS tween driving
+     only one layer would break their pixel register. */
+  @keyframes heroRise {
+    from {
+      opacity: 0;
+      transform: translateY(1.25rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .hero-rise {
+    animation: heroRise 1s var(--ease-expo) both;
+  }
+
+  .hero-headline {
+    font-size: var(--hero-headline-size);
+    line-height: var(--hero-headline-line-height);
+    letter-spacing: var(--hero-heading-tracking);
+    font-weight: 700;
+  }
+
+  .hero-description {
+    font-size: var(--hero-description-size);
+    line-height: var(--hero-body-line-height);
+    letter-spacing: var(--hero-body-tracking);
+  }
+
+  /* ---- Hero dual-layer cursor spotlight -------------------------------- */
+
+  /* State lives on <html> so every reveal layer — the hero's and the fixed
+     header's — reads one source of truth and clips identically.
+
+     visibility, NOT display. Both of these rules toggle at runtime, and taking
+     an element out of `display` and putting it back **restarts every CSS
+     animation inside it**. The reveal layer runs the same `hero-rise` entrance
+     as the base layer, on the same staggered delays — so each toggle replayed
+     that entrance on the mirror alone, and for the next second the white copy
+     sat up to 1.25rem below its black counterpart, one element at a time in
+     delay order. That is the headline tearing apart mid-scroll.
+
+     visibility:hidden paints nothing and takes no hits, exactly like display:
+     none here (both layers are already absolute/fixed, inert and
+     pointer-events:none, so neither reserves space or catches a click), but it
+     leaves running animations alone. */
+  html:not([data-reveal-ready="true"]) .reveal-clip {
+    visibility: hidden;
+  }
+
+  /* The drawer owns the screen while open — no band through the scrim. */
+  html[data-menu-open="true"] .reveal-clip {
+    visibility: hidden;
+  }
+
+  /* While the section wipe sits behind the fixed header, invert the header's
+     own ink so it stays legible against the accent field. */
+  html[data-wipe-cover="true"] [data-header-tone] {
+    color: #f6f6f4;
+  }
+  html[data-wipe-cover="true"] [data-header-mark] {
+    background-color: #f6f6f4;
+  }
+  html[data-wipe-cover="true"] [data-header-logo] {
+    filter: brightness(0) invert(1);
+  }
+
+  /* Layer 2 sits directly over Layer 1 and is clipped to a vertical band
+     centred on --reveal-position. Both layers render identical content, so
+     the band reads as an inversion of whatever it passes over. */
+  /* Position is lerped in JS every frame, so only the width transitions —
+     and it transitions on <html>, where it is set, then inherits down to
+     every .reveal-clip element already animated. */
+  .reveal-clip {
+    clip-path: inset(
+      0 calc(100% - var(--reveal-position) - var(--reveal-width) / 2) 0
+        calc(var(--reveal-position) - var(--reveal-width) / 2)
+    );
+  }
+
+  /* ---- Scroll-driven section wipe --------------------------------------
+     Defaults are a zero-width seam, so an unwritten veil paints nothing —
+     on mobile, under reduced motion, or before the trigger first fires. */
+  .section-sticky {
+    clip-path: inset(
+      var(--section-clip-top, 0px) var(--section-clip-right, 50%)
+        var(--section-clip-bottom, 0px) var(--section-clip-left, 50%)
+    );
+  }
+
+  /* Copy that exists only inside the wipe.
+
+     About Us's headline, lede and stat figures are not recoloured by the
+     wipe — they are absent from the page until the accent field arrives and
+     paints them in white. The base layer still carries the real text for
+     screen readers, no-JS visitors, and any viewport the wipe never runs on,
+     which is why it is hidden with opacity rather than removed.
+
+     !important is load-bearing: these elements are `[data-reveal-fade]`
+     targets, and the reveal timeline tweens `opacity` as an inline style. A
+     plain class would lose to it the moment the section scrolled into view. */
+  html[data-section-wipe="true"] .wipe-copy-base {
+    opacity: 0 !important;
+  }
+
+  /* The About Us CTA spends the whole blue phase underneath an opaque veil,
+     so its own :hover is invisible — and hovering it to the accent colour
+     made it invisible a second way, by matching the field behind it exactly.
+     The mirror inverts instead: a filled white panel with accent ink, which
+     nothing in this palette can swallow. */
+  [data-wipe-root]:has([data-about-cta="base"]:hover) [data-about-cta="reveal"],
+  [data-wipe-root]:has([data-about-cta="base"]:focus-visible) [data-about-cta="reveal"] {
+    background-color: var(--canvas);
+    border-color: var(--canvas);
+    color: var(--accent);
+  }
+  [data-wipe-root]:has([data-about-cta="base"]:hover)
+    [data-about-cta="reveal"]
+    > [aria-hidden="true"],
+  [data-wipe-root]:has([data-about-cta="base"]:focus-visible)
+    [data-about-cta="reveal"]
+    > [aria-hidden="true"] {
+    transform: translateX(0.25rem);
+  }
+
+  /* Same problem in the hero: hovering the real `[ Let's talk ]` splays its
+     brackets, but wherever the band covers that corner the visitor is looking
+     at the mirror, which would sit perfectly still. Replay the splay — and the
+     pointer drift with it — so the two layers never disagree about where the
+     brackets are. */
+  [data-hero]:has([data-hero-cta="base"] .magnetic:hover)
+    [data-hero-cta="reveal"]
+    [data-bracket="open"] {
+    transform: translate(
+        calc(var(--mirror-bracket-x) - 0.34rem),
+        var(--mirror-bracket-y)
+      )
+      scale(1.07);
+  }
+  [data-hero]:has([data-hero-cta="base"] .magnetic:hover)
+    [data-hero-cta="reveal"]
+    [data-bracket="close"] {
+    transform: translate(
+        calc(var(--mirror-bracket-x) + 0.34rem),
+        var(--mirror-bracket-y)
+      )
+      scale(1.07);
+  }
+  [data-hero]:has([data-hero-cta="base"] .magnetic:hover)
+    [data-hero-cta="reveal"]
+    [data-bracket-label] {
+    transform: translate(
+      calc(var(--mirror-bracket-x) * 0.4),
+      calc(var(--mirror-bracket-y) * 0.4)
+    );
+  }
+
+  /* ---- Drawer nav hover cues ------------------------------------------- */
+  .menu-link {
+    --cue-opacity: 0;
+    --cue-clip: inset(0 100% 0 0);
+  }
+  /* Current page keeps its cue visible at rest… */
+  .menu-link[data-current="true"] {
+    --cue-opacity: 1;
+    --cue-clip: inset(0 0 0 0);
+  }
+  /* …but any hover/focus in the list takes over completely. The :has()
+     selectors outrank the [data-current] rule, so exactly one cue shows. */
+  .menu-nav:has(.menu-link:hover) .menu-link,
+  .menu-nav:has(.menu-link:focus-visible) .menu-link {
+    --cue-opacity: 0;
+    --cue-clip: inset(0 100% 0 0);
+  }
+  .menu-nav:has(.menu-link:hover) .menu-link:hover,
+  .menu-nav:has(.menu-link:focus-visible) .menu-link:focus-visible {
+    --cue-opacity: 1;
+    --cue-clip: inset(0 0 0 0);
+  }
+  .menu-cue {
+    opacity: var(--cue-opacity);
+    clip-path: var(--cue-clip);
+    transition:
+      opacity 0.42s var(--ease-expo),
+      clip-path 0.42s var(--ease-expo);
+  }
+
+  /* ---- Menu drawer: an inline clip-path panel, not a modal sheet -------
+     Both transitions must live in one declaration. A Tailwind
+     `transition-opacity` utility on the same element emits the `transition`
+     shorthand from a later cascade layer, which would silently drop the
+     clip-path transition and make the panel snap open. */
+  .drawer-panel {
+    clip-path: inset(0 var(--overlay-axis-right) 0 var(--overlay-axis-left));
+    transition:
+      clip-path 0.52s var(--ease-expo),
+      opacity 0.4s var(--ease-expo);
+  }
+
+  /* ---- Corner brackets for bordered/box CTAs ---------------------------
+     Four L-marks drawn as eight gradients on one pseudo-element, so no extra
+     DOM. Applied only to bordered buttons — never to the bracketed
+     `[ Let's talk ]`, which keeps its magnetic spread below. */
+  .cta-box {
+    position: relative;
+  }
+  .cta-box::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition:
+      opacity 0.28s var(--ease-expo),
+      inset 0.28s var(--ease-expo);
+    background-repeat: no-repeat;
+    background-image:
+      linear-gradient(var(--accent), var(--accent)),
+      linear-gradient(var(--accent), var(--accent)),
+      linear-gradient(var(--accent), var(--accent)),
+      linear-gradient(var(--accent), var(--accent)),
+      linear-gradient(var(--accent), var(--accent)),
+      linear-gradient(var(--accent), var(--accent)),
+      linear-gradient(var(--accent), var(--accent)),
+      linear-gradient(var(--accent), var(--accent));
+    background-size:
+      9px 1px, 1px 9px,
+      9px 1px, 1px 9px,
+      9px 1px, 1px 9px,
+      9px 1px, 1px 9px;
+    background-position:
+      left top, left top,
+      right top, right top,
+      left bottom, left bottom,
+      right bottom, right bottom;
+  }
+  .cta-box:hover::after,
+  .cta-box:focus-visible::after {
+    opacity: 1;
+    inset: -5px;
+  }
+
+  /* ---- Magnetic bracket CTA ------------------------------------------- */
+  .magnetic {
+    --site-button-bracket-x: 0px;
+    --site-button-bracket-y: 0px;
+  }
+  .magnetic [data-bracket] {
+    transition: transform 0.18s var(--ease-magnet);
+  }
+  .magnetic:hover [data-bracket="open"] {
+    transform: translate(
+        calc(var(--site-button-bracket-x) - 0.34rem),
+        var(--site-button-bracket-y)
+      )
+      scale(1.07);
+  }
+  .magnetic:hover [data-bracket="close"] {
+    transform: translate(
+        calc(var(--site-button-bracket-x) + 0.34rem),
+        var(--site-button-bracket-y)
+      )
+      scale(1.07);
+  }
+  .magnetic [data-bracket-label] {
+    transition: transform 0.18s var(--ease-magnet);
+  }
+  .magnetic:hover [data-bracket-label] {
+    transform: translate(
+      calc(var(--site-button-bracket-x) * 0.4),
+      calc(var(--site-button-bracket-y) * 0.4)
+    );
+  }
+}
+
+@layer utilities {
+  .ease-expo {
+    transition-timing-function: var(--ease-expo);
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js .reveal-line > span,
+  .js [data-reveal-fade] {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+  /* No cursor spotlight — the inverted layers are hidden outright rather than
+     tracking the pointer. The drawer still opens, just without the ease. */
+  .reveal-clip {
+    display: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
