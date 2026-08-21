@@ -27,23 +27,6 @@ export default function HeroContent({ variant }: { variant: "base" | "reveal" })
 
   return (
     <div className="flex h-full min-h-[100svh] flex-col px-gutter pb-8 pt-[var(--header-h)]">
-      {/* Section marker. The home page is 01 in the menu's numbering, so the
-          hero carries it the same way every other section carries its own. */}
-      <p
-        className="hero-rise meta mt-5 flex items-baseline gap-2"
-        style={{ animationDelay: "0.02s" }}
-      >
-        <span className={`tnum ${isReveal ? "text-mist" : "text-accent"}`}>
-          {navigation[0].index}
-        </span>
-        <span aria-hidden="true" className={isReveal ? "text-mist/40" : "text-ink/25"}>
-          /
-        </span>
-        <span className={isReveal ? "text-mist" : "text-graphite"}>
-          {navigation[0].label}
-        </span>
-      </p>
-
       {/* Centred in the space above the footer row, then biased down 8vh so it
           reads as lower-middle. translate-y is a pure paint offset, so it
           can't shift the footer row or the centring maths.
@@ -59,6 +42,26 @@ export default function HeroContent({ variant }: { variant: "base" | "reveal" })
             lede straight through the clock beneath it. There is only room for
             the bias once there is slack to spend, so it starts at `sm`. */}
         <div className="sm:translate-y-[8vh]">
+          {/* Section marker. The home page is 01 in the menu's numbering, so
+              the hero carries it the same way every other section carries its
+              own — and it sits with the statement rather than pinned to the top
+              of the hero, where it was stranded above a few hundred pixels of
+              nothing. */}
+          <p
+            className="hero-rise meta mb-8 flex items-baseline gap-2 sm:mb-10"
+            style={{ animationDelay: "0.02s" }}
+          >
+            <span className={`tnum ${isReveal ? "text-mist" : "text-accent"}`}>
+              {navigation[0].index}
+            </span>
+            <span aria-hidden="true" className={isReveal ? "text-mist/40" : "text-ink/25"}>
+              /
+            </span>
+            <span className={isReveal ? "text-mist" : "text-graphite"}>
+              {navigation[0].label}
+            </span>
+          </p>
+
           <Heading
             className={`hero-rise hero-headline max-w-[24ch] ${headingTone}`}
             style={{ animationDelay: "0.08s" }}

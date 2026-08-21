@@ -95,10 +95,14 @@
   }
 
   /* Desktop override for the headline — the base clamp above is the mobile
-     rule. Lands in the 72–96px band at desktop widths. */
+     rule.
+     7vw, measured off the reference: at 1920 that is 134px against its 134.4,
+     on the same 0.94 line-height ratio and the same 700 weight. The previous
+     5vw capped at 96px left the statement floating in the middle of an empty
+     hero; at this scale it carries the viewport the way it is meant to. */
   @media (min-width: 75rem) and ((min-height: 42rem) or ((hover: hover) and (pointer: fine))) {
     :root {
-      --hero-headline-size: clamp(4.5rem, 5vw, 6rem);
+      --hero-headline-size: clamp(4.5rem, 7vw, 8.5rem);
     }
   }
 
