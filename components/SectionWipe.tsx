@@ -2,9 +2,22 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 
-/** Same gate specia1ne uses for its hero→work motion. */
+/**
+ * Where the wipe runs.
+ *
+ * No width condition. The reference gates its equivalent motion to tablet and
+ * up, but the wipe is the section's whole identity here, and a phone was the
+ * one place it never played. What it needs is vertical room to read as a sweep
+ * and a visitor who has not asked for stillness — neither of which is a
+ * question about width.
+ *
+ * With no pointer band on a phone, the hero's band marker resolves to a
+ * zero-width point at the centre of the viewport, so captureBand starts the
+ * field from a seam there and opens it outward. That is the same code path
+ * desktop takes when the pointer is idle.
+ */
 const ENABLE_QUERY =
-  "(min-width: 48rem) and (min-height: 37.5rem) and (prefers-reduced-motion: no-preference)";
+  "(min-height: 37.5rem) and (prefers-reduced-motion: no-preference)";
 
 /**
  * How much of the viewport still shows About Us once the blue has fully lifted.
