@@ -302,7 +302,7 @@ export default function Header() {
         ref={panelRef}
         aria-label="Primary"
         aria-hidden={!open}
-        className={`drawer-panel fixed inset-y-0 right-0 z-40 w-full bg-accent text-mist ${
+        className={`drawer-panel fixed inset-y-0 right-0 z-[60] w-full bg-accent text-mist ${
           bandVisible ? "opacity-100" : "opacity-0"
         } ${open ? "" : "pointer-events-none"}`}
         style={
@@ -312,26 +312,49 @@ export default function Header() {
           } as React.CSSProperties
         }
       >
-        <div className="ml-auto flex h-full w-drawer flex-col px-10 pb-10">
-          {/* Eyebrow — shares the header row with the Close control that sits
-              at the opposite end, so the two align vertically. */}
-          <p
-            style={{ transitionDelay: open ? "120ms" : "0ms" }}
-            className={`flex h-[var(--header-h)] shrink-0 items-center gap-2 text-xs uppercase tracking-[0.12em] transition-all duration-600 ease-expo ${
-              open ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
-            }`}
-          >
-            <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-none bg-mist" />
-            <span className="text-mist">Menu</span>
-            <span aria-hidden="true" className="text-mist/50">
-              /
-            </span>
-            <span className="text-mist/80">
-              {navigation[0].index}–{navigation[navigation.length - 1].index}
-            </span>
-          </p>
+        {/* max-w rather than a fixed width: at 25rem the column was wider than
+            a phone and pushed its own right edge — and the cue with it — off
+            screen. */}
+        <div className="ml-auto flex h-full w-full max-w-drawer flex-col px-gutter pb-8 sm:px-10 sm:pb-10">
+          {/* The drawer carries its own bar. It sits above the site's, which is
+              covered while this is open, so Close has to live in here — on a
+              phone the panel is full-bleed and the real toggle is underneath
+              it entirely. */}
+          <div className="flex h-[var(--header-h)] shrink-0 items-center justify-between gap-4">
+            <p
+              style={{ transitionDelay: open ? "120ms" : "0ms" }}
+              className={`flex items-center gap-2 text-xs uppercase tracking-[0.12em] transition-all duration-600 ease-expo ${
+                open ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
+              }`}
+            >
+              <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-none bg-mist" />
+              <span className="text-mist">Menu</span>
+              <span aria-hidden="true" className="text-mist/50">
+                /
+              </span>
+              <span className="text-mist/80">
+                {navigation[0].index}–{navigation[navigation.length - 1].index}
+              </span>
+            </p>
 
-          <nav className="menu-nav mt-12">
+            <button
+              type="button"
+              onClick={close}
+              tabIndex={open ? 0 : -1}
+              style={{ transitionDelay: open ? "120ms" : "0ms" }}
+              className={`flex items-center gap-3 font-mono text-base uppercase tracking-normal text-mist transition-all duration-600 ease-expo ${
+                open ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
+              }`}
+            >
+              Close
+              <span aria-hidden="true" className="relative block h-4 w-4">
+                <span className="absolute left-0 top-1/2 h-px w-full -translate-y-1/2 rotate-45 bg-mist" />
+                <span className="absolute left-0 top-1/2 h-px w-full -translate-y-1/2 -rotate-45 bg-mist" />
+              </span>
+            </button>
+          </div>
+
+          <nav className="menu-nav mt-8 sm:mt-12">
             <ul>
               {navigation.map((item, i) => (
                 <li key={item.href}>
@@ -340,7 +363,7 @@ export default function Header() {
                     tabIndex={open ? 0 : -1}
                     data-current={isActive(item.href) ? "true" : "false"}
                     style={{ transitionDelay: open ? `${140 + i * 55}ms` : "0ms" }}
-                    className={`menu-link group flex items-baseline gap-4 border-b border-mist/15 py-[2.34rem] transition-all duration-600 ease-expo ${
+                    className={`menu-link group flex items-baseline gap-4 border-b border-mist/15 py-5 transition-all duration-600 ease-expo sm:py-[2.34rem] ${
                       open ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
                     }`}
                   >
@@ -350,7 +373,7 @@ export default function Header() {
                       {item.label}
                     </span>
 
-                    <span className="menu-cue micro ml-auto whitespace-nowrap text-mist/70">
+                    <span className="menu-cue micro ml-3 whitespace-nowrap text-mist/70 sm:ml-auto">
                       [ {item.cue} ]
                     </span>
                   </Link>
@@ -361,7 +384,7 @@ export default function Header() {
 
           <div
             style={{ transitionDelay: open ? "420ms" : "0ms" }}
-            className={`mt-auto flex items-center gap-3 pt-10 transition-all duration-600 ease-expo ${
+            className={`mt-auto flex items-center gap-3 pt-8 transition-all duration-600 ease-expo sm:pt-10 ${
               open ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
             }`}
           >

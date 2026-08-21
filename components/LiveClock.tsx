@@ -101,8 +101,12 @@ export default function LiveClock({
   const figure = isReveal ? "text-mist" : "text-accent";
 
   return (
-    <span className={`meta inline-flex items-center gap-2 whitespace-nowrap ${className}`}>
-      {label ? <span className={muted}>{label}</span> : null}
+    // Wraps rather than running off the edge: on a phone the label takes one
+    // line and the figure the next, which is how it reads on the reference.
+    <span
+      className={`meta inline-flex flex-wrap items-center gap-x-2 gap-y-1 ${className}`}
+    >
+      {label ? <span className={`whitespace-nowrap ${muted}`}>{label}</span> : null}
       <span className={`tnum ${figure}`} suppressHydrationWarning>
         {time}
       </span>
