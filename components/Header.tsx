@@ -26,10 +26,20 @@ const NAV_TRAVEL = 104;
 /** Where the scroll-spy decides a section has become the current one. */
 const SPY_LINE = 45;
 
+/**
+ * How far down still counts as "at the top", in px.
+ *
+ * The availability note lives in the band between the bar and the page, which
+ * is empty space only while nothing has scrolled up into it yet.
+ */
+const TOP_ZONE = 8;
+
 export default function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [navGone, setNavGone] = useState(false);
+  /** True while the page is at rest at the very top. */
+  const [atTop, setAtTop] = useState(true);
   /** Which menu entry the home page is currently scrolled into. */
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const { stop, start } = useSmoothScroll();
@@ -37,6 +47,7 @@ export default function Header() {
   const panelRef = useRef<HTMLElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const goneRef = useRef(false);
+  const atTopRef = useRef(true);
 
   const close = useCallback(() => setOpen(false), []);
 
@@ -111,44 +122,47 @@ export default function Header() {
       setNavGone(value);
     };
 
-    const apply = (p: number) => {
-      write(p);
-      settle(p > 0.98);
+    const settleTop = (value: boolean) => {
+      if (atTopRef.current === value) return;
+      atTopRef.current = value;
+      setAtTop(value);
     };
 
     const hero = document.querySelector<HTMLElement>("[data-hero]");
-    if (!hero) {
-      apply(0);
-      return () => {
-        root.style.removeProperty("--nav-exit");
-      };
-    }
 
     // A zero-length trigger used purely to read the scroll position where the
     // veil finishes receding. Sharing EXIT_END with SectionWipe is what keeps
     // "the bar docks when the blue has gone" true rather than approximately
     // true — one string, one number, no drift if the wipe is ever retimed.
-    const about = document.querySelector<HTMLElement>("#about");
+    const about = hero ? document.querySelector<HTMLElement>("#about") : null;
     const dock = about
       ? ScrollTrigger.create({ trigger: about, start: EXIT_END, end: EXIT_END })
       : null;
 
     const at = (y: number) => {
+      if (!hero) return 0;
       if (y <= NAV_TRAVEL) return y / NAV_TRAVEL;
       const docked = dock?.start;
       if (docked == null || y <= docked) return 1;
       return Math.max(0, 1 - (y - docked) / NAV_TRAVEL);
     };
 
+    const apply = (y: number) => {
+      const p = at(y);
+      write(p);
+      settle(p > 0.98);
+      settleTop(y <= TOP_ZONE);
+    };
+
     const driver = ScrollTrigger.create({
       start: 0,
       end: "max",
       invalidateOnRefresh: true,
-      onUpdate: (self) => apply(at(self.scroll())),
-      onRefresh: (self) => apply(at(self.scroll())),
+      onUpdate: (self) => apply(self.scroll()),
+      onRefresh: (self) => apply(self.scroll()),
     });
 
-    apply(at(window.scrollY));
+    apply(window.scrollY);
 
     return () => {
       driver.kill();
@@ -229,6 +243,7 @@ export default function Header() {
   const barProps = {
     open,
     bandVisible,
+    atTop,
     onToggle: () => setOpen((v) => !v),
     buttonRef: toggleRef,
   };
@@ -268,7 +283,7 @@ export default function Header() {
         inert
         className="nav-chrome reveal-clip pointer-events-none fixed inset-x-0 top-0 z-[51] pb-14"
       >
-        <HeaderBar variant="reveal" open={open} bandVisible={bandVisible} />
+        <HeaderBar variant="reveal" open={open} bandVisible={bandVisible} atTop={atTop} />
       </div>
 
       {/* Translucent scrim — present only while the panel is open. */}

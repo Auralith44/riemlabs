@@ -10,6 +10,8 @@ type HeaderBarProps = {
   open: boolean;
   /** True when the accent drawer sits behind the bar. */
   bandVisible: boolean;
+  /** True while the page is at rest at the very top. */
+  atTop: boolean;
   onToggle?: () => void;
   buttonRef?: React.Ref<HTMLButtonElement>;
 };
@@ -26,6 +28,7 @@ export default function HeaderBar({
   variant,
   open,
   bandVisible,
+  atTop,
   onToggle,
   buttonRef,
 }: HeaderBarProps) {
@@ -90,10 +93,23 @@ export default function HeaderBar({
     </span>
   );
 
+  // The bar is not a chrome slab sitting on top of the page — it IS the page,
+  // painted in the same surface, with a rule under it. Two things follow from
+  // that and both matter:
+  //
+  //   the fill is `mist`, the hero's own colour, so the top of the site reads
+  //   as one field rather than a white strip laid over a warm one;
+  //
+  //   the rule is drawn by a pseudo-element inset to the page gutter, not a
+  //   `border-b` on the row. A border spans the whole viewport edge to edge; a
+  //   rule that starts and stops on the same margin as the wordmark and the
+  //   headline belongs to the grid, and holds those endpoints at every scroll
+  //   position and every viewport width because the inset is the same clamp
+  //   the gutter itself uses.
   return (
     <div
-      className={`flex h-[var(--header-h)] items-center justify-between gap-6 border-b px-gutter ${
-        isReveal ? "border-mist/25 bg-accent" : "border-hairline bg-canvas"
+      className={`relative flex h-[var(--header-h)] items-center justify-between gap-6 px-gutter after:absolute after:bottom-0 after:left-gutter after:right-gutter after:h-px after:content-[''] ${
+        isReveal ? "bg-accent after:bg-mist/25" : "bg-mist after:bg-hairline"
       }`}
     >
       {isReveal ? (
@@ -118,7 +134,7 @@ export default function HeaderBar({
         </Link>
       )}
 
-      <div className="relative flex flex-col items-end">
+      <div className="flex flex-col items-end">
         {isReveal ? (
           <span className={toggleClass}>
             {menuLabel}
@@ -140,19 +156,30 @@ export default function HeaderBar({
           </button>
         )}
 
-        {/* Availability badge — stacked directly under the Menu toggle. It
-            stays put with the drawer open; only its ink changes, because the
-            accent panel is behind it then. */}
-        <span className="pointer-events-none absolute right-0 top-full mt-2 hidden items-center gap-2 whitespace-nowrap transition-opacity duration-400 ease-expo sm:inline-flex">
-          <span
-            data-header-mark={isReveal ? undefined : ""}
-            className={`h-1.5 w-1.5 rounded-full animate-pulse-dot ${badgeDot}`}
-          />
-          <span data-header-tone={isReveal ? undefined : ""} className={`micro ${badgeTone}`}>
-            Available for Hire
-          </span>
-        </span>
       </div>
+
+      {/* Availability note.
+          Positioned against the ROW rather than the toggle, so it clears the
+          rule instead of straddling it — it belongs to the band between the
+          bar and the page, on the same right margin the rule ends on.
+
+          That band is only empty while nothing has scrolled up into it, so the
+          note is shown at rest at the top and withdrawn as soon as the page
+          moves. Left up, it would sit on top of whatever body copy happened to
+          be passing under the rule. */}
+      <span
+        className={`pointer-events-none absolute right-gutter top-full mt-3 hidden items-center gap-2 whitespace-nowrap transition-opacity duration-400 ease-expo sm:inline-flex ${
+          atTop ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <span
+          data-header-mark={isReveal ? undefined : ""}
+          className={`h-1.5 w-1.5 rounded-full animate-pulse-dot ${badgeDot}`}
+        />
+        <span data-header-tone={isReveal ? undefined : ""} className={`micro ${badgeTone}`}>
+          Available for Hire
+        </span>
+      </span>
     </div>
   );
 }
