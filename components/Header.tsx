@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import HeaderBar from "@/components/HeaderBar";
+import { EXIT_END } from "@/components/SectionWipe";
 import { useSmoothScroll } from "@/components/SmoothScrollProvider";
 import { ScrollTrigger } from "@/lib/gsap";
 import { legalLinks, navigation } from "@/lib/site";
@@ -15,22 +16,23 @@ const AXIS_OPEN = "calc(100% - 25rem)";
 /**
  * Scroll distance the bar is driven over, in px.
  *
- * Kept equal to --nav-travel (6.5rem) so the bar rises exactly one pixel per
+ * Kept equal to --nav-travel (6.5rem) so the bar moves exactly one pixel per
  * pixel of scroll. That 1:1 relationship is the whole point: it makes the bar
- * read as part of the hero, scrolling away with it, rather than as a fixed
- * element playing an exit animation. Scrolling back up brings it down at the
- * same rate, for free, because it is the same mapping in reverse.
+ * read as part of the page rather than an element playing an animation, and
+ * scrolling back up reverses it for free because it is the same mapping.
  */
 const NAV_TRAVEL = 104;
+
+/** Where the scroll-spy decides a section has become the current one. */
+const SPY_LINE = 45;
 
 export default function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [hovered, setHovered] = useState(false);
-  const [keyboardFocus, setKeyboardFocus] = useState(false);
-  const [hash, setHash] = useState("");
   const [navGone, setNavGone] = useState(false);
-  const { stop, start, scrollTo } = useSmoothScroll();
+  /** Which menu entry the home page is currently scrolled into. */
+  const [activeKey, setActiveKey] = useState<string | null>(null);
+  const { stop, start } = useSmoothScroll();
 
   const panelRef = useRef<HTMLElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -41,17 +43,63 @@ export default function Header() {
   useEffect(() => setOpen(false), [pathname]);
 
   /**
-   * The bar leaves at scroll pace and comes back the same way.
+   * Freeze the page and flag the open state on <html>.
    *
-   * --nav-exit is published on <html> and read by BOTH the real bar and its
-   * inverted reveal copy, so the two can never travel by different amounts or
-   * in different frames. Everything the bar contains — wordmark, toggle,
-   * availability badge — sits inside those two elements and therefore moves as
-   * one piece.
+   * The flag is what both reveal layers key off to suppress themselves, so
+   * nothing is left tracking the pointer or sweeping behind the scrim while
+   * the drawer is up. Lenis is stopped and the body is locked so the page
+   * underneath cannot move at all — the drawer is the only thing on screen.
+   */
+  useEffect(() => {
+    if (!open) {
+      delete document.documentElement.dataset.menuOpen;
+      start();
+      return;
+    }
+
+    document.documentElement.dataset.menuOpen = "true";
+    stop();
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+
+    const first = panelRef.current?.querySelector<HTMLAnchorElement>("a[href]");
+    first?.focus();
+
+    return () => {
+      document.body.style.overflow = previous;
+      window.removeEventListener("keydown", onKey);
+
+      // Never leave focus stranded inside a panel that is about to become
+      // aria-hidden and non-interactive.
+      if (panelRef.current?.contains(document.activeElement)) {
+        toggleRef.current?.focus({ preventScroll: true });
+      }
+    };
+  }, [open, stop, start]);
+
+  /**
+   * Where the bar is, as a 0-to-1 scroll progress on --nav-exit.
    *
-   * The React state is only for `inert`; it flips once at the end of the
-   * travel rather than on every scroll frame, so this does not re-render the
-   * drawer sixty times a second.
+   * Published on <html> and read by BOTH the real bar and its inverted reveal
+   * copy, so the two can never travel by different amounts or in different
+   * frames. Everything the bar contains moves as one piece.
+   *
+   * The home page has three regions. Through the hero the bar rises with the
+   * page, one pixel per pixel, and is gone before the headline reaches the
+   * top. It stays gone for the whole of About Us, whose accent field owns the
+   * screen there. It docks again the moment that field finishes lifting, and
+   * from then on it is simply the page's bar — content scrolls up under it and
+   * is cut off at its rule. Scrolling back up reverses each region in turn.
+   *
+   * Interior pages have no hero and no wipe, so the bar is always docked.
+   *
+   * The React state is only for `inert`; it flips once per region rather than
+   * on every scroll frame, so this does not re-render the drawer at 60fps.
    */
   useEffect(() => {
     const root = document.documentElement;
@@ -68,52 +116,109 @@ export default function Header() {
       settle(p > 0.98);
     };
 
-    apply(Math.min(1, Math.max(0, window.scrollY / NAV_TRAVEL)));
+    const hero = document.querySelector<HTMLElement>("[data-hero]");
+    if (!hero) {
+      apply(0);
+      return () => {
+        root.style.removeProperty("--nav-exit");
+      };
+    }
 
-    const trigger = ScrollTrigger.create({
+    // A zero-length trigger used purely to read the scroll position where the
+    // veil finishes receding. Sharing EXIT_END with SectionWipe is what keeps
+    // "the bar docks when the blue has gone" true rather than approximately
+    // true — one string, one number, no drift if the wipe is ever retimed.
+    const about = document.querySelector<HTMLElement>("#about");
+    const dock = about
+      ? ScrollTrigger.create({ trigger: about, start: EXIT_END, end: EXIT_END })
+      : null;
+
+    const at = (y: number) => {
+      if (y <= NAV_TRAVEL) return y / NAV_TRAVEL;
+      const docked = dock?.start;
+      if (docked == null || y <= docked) return 1;
+      return Math.max(0, 1 - (y - docked) / NAV_TRAVEL);
+    };
+
+    const driver = ScrollTrigger.create({
       start: 0,
-      end: NAV_TRAVEL,
+      end: "max",
       invalidateOnRefresh: true,
-      onUpdate: (self) => apply(self.progress),
-      // onUpdate only fires inside the range; the ends have to be pinned or the
-      // bar would freeze at whatever fraction it held when it left.
-      onLeave: () => apply(1),
-      onLeaveBack: () => apply(0),
-      onEnterBack: (self) => apply(self.progress),
+      onUpdate: (self) => apply(at(self.scroll())),
+      onRefresh: (self) => apply(at(self.scroll())),
     });
 
+    apply(at(window.scrollY));
+
     return () => {
-      trigger.kill();
+      driver.kill();
+      dock?.kill();
       root.style.removeProperty("--nav-exit");
     };
   }, [pathname]);
 
+  /**
+   * Scroll-spy for the drawer's resting cue.
+   *
+   * The cue beside each entry marks where you actually are. On an interior
+   * page that is just the route, but the home page carries every section at
+   * once, so the entry has to follow the section crossing the middle of the
+   * screen rather than sit permanently on the first one.
+   */
+  useEffect(() => {
+    if (pathname !== "/") {
+      setActiveKey(null);
+      return;
+    }
+
+    const targets = navigation
+      .map((item) => {
+        const el =
+          item.href === "/"
+            ? document.querySelector<HTMLElement>("[data-hero]")
+            : document.querySelector<HTMLElement>(`#${item.href.slice(1)}`);
+        return el ? { href: item.href, el } : null;
+      })
+      .filter((t): t is { href: string; el: HTMLElement } => t !== null);
+
+    if (targets.length === 0) return;
+
+    const triggers = targets.map(({ href, el }) =>
+      ScrollTrigger.create({
+        trigger: el,
+        start: `top ${SPY_LINE}%`,
+        end: `bottom ${SPY_LINE}%`,
+        onToggle: (self) => {
+          if (self.isActive) setActiveKey(href);
+        },
+      }),
+    );
+
+    // onToggle only reports transitions, so seed from whatever is already
+    // under the line — otherwise a mid-page reload shows the wrong entry.
+    const seeded = triggers.findIndex((t) => t.isActive);
+    setActiveKey(targets[seeded === -1 ? 0 : seeded].href);
+
+    return () => triggers.forEach((t) => t.kill());
+  }, [pathname]);
+
+  // On the home page the current entry is whichever section you are in; on an
+  // interior page it is the route. Index never matches a sub-route, or it
+  // would light up on every page.
   const isActive = (href: string) => {
-    if (href.startsWith("/#")) return pathname === "/" && hash === href.slice(1);
-    if (href === "/") return pathname === "/" && hash === "";
-    return pathname.startsWith(href);
+    if (pathname === "/") return href === (activeKey ?? "/");
+    return href !== "/" && pathname.startsWith(href);
   };
 
-  const onNavClick = (event: React.MouseEvent, href: string) => {
-    if (!href.startsWith("/#") || pathname !== "/") return;
+  // Every entry is a real page now, so navigation is an ordinary link
+  // traversal — nothing to intercept.
 
-    event.preventDefault();
-    const target = href.slice(1);
-    const headerOffset =
-      -(Number.parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue("--header-h"),
-      ) || 0);
-
-    window.history.replaceState(null, "", href);
-    setHash(target);
-    setOpen(false);
-    window.setTimeout(() => scrollTo(target, headerOffset), 180);
-  };
-
-  // The closed 7rem band is a hover/keyboard affordance only. Mouse-click
-  // focus must NOT pin it open — that would leave the blue panel parked on
-  // screen after the drawer closes.
-  const bandVisible = open || hovered || keyboardFocus;
+  // The drawer's accent panel appears only when the drawer is actually open.
+  // It used to also peek out as a 7rem band on hover, which parked a blue
+  // stripe against the bar on every page and cut across the availability
+  // badge. The accent belongs to the cursor band in the hero, where it is a
+  // surprise, not to a permanent affordance.
+  const bandVisible = open;
 
   // `inert` follows the travel so a keyboard user never tabs into a bar that
   // has scrolled off the top. Never while the drawer is open — the toggle has
@@ -125,16 +230,15 @@ export default function Header() {
     open,
     bandVisible,
     onToggle: () => setOpen((v) => !v),
-    onPointerEnter: () => setHovered(true),
-    onPointerLeave: () => setHovered(false),
-    onFocus: (e: React.FocusEvent<HTMLButtonElement>) =>
-      setKeyboardFocus(e.currentTarget.matches(":focus-visible")),
-    onBlur: () => setKeyboardFocus(false),
     buttonRef: toggleRef,
   };
 
   return (
     <>
+      {/* The bar is opaque and carries a rule along its bottom edge. That
+          rule is the site's horizon: everything scrolling up runs under the
+          bar and is cut off there rather than fading out in open space, and
+          everything scrolling back down emerges from it. */}
       <header
         inert={hidden}
         className={`nav-chrome fixed inset-x-0 top-0 z-50 ${chromeState}`}
@@ -218,7 +322,6 @@ export default function Header() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    onClick={(event) => onNavClick(event, item.href)}
                     tabIndex={open ? 0 : -1}
                     data-current={isActive(item.href) ? "true" : "false"}
                     style={{ transitionDelay: open ? `${140 + i * 55}ms` : "0ms" }}

@@ -68,8 +68,10 @@ export default function HeroSpotlight() {
       else delete root.dataset.revealReady;
 
       // While the section wipe owns the transition it drives --reveal-position
-      // and --reveal-width itself, so the band and the veil stay one shape.
+      // and --reveal-width itself, so the band and the veil stay one shape —
+      // and the band is wide and meaningful throughout, never idle.
       if (paused) {
+        delete root.dataset.revealIdle;
         frame = window.requestAnimationFrame(tick);
         return;
       }
@@ -86,6 +88,13 @@ export default function HeroSpotlight() {
 
       root.style.setProperty("--reveal-position", `${currentPosition.toFixed(3)}%`);
       root.style.setProperty("--reveal-width", `${currentWidth.toFixed(3)}px`);
+
+      // Fully collapsed is not the same as narrow: a zero-width clip still
+      // rounds to a visible hairline. Flag the idle state so the stylesheet
+      // can take the layer off screen entirely.
+      if (currentWidth < 0.5) root.dataset.revealIdle = "true";
+      else delete root.dataset.revealIdle;
+
       frame = window.requestAnimationFrame(tick);
     };
 
@@ -198,6 +207,7 @@ export default function HeroSpotlight() {
       targetWidth = 0;
       currentWidth = 0;
       root.style.setProperty("--reveal-width", "0px");
+      root.dataset.revealIdle = "true";
       window.clearTimeout(idleTimer);
       window.cancelAnimationFrame(frame);
       window.removeEventListener("pointermove", onPointerMove);

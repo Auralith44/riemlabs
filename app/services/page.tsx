@@ -42,7 +42,7 @@ export default function ServicesPage() {
   return (
     <>
       <PageIntro
-        index="03"
+        index="04"
         label="Services"
         lines={["What we do,", "and what you", "get for it."]}
         lede="Four disciplines that usually run as one track. Expand any of them for the deliverables, the stack, and how long it typically takes."

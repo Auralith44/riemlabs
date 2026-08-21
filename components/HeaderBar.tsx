@@ -2,20 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import type { PointerEvent as ReactPointerEvent, FocusEvent as ReactFocusEvent } from "react";
 import { site } from "@/lib/site";
 import logoSrc from "@/public/riem-labs-logo.png";
 
 type HeaderBarProps = {
   variant: "base" | "reveal";
   open: boolean;
-  /** True when the blue drawer band sits behind the bar. */
+  /** True when the accent drawer sits behind the bar. */
   bandVisible: boolean;
   onToggle?: () => void;
-  onPointerEnter?: (e: ReactPointerEvent<HTMLButtonElement>) => void;
-  onPointerLeave?: (e: ReactPointerEvent<HTMLButtonElement>) => void;
-  onFocus?: (e: ReactFocusEvent<HTMLButtonElement>) => void;
-  onBlur?: (e: ReactFocusEvent<HTMLButtonElement>) => void;
   buttonRef?: React.Ref<HTMLButtonElement>;
 };
 
@@ -32,20 +27,23 @@ export default function HeaderBar({
   open,
   bandVisible,
   onToggle,
-  onPointerEnter,
-  onPointerLeave,
-  onFocus,
-  onBlur,
   buttonRef,
 }: HeaderBarProps) {
   const isReveal = variant === "reveal";
 
-  // Inside the band everything is white; outside it follows the drawer state.
-  const labelTone = isReveal ? "text-mist" : bandVisible ? "text-mist" : "text-graphite";
+  // Inside the band everything is white. Outside it the bar now paints its own
+  // opaque row, so the label stays dark whatever the drawer is doing — going
+  // white on `bandVisible` left "Close" as white-on-white once the row stopped
+  // letting the accent panel show through from behind.
+  const labelTone = isReveal ? "text-mist" : "text-graphite";
   const markTone = isReveal ? "bg-mist" : "bg-accent";
   const badgeTone = isReveal ? "text-mist" : bandVisible ? "text-mist" : "text-stone";
   const badgeDot = isReveal ? "bg-mist" : "bg-accent";
 
+  // The four marks slide together into a single square on hover. The rule
+  // that moves them lives in globals.css and is keyed off :has(), so it fires
+  // on this copy AND on the reveal mirror from one hover — a `group-hover`
+  // here would only ever reach the copy the pointer is actually over.
   const icon = (
     <span aria-hidden="true" className="relative block h-4 w-4">
       <span
@@ -56,6 +54,7 @@ export default function HeaderBar({
         {[0, 1, 2, 3].map((i) => (
           <span
             key={i}
+            data-nav-mark={i}
             data-header-mark={isReveal ? undefined : ""}
             className={`block h-1.5 w-1.5 rounded-none ${markTone}`}
           />
@@ -93,8 +92,8 @@ export default function HeaderBar({
 
   return (
     <div
-      className={`flex h-[var(--header-h)] items-center justify-between gap-6 px-gutter ${
-        isReveal ? "bg-accent" : ""
+      className={`flex h-[var(--header-h)] items-center justify-between gap-6 border-b px-gutter ${
+        isReveal ? "border-mist/25 bg-accent" : "border-hairline bg-canvas"
       }`}
     >
       {isReveal ? (
@@ -130,11 +129,8 @@ export default function HeaderBar({
             ref={buttonRef}
             type="button"
             data-reveal-anchor="menu"
+            data-nav-toggle=""
             onClick={onToggle}
-            onPointerEnter={onPointerEnter}
-            onPointerLeave={onPointerLeave}
-            onFocus={onFocus}
-            onBlur={onBlur}
             aria-expanded={open}
             aria-controls="menu-drawer"
             className={toggleClass}
@@ -144,12 +140,10 @@ export default function HeaderBar({
           </button>
         )}
 
-        {/* Availability badge — stacked directly under the Menu toggle. */}
-        <span
-          className={`pointer-events-none absolute right-0 top-full mt-2 hidden items-center gap-2 whitespace-nowrap transition-opacity duration-400 ease-expo sm:inline-flex ${
-            open ? "opacity-0" : "opacity-100"
-          }`}
-        >
+        {/* Availability badge — stacked directly under the Menu toggle. It
+            stays put with the drawer open; only its ink changes, because the
+            accent panel is behind it then. */}
+        <span className="pointer-events-none absolute right-0 top-full mt-2 hidden items-center gap-2 whitespace-nowrap transition-opacity duration-400 ease-expo sm:inline-flex">
           <span
             data-header-mark={isReveal ? undefined : ""}
             className={`h-1.5 w-1.5 rounded-full animate-pulse-dot ${badgeDot}`}

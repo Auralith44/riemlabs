@@ -20,7 +20,7 @@ export default function WorkPage() {
   return (
     <>
       <PageIntro
-        index="01"
+        index="03"
         label="Work"
         lines={["Systems that", "shipped, and", "stayed shipped."]}
         lede="Every project below is live and maintained by the client's own team. Open a preview for the brief, the role we played, and what it was built on."

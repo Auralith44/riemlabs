@@ -40,7 +40,7 @@ export default function ContactPage() {
   return (
     <>
       <PageIntro
-        index="04"
+        index="05"
         label="Contact"
         lines={["Start a", "project."]}
         lede="The more specific the brief, the more useful our first reply. Tell us what you're building, what's hard about it, and roughly what you can spend."

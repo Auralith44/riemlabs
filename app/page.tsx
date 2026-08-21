@@ -12,20 +12,6 @@ import { Fade } from "@/components/RevealText";
 import { featuredProjects } from "@/lib/projects";
 import { services } from "@/lib/services";
 
-const SURFACE = [
-  "Typographic scale & rhythm",
-  "Composition and grid logic",
-  "Motion, state, and feedback",
-  "Imagery, tone, and voice",
-];
-
-const SYSTEM = [
-  "Tokens and primitives",
-  "Content model & routing",
-  "Component contracts",
-  "Performance & a11y budgets",
-];
-
 export default function HomePage() {
   return (
     <>
@@ -45,11 +31,11 @@ export default function HomePage() {
       {/* ── Stats strip ────────────────────────────────────────────── */}
       <StatsBar />
 
-      {/* ── 02 / Work ──────────────────────────────────────────────── */}
-      <RevealSection className="bg-bone">
+      {/* ── 03 / Work ──────────────────────────────────────────────── */}
+      <RevealSection id="work" className="bg-bone">
         <div className="shell py-section">
           <SectionHeader
-            index="02"
+            index="03"
             label="Work"
             lines={["Recent builds,", "in production."]}
             description="A short selection. Each project shipped with a documented system the client's own team now extends."
@@ -77,57 +63,8 @@ export default function HomePage() {
         </div>
       </RevealSection>
 
-      {/* ── 03 / Practice ──────────────────────────────────────────── */}
-      <RevealSection className="bg-canvas">
-        <div className="shell py-section">
-          <SectionHeader
-            index="03"
-            label="Practice"
-            lines={["Surface is what", "they see. System", "is why it holds."]}
-            description="Two halves of the same job. We treat them as one deliverable, because a beautiful page on a weak system is a redesign waiting to happen."
-            aside={
-              <BracketLink href="/about" size="sm">
-                About the studio
-              </BracketLink>
-            }
-          />
-
-          <div className="mt-20 grid border-t border-hairline md:grid-cols-2">
-            {[
-              { title: "Surface", sub: "The visible experience", items: SURFACE, index: "01" },
-              { title: "System", sub: "The operating logic", items: SYSTEM, index: "02" },
-            ].map((col, i) => (
-              <Fade
-                key={col.title}
-                className={`py-12 ${i === 0 ? "md:border-r md:border-hairline md:pr-gutter" : "border-t border-hairline md:border-t-0 md:pl-gutter"}`}
-              >
-                <div className="flex items-baseline gap-3">
-                  <span className="micro tnum text-accent">{col.index}</span>
-                  <h3 className="text-title font-medium">{col.title}</h3>
-                </div>
-                <p className="meta mt-3 text-ink/40">{col.sub}</p>
-
-                <ul className="mt-10">
-                  {col.items.map((item) => (
-                    <li
-                      key={item}
-                      className="group flex items-center justify-between gap-6 border-b border-hairline py-4 text-sm transition-colors duration-400 ease-expo hover:text-accent"
-                    >
-                      {item}
-                      <span className="micro text-ink/20 transition-colors duration-400 ease-expo group-hover:text-accent">
-                        —
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </Fade>
-            ))}
-          </div>
-        </div>
-      </RevealSection>
-
       {/* ── 04 / Services ──────────────────────────────────────────── */}
-      <RevealSection className="bg-bone">
+      <RevealSection id="services" className="bg-bone">
         <div className="shell py-section">
           <SectionHeader
             index="04"
@@ -181,7 +118,7 @@ export default function HomePage() {
       </RevealSection>
 
       {/* ── 05 / Contact ───────────────────────────────────────────── */}
-      <CTABanner />
+      <CTABanner id="contact" />
     </>
   );
 }

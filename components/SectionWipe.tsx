@@ -11,7 +11,7 @@ const ENABLE_QUERY =
  * The recede finishes here rather than at the section boundary, so the section's
  * real light background is on screen for a beat before the dark stats bar.
  */
-const EXIT_END = "bottom 40%";
+export const EXIT_END = "bottom 40%";
 
 const clamp = (min: number, max: number, v: number) => Math.min(max, Math.max(min, v));
 

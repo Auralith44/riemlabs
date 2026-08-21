@@ -24,7 +24,7 @@ export type NavItem = {
 
 export const navigation: NavItem[] = [
   { label: "Index", href: "/", index: "01", cue: "Home" },
-  { label: "About Us", href: "/#about", index: "02", cue: "Studio" },
+  { label: "About Us", href: "/about", index: "02", cue: "Studio" },
   { label: "Work", href: "/work", index: "03", cue: "Proof" },
   { label: "Services", href: "/services", index: "04", cue: "Method" },
   { label: "Contact", href: "/contact", index: "05", cue: "Action" },

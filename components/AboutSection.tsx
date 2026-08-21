@@ -107,7 +107,7 @@ export default function AboutSection({
           className={`flex flex-wrap items-baseline justify-between gap-x-8 gap-y-3 border-t pt-5 ${ruleTone}`}
         >
           <p className="meta flex items-baseline gap-2">
-            <span className={`tnum ${eyebrowIdx}`}>01</span>
+            <span className={`tnum ${eyebrowIdx}`}>02</span>
             <span className={eyebrowSlash}>/</span>
             <span className={headTone}>About Us</span>
           </p>

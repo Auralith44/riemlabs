@@ -252,8 +252,22 @@
     visibility: hidden;
   }
 
-  /* The drawer owns the screen while open — no band through the scrim. */
+  /* The drawer owns the screen while open — no band through the scrim, and
+     nothing moving behind it. */
   html[data-menu-open="true"] .reveal-clip {
+    visibility: hidden;
+  }
+
+  /* Collapsed means gone.
+
+     A zero-width band is expressed as two insets that sum to exactly 100%
+     (left: 49.43%, right: 50.57%), and the two round independently — which
+     left a one-pixel accent hairline standing in the middle of the hero
+     whenever the pointer was idle. The band is meant to be a surprise, so at
+     rest there must be nothing there at all to notice. HeroSpotlight sets this
+     flag the moment the collapse reaches zero and clears it on the first
+     frame of any reopening. */
+  html[data-reveal-idle="true"] .reveal-clip {
     visibility: hidden;
   }
 
@@ -395,6 +409,28 @@
       calc(var(--mirror-bracket-x) * 0.4),
       calc(var(--mirror-bracket-y) * 0.4)
     );
+  }
+
+  /* ---- Menu toggle: four marks become one ------------------------------
+
+     Driven from :has() on the document rather than a `group-hover` on the
+     button, so one hover moves the marks in the real bar and in its reveal
+     mirror at the same time. A group-hover would only ever reach the copy the
+     pointer is physically over, and the other would sit still under the band. */
+  [data-nav-mark] {
+    transition: transform 0.4s var(--ease-expo);
+  }
+  html:has([data-nav-toggle]:hover) [data-nav-mark="0"] {
+    transform: translate(1.5px, 1.5px);
+  }
+  html:has([data-nav-toggle]:hover) [data-nav-mark="1"] {
+    transform: translate(-1.5px, 1.5px);
+  }
+  html:has([data-nav-toggle]:hover) [data-nav-mark="2"] {
+    transform: translate(1.5px, -1.5px);
+  }
+  html:has([data-nav-toggle]:hover) [data-nav-mark="3"] {
+    transform: translate(-1.5px, -1.5px);
   }
 
   /* ---- Drawer nav hover cues ------------------------------------------- */
