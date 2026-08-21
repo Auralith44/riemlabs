@@ -53,7 +53,12 @@ export default function HeroContent({ variant }: { variant: "base" | "reveal" })
           across it — and because both layers are laid out identically, the
           black half and the white half stay in step by construction. */}
       <div className="flex flex-1 flex-col justify-center">
-        <div className="translate-y-[8vh]">
+        {/* The 8vh bias is a paint offset — it moves the block down without
+            telling the layout, so on a phone, where the headline and lede
+            already fill nearly the whole column, it pushed the last line of the
+            lede straight through the clock beneath it. There is only room for
+            the bias once there is slack to spend, so it starts at `sm`. */}
+        <div className="sm:translate-y-[8vh]">
           <Heading
             className={`hero-rise hero-headline max-w-[24ch] ${headingTone}`}
             style={{ animationDelay: "0.08s" }}
@@ -76,12 +81,16 @@ export default function HeroContent({ variant }: { variant: "base" | "reveal" })
           CTA overlapped as one unreadable line. The scroll cue is the one that
           carries no information, so it is the one that goes. */}
       <div
-        className="hero-rise grid grid-cols-2 items-end gap-4 sm:grid-cols-3"
+        className="hero-rise mt-10 grid grid-cols-2 items-end gap-4 sm:mt-0 sm:grid-cols-3"
         style={{ animationDelay: "0.34s" }}
       >
-        <div className="flex items-center gap-2">
+        {/* items-start, not items-center: the clock wraps to two lines on a
+            phone, and a marker centred against both sat in the gutter between
+            them. The 3px lifts it onto the optical centre of the first line,
+            which is where it also sits when the clock is a single line. */}
+        <div className="flex items-start gap-2">
           <span
-            className={`h-1.5 w-1.5 shrink-0 rounded-full animate-pulse-dot ${
+            className={`mt-[3px] h-1.5 w-1.5 shrink-0 rounded-full animate-pulse-dot ${
               isReveal ? "bg-mist" : "bg-accent"
             }`}
           />
