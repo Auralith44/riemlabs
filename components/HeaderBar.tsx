@@ -12,7 +12,11 @@ type HeaderBarProps = {
   bandVisible: boolean;
   /** True while the page is at rest at the very top. */
   atTop: boolean;
+  /** Where the marker's open animation starts from. */
+  origin: "grid" | "dot" | "close";
   onToggle?: () => void;
+  /** Raises/clears the shared reveal-anchor flag the marker reads. */
+  onAnchor?: (active: boolean) => void;
   buttonRef?: React.Ref<HTMLButtonElement>;
 };
 
@@ -29,7 +33,9 @@ export default function HeaderBar({
   open,
   bandVisible,
   atTop,
+  origin,
   onToggle,
+  onAnchor,
   buttonRef,
 }: HeaderBarProps) {
   const isReveal = variant === "reveal";
@@ -39,7 +45,6 @@ export default function HeaderBar({
   // white on `bandVisible` left "Close" as white-on-white once the row stopped
   // letting the accent panel show through from behind.
   const labelTone = isReveal ? "text-mist" : "text-graphite";
-  const markTone = isReveal ? "bg-mist" : "bg-accent";
   const badgeTone = isReveal ? "text-mist" : bandVisible ? "text-mist" : "text-stone";
   const badgeDot = isReveal ? "bg-mist" : "bg-accent";
 
@@ -47,49 +52,37 @@ export default function HeaderBar({
   // that moves them lives in globals.css and is keyed off :has(), so it fires
   // on this copy AND on the reveal mirror from one hover — a `group-hover`
   // here would only ever reach the copy the pointer is actually over.
+  /**
+   * Four marks in a square, which gather to a single dot under the pointer and
+   * unfold into a cross when the drawer opens.
+   *
+   * Each mark's grid position and its cross position are declared as custom
+   * properties on the mark itself, so the stylesheet's keyframes can move any
+   * of them between the two without knowing which one it is holding.
+   */
   const icon = (
-    <span aria-hidden="true" className="relative block h-4 w-4">
-      <span
-        className={`absolute inset-0 grid grid-cols-2 gap-[3px] transition-all duration-400 ease-expo ${
-          open ? "scale-50 opacity-0" : "scale-100 opacity-100"
-        }`}
-      >
-        {[0, 1, 2, 3].map((i) => (
-          <span
-            key={i}
-            data-nav-mark={i}
-            data-header-mark={isReveal ? undefined : ""}
-            className={`block h-1.5 w-1.5 rounded-none ${markTone}`}
-          />
-        ))}
-      </span>
-
-      <span
-        className={`absolute inset-0 transition-all duration-400 ease-expo ${
-          open ? "rotate-0 scale-100 opacity-100" : "-rotate-45 scale-75 opacity-0"
-        }`}
-      >
-        <span
-          data-header-mark={isReveal ? undefined : ""}
-          className={`absolute left-0 top-1/2 h-px w-full -translate-y-1/2 rotate-45 ${markTone}`}
-        />
-        <span
-          data-header-mark={isReveal ? undefined : ""}
-          className={`absolute left-0 top-1/2 h-px w-full -translate-y-1/2 -rotate-45 ${markTone}`}
-        />
-      </span>
+    <span aria-hidden="true" className="menu-marker">
+      {[0, 1, 2, 3].map((i) => (
+        <span key={i} data-header-mark={isReveal ? undefined : ""} />
+      ))}
     </span>
   );
 
   const toggleClass = `group -mr-1 flex items-center gap-3 px-1 py-2 transition-colors duration-400 ease-expo ${labelTone}`;
 
   // 16px, normal tracking — deliberately not the `.meta` scale used elsewhere.
+  //
+  // Both words are always rendered, stacked, and cross-faded: swapping the
+  // string would snap, and the outgoing word needs to still be there to move
+  // out of the way. The box is 5ch — the longer of the two words — so the
+  // button never changes width mid-transition. Monospace makes that exact.
   const menuLabel = (
     <span
       data-header-tone={isReveal ? undefined : ""}
-      className="font-mono text-base uppercase tracking-normal"
+      className="menu-label font-mono text-base uppercase tracking-normal"
     >
-      {open ? "Close" : "Menu"}
+      <span className="menu-word menu-word--menu">Menu</span>
+      <span className="menu-word menu-word--close">Close</span>
     </span>
   );
 
@@ -135,8 +128,17 @@ export default function HeaderBar({
       )}
 
       <div className="flex flex-col items-end">
+        {/* The mirror carries the same state attributes as the real control,
+            because the stylesheet drives the marker off them — without these
+            the reveal copy would sit in its resting grid while the base copy
+            animated, and the band would show the two disagreeing. */}
         {isReveal ? (
-          <span className={toggleClass}>
+          <span
+            data-menu-state={open ? "open" : "closed"}
+            data-menu-origin={origin}
+            data-overlay-control=""
+            className={toggleClass}
+          >
             {menuLabel}
             {icon}
           </span>
@@ -144,9 +146,21 @@ export default function HeaderBar({
           <button
             ref={buttonRef}
             type="button"
-            data-reveal-anchor="menu"
+            /* Two attributes, not one: the flag says "this is an anchor", the
+               name says which. The pointer-band driver matches on the flag. */
+            data-reveal-anchor=""
+            data-reveal-anchor-name="menu"
+            data-overlay-control=""
             data-nav-toggle=""
+            data-menu-state={open ? "open" : "closed"}
+            data-menu-origin={origin}
             onClick={onToggle}
+            onPointerEnter={() => onAnchor?.(true)}
+            onPointerLeave={() => onAnchor?.(false)}
+            onFocus={(e) => {
+              if (e.currentTarget.matches(":focus-visible")) onAnchor?.(true);
+            }}
+            onBlur={() => onAnchor?.(false)}
             aria-expanded={open}
             aria-controls="menu-drawer"
             className={toggleClass}

@@ -9,10 +9,6 @@ import { useSmoothScroll } from "@/components/SmoothScrollProvider";
 import { ScrollTrigger } from "@/lib/gsap";
 import { legalLinks, navigation } from "@/lib/site";
 
-/** Panel geometry, mirrored from the --overlay-axis-* tokens. */
-const AXIS_CLOSED = "calc(100% - 7rem)";
-const AXIS_OPEN = "calc(100% - 25rem)";
-
 /**
  * Scroll distance the bar is driven over, in px.
  *
@@ -42,6 +38,14 @@ export default function Header() {
   const [atTop, setAtTop] = useState(true);
   /** Which menu entry the home page is currently scrolled into. */
   const [activeKey, setActiveKey] = useState<string | null>(null);
+  /**
+   * Where the marker's open animation starts from.
+   *
+   * "dot" when the pointer had already collapsed the four marks to centre
+   * before the click, so the cross grows straight out of that single dot;
+   * "grid" when the click came cold and the marks have to gather first.
+   */
+  const [origin, setOrigin] = useState<"grid" | "dot" | "close">("grid");
   const { stop, start } = useSmoothScroll();
 
   const panelRef = useRef<HTMLElement>(null);
@@ -234,6 +238,35 @@ export default function Header() {
   // surprise, not to a permanent affordance.
   const bandVisible = open;
 
+  /**
+   * The marker's hover state is published as one flag on <html>, and read from
+   * CSS by both the real bar and its reveal mirror. One writer, so the two
+   * layers cannot disagree about whether the marks are gathered.
+   *
+   * It lives here rather than in the pointer-band driver because that driver
+   * only runs on the home page, behind a desktop media query — the marker has
+   * to react on every page the bar appears on.
+   */
+  const markAnchor = useCallback((active: boolean) => {
+    const root = document.documentElement;
+    if (active) root.dataset.revealAnchorActive = "menu";
+    else if (root.dataset.revealAnchorActive === "menu") delete root.dataset.revealAnchorActive;
+  }, []);
+
+  useEffect(() => () => markAnchor(false), [markAnchor]);
+
+  const onToggle = () => {
+    const next = !open;
+    setOrigin(
+      next
+        ? document.documentElement.dataset.revealAnchorActive === "menu"
+          ? "dot"
+          : "grid"
+        : "close",
+    );
+    setOpen(next);
+  };
+
   // `inert` follows the travel so a keyboard user never tabs into a bar that
   // has scrolled off the top. Never while the drawer is open — the toggle has
   // to stay reachable to close it.
@@ -244,7 +277,9 @@ export default function Header() {
     open,
     bandVisible,
     atTop,
-    onToggle: () => setOpen((v) => !v),
+    origin,
+    onToggle,
+    onAnchor: markAnchor,
     buttonRef: toggleRef,
   };
 
@@ -283,50 +318,46 @@ export default function Header() {
         inert
         className="nav-chrome reveal-clip pointer-events-none fixed inset-x-0 top-0 z-[51] pb-14"
       >
-        <HeaderBar variant="reveal" open={open} bandVisible={bandVisible} atTop={atTop} />
+        <HeaderBar
+          variant="reveal"
+          open={open}
+          bandVisible={bandVisible}
+          atTop={atTop}
+          origin={origin}
+        />
       </div>
 
-      {/* Translucent scrim — present only while the panel is open. */}
+      {/* One fixed overlay root; the backdrop and the panel are absolute
+          inside it. The panel used to be revealed by clip-path, which opened
+          it as a widening slot — this slides the whole panel in from the edge
+          instead, which is what the reference does and what reads as a drawer
+          rather than a reveal. */}
       <div
-        onClick={close}
-        aria-hidden="true"
-        className={`fixed inset-0 z-30 transition-opacity duration-520 ease-expo ${
-          open ? "opacity-100" : "pointer-events-none opacity-0"
-        }`}
-        style={{ background: "rgba(242, 241, 235, 0.78)" }}
-      />
-
-      {/* Inline clip-path panel. Full-width element, revealed by clip only. */}
-      <aside
-        id="menu-drawer"
-        ref={panelRef}
-        aria-label="Primary"
-        aria-hidden={!open}
-        className={`drawer-panel fixed inset-y-0 right-0 z-[60] w-full bg-accent text-mist ${
-          bandVisible ? "opacity-100" : "opacity-0"
-        } ${open ? "" : "pointer-events-none"}`}
-        style={
-          {
-            "--overlay-axis-left": open ? AXIS_OPEN : AXIS_CLOSED,
-            "--overlay-axis-right": "0px",
-          } as React.CSSProperties
-        }
+        className="site-overlay fixed inset-0 z-[60]"
+        data-overlay-state={open ? "open" : "closed"}
       >
-        {/* max-w rather than a fixed width: at 25rem the column was wider than
-            a phone and pushed its own right edge — and the cue with it — off
-            screen. */}
-        <div className="ml-auto flex h-full w-full max-w-drawer flex-col px-gutter pb-8 sm:px-10 sm:pb-10">
+        <button
+          type="button"
+          onClick={close}
+          tabIndex={-1}
+          aria-hidden="true"
+          className="site-overlay__backdrop"
+        />
+
+        <aside
+          id="menu-drawer"
+          ref={panelRef}
+          aria-label="Primary"
+          aria-hidden={!open}
+          className="site-overlay__panel bg-accent text-mist"
+        >
+          <div className="flex h-full flex-col px-gutter pb-8 sm:px-10 sm:pb-10">
           {/* The drawer carries its own bar. It sits above the site's, which is
               covered while this is open, so Close has to live in here — on a
               phone the panel is full-bleed and the real toggle is underneath
               it entirely. */}
-          <div className="flex h-[var(--header-h)] shrink-0 items-center justify-between gap-4">
-            <p
-              style={{ transitionDelay: open ? "120ms" : "0ms" }}
-              className={`flex items-center gap-2 text-xs uppercase tracking-[0.12em] transition-all duration-600 ease-expo ${
-                open ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
-              }`}
-            >
+          <div className="site-overlay__eyebrow flex h-[var(--header-h)] shrink-0 items-center justify-between gap-4">
+            <p className="flex items-center gap-2 text-xs uppercase tracking-[0.12em]">
               <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-none bg-mist" />
               <span className="text-mist">Menu</span>
               <span aria-hidden="true" className="text-mist/50">
@@ -341,10 +372,7 @@ export default function Header() {
               type="button"
               onClick={close}
               tabIndex={open ? 0 : -1}
-              style={{ transitionDelay: open ? "120ms" : "0ms" }}
-              className={`flex items-center gap-3 font-mono text-base uppercase tracking-normal text-mist transition-all duration-600 ease-expo ${
-                open ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
-              }`}
+              className="flex items-center gap-3 font-mono text-base uppercase tracking-normal text-mist"
             >
               Close
               <span aria-hidden="true" className="relative block h-4 w-4">
@@ -354,7 +382,7 @@ export default function Header() {
             </button>
           </div>
 
-          <nav className="menu-nav mt-8 sm:mt-12">
+          <nav className="site-overlay__menu menu-nav mt-8 sm:mt-12">
             <ul>
               {navigation.map((item, i) => (
                 <li key={item.href}>
@@ -362,10 +390,7 @@ export default function Header() {
                     href={item.href}
                     tabIndex={open ? 0 : -1}
                     data-current={isActive(item.href) ? "true" : "false"}
-                    style={{ transitionDelay: open ? `${140 + i * 55}ms` : "0ms" }}
-                    className={`menu-link group flex items-baseline gap-4 border-b border-mist/15 py-5 transition-all duration-600 ease-expo sm:py-[2.34rem] ${
-                      open ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
-                    }`}
+                    className="menu-link group flex items-baseline gap-4 border-b border-mist/15 py-5 sm:py-[2.34rem]"
                   >
                     <span className="micro tnum w-6 shrink-0 text-mist/45">{item.index}</span>
 
@@ -382,12 +407,7 @@ export default function Header() {
             </ul>
           </nav>
 
-          <div
-            style={{ transitionDelay: open ? "420ms" : "0ms" }}
-            className={`mt-auto flex items-center gap-3 pt-8 transition-all duration-600 ease-expo sm:pt-10 ${
-              open ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
-            }`}
-          >
+          <div className="site-overlay__footer mt-auto flex items-center gap-3 pt-8 sm:pt-10">
             {legalLinks.map((link, i) => (
               <span key={link.href} className="flex items-center gap-3">
                 {i > 0 ? (
@@ -404,9 +424,10 @@ export default function Header() {
                 </Link>
               </span>
             ))}
+            </div>
           </div>
-        </div>
-      </aside>
+        </aside>
+      </div>
     </>
   );
 }

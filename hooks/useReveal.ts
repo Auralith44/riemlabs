@@ -43,7 +43,11 @@ export function useReveal<T extends HTMLElement = HTMLDivElement>() {
       // replacing it. Without zeroing y, the tween animates the percentage to
       // 0 while the stale pixel offset survives, leaving every line parked
       // just below its own overflow-hidden mask — invisible.
-      gsap.set(lines, { yPercent: 110, y: 0, opacity: 0 });
+      // 120, matching the CSS pre-hide. The mask box is the line plus the
+      // 0.18em of descender padding `.reveal-line` now carries, so clearing it
+      // takes ~118% of the line's own height; 110 left a band of the line's
+      // top edge sitting inside the box, visible before the tween started.
+      gsap.set(lines, { yPercent: 120, y: 0, opacity: 0 });
       gsap.set(fades, { yPercent: 0, y: 18, opacity: 0 });
 
       const explicit = gsap.utils.toArray<HTMLElement>("[data-reveal-block]", root);

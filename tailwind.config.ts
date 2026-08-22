@@ -38,15 +38,15 @@ const config: Config = {
       },
       fontSize: {
         // Editorial display scale — fluid, tuned for tight grotesk settings.
-        display: ["clamp(2.75rem, 7.4vw, 8.25rem)", { lineHeight: "0.9", letterSpacing: "-0.045em" }],
+        display: ["clamp(2.75rem, 7.4vw, 8.25rem)", { lineHeight: "1", letterSpacing: "-0.045em" }],
         // Flush-left hero statement.
         hero: [
           "clamp(2.5rem, 0.75rem + 9.1vw, 5.25rem)",
-          { lineHeight: "0.94", letterSpacing: "-0.04em", fontWeight: "700" },
+          { lineHeight: "1", letterSpacing: "-0.04em", fontWeight: "700" },
         ],
         // Hero intro paragraph.
         intro: ["18px", { lineHeight: "1.56" }],
-        headline: ["clamp(2rem, 4.4vw, 4.5rem)", { lineHeight: "0.96", letterSpacing: "-0.035em" }],
+        headline: ["clamp(2rem, 4.4vw, 4.5rem)", { lineHeight: "1", letterSpacing: "-0.035em" }],
         title: ["clamp(1.5rem, 2.4vw, 2.5rem)", { lineHeight: "1.04", letterSpacing: "-0.025em" }],
         lede: ["clamp(1.05rem, 1.45vw, 1.5rem)", { lineHeight: "1.4", letterSpacing: "-0.015em" }],
         meta: ["0.6875rem", { lineHeight: "1.1", letterSpacing: "0.14em" }],

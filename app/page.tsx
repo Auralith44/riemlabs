@@ -3,6 +3,7 @@ import AboutSection from "@/components/AboutSection";
 import BracketLink from "@/components/BracketLink";
 import CTABanner from "@/components/CTABanner";
 import HeroSpotlight from "@/components/HeroSpotlight";
+import LogoMarquee from "@/components/LogoMarquee";
 import ProjectCard from "@/components/ProjectCard";
 import SectionWipe from "@/components/SectionWipe";
 import StatsBar from "@/components/StatsBar";
@@ -62,6 +63,9 @@ export default function HomePage() {
           </Fade>
         </div>
       </RevealSection>
+
+      {/* ── Tech stack ─────────────────────────────────────────────── */}
+      <LogoMarquee />
 
       {/* ── 04 / Services ──────────────────────────────────────────── */}
       <RevealSection id="services" className="bg-bone">
