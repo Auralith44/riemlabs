@@ -1,9 +1,9 @@
-export type ProjectCategory =
-  | "PRODUCT SYSTEM"
-  | "STUDIO SYSTEM"
-  | "COMMERCE"
-  | "BRAND SYSTEM"
-  | "EDITORIAL";
+/**
+ * What the client does, not what we built. It is the one descriptor the work
+ * rows carry beside the name, so it reads as a sector rather than a taxonomy
+ * of our own deliverables.
+ */
+export type ProjectCategory = string;
 
 export type Project = {
   slug: string;
@@ -24,63 +24,63 @@ export type Project = {
 
 export const projects: Project[] = [
   {
-    slug: "meridian",
+    slug: "oracle-chemicals",
     index: "01",
-    title: "Meridian",
-    client: "Meridian Capital",
+    title: "Oracle Chemicals",
+    client: "Chemical Distributor",
     year: "2026",
-    category: "PRODUCT SYSTEM",
+    category: "Chemical Distributor",
     summary:
-      "A treasury interface for a multi-market fund. Dense tabular data, kept legible through a strict typographic scale and a single accent reserved for state.",
-    role: ["Product design", "Design system", "Front-end"],
-    stack: ["Next.js", "TypeScript", "Tailwind", "Visx"],
+      "A distribution catalogue built for people who arrive knowing exactly what they need. Product data, safety documentation and enquiry routing in one structure a small team can keep current.",
+    role: ["Web systems", "Design system", "Front-end"],
+    stack: ["Next.js", "TypeScript", "Tailwind"],
     visual: "grid",
-    href: "https://example.com/meridian",
+    href: "https://oraclechemicals.co.ke",
     featured: true,
   },
   {
-    slug: "atlas-foundry",
+    slug: "elfi-dental-care",
     index: "02",
-    title: "Atlas Foundry",
-    client: "Atlas Type",
-    year: "2025",
-    category: "STUDIO SYSTEM",
+    title: "Elfi Dental Care",
+    client: "Dental Clinic",
+    year: "2026",
+    category: "Dental Clinic",
     summary:
-      "Specimen platform and licensing flow for an independent type foundry. Every page is a typographic argument for the thing it sells.",
-    role: ["Art direction", "Web systems", "Front-end"],
-    stack: ["Next.js", "GSAP", "Lenis", "Sanity"],
+      "A clinic site that answers the questions a prospective patient actually has — what it costs, how long it takes, who is doing it — and turns the answer into a booking.",
+    role: ["Visual direction", "Web systems", "Front-end"],
+    stack: ["Next.js", "Tailwind", "Sanity"],
     visual: "arc",
-    href: "https://example.com/atlas",
+    href: "https://elfidentalcare.co.ke",
     featured: true,
   },
   {
-    slug: "kilim",
+    slug: "the-village-restaurant",
     index: "03",
-    title: "Kilim",
-    client: "Kilim Goods",
-    year: "2025",
-    category: "COMMERCE",
+    title: "The Village Restaurant",
+    client: "Restaurant",
+    year: "2026",
+    category: "Restaurant",
     summary:
-      "Direct-to-consumer storefront for a textile house. Editorial pacing on the way in, ruthless efficiency at checkout.",
-    role: ["Visual direction", "Commerce build", "Performance"],
-    stack: ["Next.js", "Shopify", "Tailwind", "GSAP"],
+      "Menu, hours and reservations, held in a layout that survives a kitchen changing its mind weekly. Photography carries the room; the type stays out of its way.",
+    role: ["Art direction", "Web systems", "Front-end"],
+    stack: ["Next.js", "Tailwind", "GSAP"],
     visual: "stack",
-    href: "https://example.com/kilim",
+    href: "https://thevillagerestaurant.co.ke",
     featured: true,
   },
   {
-    slug: "northbound",
+    slug: "the-clicq",
     index: "04",
-    title: "Northbound",
-    client: "Northbound Rail",
-    year: "2025",
-    category: "BRAND SYSTEM",
+    title: "THE CLICQ",
+    client: "Marketing & Communications",
+    year: "2026",
+    category: "Marketing & Communications",
     summary:
-      "Identity and digital system for a regional rail operator — wayfinding logic carried intact from platform signage into the booking flow.",
-    role: ["Brand system", "Design system", "Front-end"],
-    stack: ["Next.js", "TypeScript", "Figma", "Storybook"],
-    visual: "rule",
-    href: "https://example.com/northbound",
+      "A studio site for a studio — the hardest brief there is. Case work in front, capability behind it, and a system their own team extends without calling us.",
+    role: ["Design system", "Web systems", "Front-end"],
+    stack: ["Next.js", "TypeScript", "GSAP", "Lenis"],
+    visual: "orbit",
+    href: "https://theclicq.com",
     featured: true,
   },
   {
@@ -145,12 +145,6 @@ export const projects: Project[] = [
   },
 ];
 
-export const categories: ProjectCategory[] = [
-  "PRODUCT SYSTEM",
-  "STUDIO SYSTEM",
-  "COMMERCE",
-  "BRAND SYSTEM",
-  "EDITORIAL",
-];
+export const categories: ProjectCategory[] = [...new Set(projects.map((p) => p.category))];
 
 export const featuredProjects = projects.filter((p) => p.featured);

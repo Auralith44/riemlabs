@@ -18,7 +18,7 @@ export default function CTABanner({
   index = "05",
   label = "Contact",
   lines = ["Let's build the", "next one together."],
-  note = "Currently taking on two engagements for Q3 2026. Tell us the shape of the problem and we'll tell you whether we're the right studio for it.",
+  note = "Whether you have a detailed brief or an early concept, tell us what you're building. We'll review your goals and provide a straightforward path forward within 24 hours.",
 }: CTABannerProps) {
   return (
     <RevealSection id={id} className="bg-ink text-canvas">

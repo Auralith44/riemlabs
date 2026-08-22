@@ -2,10 +2,29 @@
 
 import Link from "next/link";
 import BracketLink from "@/components/BracketLink";
-import LiveClock from "@/components/LiveClock";
+import SocialIcon from "@/components/SocialIcon";
 import { useSmoothScroll } from "@/components/SmoothScrollProvider";
 import { services } from "@/lib/services";
-import { navigation, site, socials } from "@/lib/site";
+import { legalLinks, navigation, site, socials } from "@/lib/site";
+
+/** One column of the right-hand navigation grid. */
+function Column({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <nav aria-label={title}>
+      <p className="micro text-ink/35">{title}</p>
+      <ul className="mt-5 space-y-2.5">{children}</ul>
+    </nav>
+  );
+}
+
+const linkClass =
+  "text-sm text-ink/70 transition-colors duration-400 ease-expo hover:text-accent";
 
 export default function Footer() {
   const { scrollTo } = useSmoothScroll();
@@ -14,72 +33,76 @@ export default function Footer() {
   return (
     <footer className="hairline-t bg-bone">
       <div className="shell">
-        {/* Contact band */}
-        <div className="grid gap-x-gutter gap-y-12 py-section md:grid-cols-12">
-          <div className="md:col-span-7">
-            <p className="meta text-ink/40">Next available — Q3 2026</p>
-            <h2 className="mt-6 text-headline font-medium">
-              Have a project
-              <br />
-              worth building?
+        {/* The band is deliberately shallow. Everything in it sits down against
+            the rule below rather than floating in the middle of a tall block,
+            so the wordmark under that rule reads as the floor of the page. */}
+        <div className="grid gap-x-gutter gap-y-12 pb-10 pt-14 md:grid-cols-12 lg:pt-16">
+          <div className="md:col-span-5">
+            <p className="meta inline-flex items-center gap-2.5 text-ink/45">
+              <span className="status-dot" aria-hidden="true" />
+              Available for new projects
+            </p>
+
+            <h2 className="mt-5 max-w-[16ch] text-headline font-medium">
+              Engineered systems for the performance-obsessed.
             </h2>
-          </div>
 
-          <nav aria-label="Footer" className="md:col-span-3">
-            <p className="meta text-ink/40">Index</p>
-            <ul className="mt-6 space-y-3">
-              {navigation.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="group flex items-baseline gap-2 text-sm transition-colors duration-400 ease-expo hover:text-accent"
-                  >
-                    <span className="micro tnum text-ink/25 transition-colors duration-400 ease-expo group-hover:text-accent">
-                      {item.index}
-                    </span>
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          <div className="md:col-span-2">
-            <p className="meta text-ink/40">Elsewhere</p>
-            <ul className="mt-6 space-y-3">
+            <ul className="mt-8 flex items-center gap-3">
               {socials.map((s) => (
                 <li key={s.label}>
                   <a
                     href={s.href}
                     target="_blank"
                     rel="noreferrer noopener"
-                    className="text-sm transition-colors duration-400 ease-expo hover:text-accent"
+                    aria-label={s.label}
+                    className="flex h-10 w-10 items-center justify-center border border-hairline text-ink/50 transition-colors duration-400 ease-expo hover:border-accent hover:text-accent"
                   >
-                    {s.label}
+                    <SocialIcon name={s.icon} className="h-[18px] w-[18px]" />
                   </a>
                 </li>
               ))}
             </ul>
+          </div>
 
-            <p className="meta mt-10 text-ink/40">Services</p>
-            <ul className="mt-6 space-y-3">
+          <div className="grid grid-cols-2 gap-x-gutter gap-y-10 md:col-span-7 md:grid-cols-3">
+            <Column title="Index">
+              {navigation.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className={linkClass}>
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </Column>
+
+            <Column title="Services">
               {services.map((s) => (
                 <li key={s.index}>
-                  <Link
-                    href="/services"
-                    className="text-sm text-ink/70 transition-colors duration-400 ease-expo hover:text-accent"
-                  >
+                  <Link href="/services" className={linkClass}>
                     {s.title}
                   </Link>
                 </li>
               ))}
-            </ul>
+            </Column>
+
+            <Column title="Legal">
+              {legalLinks.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className={linkClass}>
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </Column>
           </div>
         </div>
 
-        {/* Oversized wordmark */}
-        <div className="hairline-t overflow-hidden py-8">
-          <p className="select-none whitespace-nowrap text-display font-medium leading-none text-ink/[0.07]">
+        {/* Oversized wordmark, sitting on the rule as the page's floor. */}
+        <div className="hairline-t overflow-hidden py-6">
+          <p
+            className="select-none whitespace-nowrap font-medium leading-none text-ink/[0.07]"
+            style={{ fontSize: "clamp(3.5rem, 9.5vw, 11rem)", letterSpacing: "-0.045em" }}
+          >
             {site.name.toUpperCase()}
           </p>
         </div>
@@ -90,10 +113,9 @@ export default function Footer() {
             © {year} {site.name} — All rights reserved
           </p>
 
-          <div className="flex items-center gap-3">
-            <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse-dot" />
-            <LiveClock seconds label={`Based in ${site.city}`} />
-          </div>
+          <p className="meta text-ink/40">
+            Based in {site.city}, {site.country}
+          </p>
 
           <BracketLink onClick={() => scrollTo(0)} size="sm">
             Back to top

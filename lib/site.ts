@@ -31,13 +31,15 @@ export const navigation: NavItem[] = [
 ];
 
 export const legalLinks = [
-  { label: "Privacy", href: "/privacy" },
-  { label: "Terms", href: "/terms" },
+  { label: "Terms of Service", href: "/terms" },
+  { label: "Privacy Policy", href: "/privacy" },
+  { label: "Refund Policy", href: "/refund" },
 ];
 
+/** `icon` keys the inline mark the footer draws for each. */
 export const socials = [
-  { label: "Instagram", href: "https://instagram.com" },
-  { label: "LinkedIn", href: "https://linkedin.com" },
-  { label: "Dribbble", href: "https://dribbble.com" },
-  { label: "GitHub", href: "https://github.com" },
-];
+  { label: "WhatsApp", href: "https://wa.me/254700000000", icon: "whatsapp" },
+  { label: "Instagram", href: "https://instagram.com", icon: "instagram" },
+  { label: "LinkedIn", href: "https://linkedin.com", icon: "linkedin" },
+  { label: "GitHub", href: "https://github.com", icon: "github" },
+] as const;

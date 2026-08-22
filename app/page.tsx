@@ -38,8 +38,8 @@ export default function HomePage() {
           <SectionHeader
             index="03"
             label="Work"
-            lines={["Recent builds,", "in production."]}
-            description="A short selection. Each project shipped with a documented system the client's own team now extends."
+            lines={["Proven in production.", "Built for growth."]}
+            description="A curated selection of custom web platforms and design systems — engineered for visual distinction, high performance, and real business impact."
           />
 
           <div className="mt-20 border-t border-hairline">
@@ -48,10 +48,7 @@ export default function HomePage() {
             ))}
           </div>
 
-          <Fade className="mt-14 flex flex-wrap items-center justify-between gap-6">
-            <p className="meta text-ink/40">
-              {featuredProjects.length} of 120+ shipped engagements
-            </p>
+          <Fade className="mt-14 flex justify-end">
             <BracketLink href="/work">View all work</BracketLink>
           </Fade>
         </div>
@@ -66,8 +63,8 @@ export default function HomePage() {
           <SectionHeader
             index="04"
             label="Services"
-            lines={["Four ways we", "work with teams."]}
-            description="Engagements are scoped to one of these, or run end to end as a single track from direction through handover."
+            lines={["Tailored digital solutions,", "engineered to endure."]}
+            description="From targeted high-impact deliverables to full-scale platform infrastructure, we engineer digital solutions across the spectrum — built with precision, performance, and long-term utility."
           />
 
           <div className="mt-20 grid gap-px border border-hairline bg-hairline sm:grid-cols-2">

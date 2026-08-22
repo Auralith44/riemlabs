@@ -34,13 +34,14 @@ export default function ProjectCard({
             {project.index}
           </span>
 
-          <h3 className="col-span-10 text-title font-medium transition-[color,transform] duration-600 ease-expo group-hover:translate-x-2 group-hover:text-accent md:col-span-4">
+          <h3 className="col-span-10 text-title font-medium transition-[color,transform] duration-600 ease-expo group-hover:translate-x-2 group-hover:text-accent md:col-span-6">
             {project.title}
           </h3>
 
-          <p className="meta col-span-6 text-ink/45 md:col-span-3">{project.client}</p>
-
-          <p className="meta col-span-4 text-ink/45 md:col-span-2">{project.category}</p>
+          {/* One descriptor, not two. The old row carried the client name
+              beside the project name, which for most of these is the same
+              words twice; what earns the column is what the client does. */}
+          <p className="meta col-span-10 text-ink/45 md:col-span-3">{project.category}</p>
 
           <div className="col-span-2 flex items-center justify-end gap-4 md:col-span-2">
             <span className="meta tnum text-ink/35">{project.year}</span>

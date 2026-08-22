@@ -84,7 +84,7 @@ function subscribeTo(seconds: boolean) {
  * hydration — the real time only appears once we're client-side.
  */
 export default function LiveClock({
-  label = `Based in ${site.city}`,
+  label = `Based in ${site.city}, ${site.country}`,
   seconds = false,
   tone = "base",
   className = "",

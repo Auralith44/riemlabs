@@ -52,6 +52,8 @@
     --ink: #0d0d0d;
     --hairline: #e0e0dc;
     --accent: #1b17ff;
+    /* Availability light only — never used as a brand colour. */
+    --status: #22c55e;
     --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
     --ease-magnet: cubic-bezier(0.2, 0.7, 0.2, 1);
 
@@ -440,6 +442,34 @@
     transform: translate(-1.5px, -1.5px);
   }
 
+  /* ---- Availability indicator ------------------------------------------
+     The one place green appears. The palette is otherwise ink, canvas and a
+     single accent, but a status light reads as a status light because it is
+     green — an accent-blue dot beside "available" would just look like more
+     brand. The ring pulses outward and fades rather than the dot itself
+     blinking, so it registers as alive without flickering in peripheral
+     vision. */
+  .status-dot {
+    display: inline-block;
+    height: 0.5rem;
+    width: 0.5rem;
+    flex-shrink: 0;
+    border-radius: 9999px;
+    background-color: var(--status);
+    animation: statusPulse 2.4s var(--ease-expo) infinite;
+  }
+  @keyframes statusPulse {
+    0% {
+      box-shadow: 0 0 0 0 rgb(34 197 94 / 0.5);
+    }
+    70% {
+      box-shadow: 0 0 0 0.5rem rgb(34 197 94 / 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgb(34 197 94 / 0);
+    }
+  }
+
   /* ---- Tech-stack ticker -----------------------------------------------
      Two tracks, each travelling exactly -100% of its own width. Not one
      doubled track at -50%: `gap` sits only BETWEEN flex children, so a single
@@ -464,15 +494,15 @@
     -webkit-mask-image: linear-gradient(
       to right,
       transparent 0%,
-      black 6%,
-      black 94%,
+      black 10%,
+      black 90%,
       transparent 100%
     );
     mask-image: linear-gradient(
       to right,
       transparent 0%,
-      black 6%,
-      black 94%,
+      black 10%,
+      black 90%,
       transparent 100%
     );
   }
