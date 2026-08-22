@@ -23,12 +23,6 @@ export default function Footer() {
               <br />
               worth building?
             </h2>
-            <a
-              href={`mailto:${site.email}`}
-              className="link-wipe mt-8 inline-block text-lede text-ink"
-            >
-              {site.email}
-            </a>
           </div>
 
           <nav aria-label="Footer" className="md:col-span-3">

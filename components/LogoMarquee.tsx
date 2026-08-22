@@ -120,51 +120,57 @@ const LOGOS: Logo[] = [
   },
 ];
 
-/**
- * One track, its contents listed twice.
- *
- * The animation travels exactly -50% — the width of one full copy — so the
- * frame where it snaps back to 0 is identical to the frame before it and the
- * seam cannot be seen. `linear` is not a preference: any easing varies the
- * speed across the cycle, and the discontinuity at the wrap becomes visible as
- * a hitch.
- */
-function Strip({
-  direction = "normal",
-  duration = 34,
-}: {
-  direction?: "normal" | "reverse";
-  duration?: number;
-}) {
-  const track = [...LOGOS, ...LOGOS];
-
+/** One pass of the list. Rendered twice, side by side. */
+function Track({ hidden = false }: { hidden?: boolean }) {
   return (
-    <div className="logo-marquee">
-      <div
-        className="logo-marquee__track flex w-max items-center gap-12"
-        style={{ animationDuration: `${duration}s`, animationDirection: direction }}
-      >
-        {track.map((logo, i) => (
-          <div
-            key={`${logo.name}-${i}`}
-            /* The duplicate half is decoration; only the first pass is read. */
-            aria-hidden={i >= LOGOS.length ? "true" : undefined}
-            className="flex shrink-0 items-center gap-3 text-graphite/40 transition-colors duration-400 ease-expo hover:text-graphite"
-          >
-            <span className="block h-6 w-6 shrink-0">{logo.svg}</span>
-            <span className="font-mono text-sm uppercase tracking-[0.08em]">{logo.name}</span>
-          </div>
-        ))}
-      </div>
+    <div
+      aria-hidden={hidden ? "true" : undefined}
+      className="logo-marquee__track flex shrink-0 items-center gap-12 pr-12"
+    >
+      {LOGOS.map((logo) => (
+        <div
+          key={logo.name}
+          className="flex shrink-0 items-center gap-3 text-graphite/40 transition-colors duration-400 ease-expo hover:text-graphite"
+        >
+          <span className="block h-6 w-6 shrink-0">{logo.svg}</span>
+          <span className="font-mono text-xs uppercase tracking-widest">{logo.name}</span>
+        </div>
+      ))}
     </div>
   );
 }
 
-/** Tech-stack ticker. Sits directly under Work on the home page. */
+/**
+ * How many copies of the list ride the rail.
+ *
+ * Three, not two. Each track travels exactly -100% of its own width, so at the
+ * end of a cycle the first has left the window entirely and only the remaining
+ * TRACKS-1 are still covering it. One list is about 1410px wide, so two tracks
+ * leave the rail 14px short of a 1425px window and a sliver of empty page
+ * flashes at the right edge on every wrap; three keep ~2820px of cover, which
+ * is wider than any window this is going to open in.
+ */
+const TRACKS = 3;
+
+/**
+ * Tech-stack ticker. Sits directly under Work on the home page.
+ *
+ * Each track travels exactly -100% of its own width, rather than one doubled
+ * track travelling -50%. That distinction is the whole reason the loop is
+ * seamless: `gap` sits only BETWEEN flex children, so a single list of 2N items
+ * has 2N-1 gaps and its midpoint falls half a gap short of a full copy — enough
+ * to jump the row every cycle. Separate tracks each carry a trailing `pr-12` in
+ * place of that missing gap, so they tile exactly and -100% lands one on the
+ * next one's starting mark.
+ */
 export default function LogoMarquee() {
   return (
-    <section aria-label="Tech stack" className="border-y border-hairline bg-canvas py-10">
-      <Strip />
+    <section aria-label="Tech stack" className="border-y border-hairline bg-canvas py-8">
+      <div className="logo-marquee flex w-full">
+        {Array.from({ length: TRACKS }, (_, i) => (
+          <Track key={i} hidden={i > 0} />
+        ))}
+      </div>
     </section>
   );
 }

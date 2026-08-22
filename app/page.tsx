@@ -40,11 +40,6 @@ export default function HomePage() {
             label="Work"
             lines={["Recent builds,", "in production."]}
             description="A short selection. Each project shipped with a documented system the client's own team now extends."
-            aside={
-              <BracketLink href="/work" size="sm">
-                View all work
-              </BracketLink>
-            }
           />
 
           <div className="mt-20 border-t border-hairline">
@@ -57,9 +52,7 @@ export default function HomePage() {
             <p className="meta text-ink/40">
               {featuredProjects.length} of 120+ shipped engagements
             </p>
-            <BracketLink href="/work" variant="framed">
-              Full index
-            </BracketLink>
+            <BracketLink href="/work">View all work</BracketLink>
           </Fade>
         </div>
       </RevealSection>
@@ -75,11 +68,6 @@ export default function HomePage() {
             label="Services"
             lines={["Four ways we", "work with teams."]}
             description="Engagements are scoped to one of these, or run end to end as a single track from direction through handover."
-            aside={
-              <BracketLink href="/services" size="sm">
-                Full breakdown
-              </BracketLink>
-            }
           />
 
           <div className="mt-20 grid gap-px border border-hairline bg-hairline sm:grid-cols-2">
@@ -118,6 +106,10 @@ export default function HomePage() {
               </Fade>
             ))}
           </div>
+
+          <Fade className="mt-14 flex justify-end">
+            <BracketLink href="/services">Full breakdown</BracketLink>
+          </Fade>
         </div>
       </RevealSection>
 

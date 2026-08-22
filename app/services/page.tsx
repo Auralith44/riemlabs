@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import CTABanner from "@/components/CTABanner";
-import Marquee from "@/components/Marquee";
+import LogoMarquee from "@/components/LogoMarquee";
 import PageIntro from "@/components/PageIntro";
 import RevealSection from "@/components/RevealSection";
 import SectionHeader from "@/components/SectionHeader";
@@ -67,18 +67,7 @@ export default function ServicesPage() {
         </div>
       </RevealSection>
 
-      <Marquee
-        items={[
-          "Next.js",
-          "TypeScript",
-          "Tailwind CSS",
-          "GSAP",
-          "ScrollTrigger",
-          "Lenis",
-          "Storybook",
-          "Vercel",
-        ]}
-      />
+      <LogoMarquee />
 
       {/* ── 03.2 / Engagement models ───────────────────────────────── */}
       <RevealSection className="bg-bone">

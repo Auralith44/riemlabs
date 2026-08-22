@@ -48,13 +48,6 @@ export default function CTABanner({
               <BracketLink href="/contact" variant="framed" size="lg" tone="dark">
                 Start a project
               </BracketLink>
-
-              <a
-                href={`mailto:${site.email}`}
-                className="meta text-canvas/50 transition-colors duration-400 ease-expo hover:text-accent"
-              >
-                {site.email}
-              </a>
             </Fade>
           </div>
         </div>

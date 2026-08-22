@@ -1,4 +1,4 @@
-import Link from "next/link";
+import BracketLink from "@/components/BracketLink";
 import RevealSection from "@/components/RevealSection";
 import { Fade } from "@/components/RevealText";
 import { services } from "@/lib/services";
@@ -85,7 +85,6 @@ export default function AboutSection({
   const ruleTone = isReveal ? "border-canvas/20" : "border-hairline";
   const eyebrowIdx = isReveal ? "text-canvas" : "text-accent";
   const eyebrowSlash = isReveal ? "text-canvas/40" : "text-ink/25";
-  const eyebrowLink = isReveal ? "text-canvas/70" : "text-ink/50";
 
   // The card inverts with the field behind it, the opposite way round to the
   // copy: light panel on the blue, dark panel on the white. Both the base and
@@ -111,24 +110,6 @@ export default function AboutSection({
             <span className={eyebrowSlash}>/</span>
             <span className={headTone}>About Us</span>
           </p>
-          {isMirror ? (
-            <span className={`meta inline-flex items-center gap-2 ${eyebrowLink}`}>
-              Full Studio <span aria-hidden="true">→</span>
-            </span>
-          ) : (
-            <Link
-              href="/about"
-              className="meta group inline-flex items-center gap-2 text-ink/50 transition-colors duration-400 ease-expo hover:text-accent"
-            >
-              Full Studio
-              <span
-                aria-hidden="true"
-                className="transition-transform duration-400 ease-expo group-hover:translate-x-1"
-              >
-                →
-              </span>
-            </Link>
-          )}
         </div>
 
         <div className="mt-16 grid gap-x-gutter gap-y-14 lg:grid-cols-5">
@@ -161,41 +142,22 @@ export default function AboutSection({
               ))}
             </Block>
 
+            {/* One action for the section, in the bracketed form the rest of
+                the site uses. It carries `data-about-cta` on both layers so the
+                stylesheet can replay the real link's hover on the mirror — the
+                real one spends the whole blue phase under an opaque veil, where
+                its own :hover paints nothing anyone can see. */}
             <Block className="mt-12">
-              {/* The real link spends the whole blue phase underneath an opaque
-                  veil, so its own :hover paints nothing anyone can see — and on
-                  the light background it is deliberately inert to the pointer.
-                  `data-about-cta` lets the stylesheet mirror the hover onto the
-                  white copy and invert it to a filled panel, the one treatment
-                  that cannot dissolve into the field behind it. */}
-              {isMirror ? (
-                <span
-                  data-about-cta={isReveal ? "reveal" : undefined}
-                  className={`inline-flex items-center gap-3 border px-7 py-4 font-mono text-sm uppercase tracking-[0.1em] transition-colors duration-400 ease-expo ${ruleTone} ${headTone}`}
-                >
-                  Read Our Story
-                  <span
-                    aria-hidden="true"
-                    className="transition-transform duration-400 ease-expo"
-                  >
-                    →
-                  </span>
-                </span>
-              ) : (
-                <Link
+              <div data-about-cta={isReveal ? "reveal" : variant === "base" ? "base" : undefined}>
+                <BracketLink
                   href="/about"
-                  data-about-cta="base"
-                  className="group inline-flex items-center gap-3 border border-hairline px-7 py-4 font-mono text-sm uppercase tracking-[0.1em]"
+                  size="lg"
+                  asStatic={isMirror}
+                  tone={isReveal ? "reveal" : "light"}
                 >
-                  Read Our Story
-                  <span
-                    aria-hidden="true"
-                    className="transition-transform duration-400 ease-expo"
-                  >
-                    →
-                  </span>
-                </Link>
-              )}
+                  Full Studio
+                </BracketLink>
+              </div>
             </Block>
           </div>
 

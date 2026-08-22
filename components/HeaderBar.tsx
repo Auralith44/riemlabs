@@ -14,7 +14,9 @@ type HeaderBarProps = {
   atTop: boolean;
   /** Where the marker's open animation starts from. */
   origin: "grid" | "dot" | "close";
-  onToggle?: () => void;
+  onToggle?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  /** Context-aware home action: scroll to top, or navigate. */
+  onLogoClick?: (event: React.MouseEvent<HTMLAnchorElement>) => void;
   /** Raises/clears the shared reveal-anchor flag the marker reads. */
   onAnchor?: (active: boolean) => void;
   buttonRef?: React.Ref<HTMLButtonElement>;
@@ -36,6 +38,7 @@ export default function HeaderBar({
   origin,
   onToggle,
   onAnchor,
+  onLogoClick,
   buttonRef,
 }: HeaderBarProps) {
   const isReveal = variant === "reveal";
@@ -116,7 +119,12 @@ export default function HeaderBar({
           />
         </span>
       ) : (
-        <Link href="/" aria-label={`${site.name} — home`} className="flex items-center">
+        <Link
+          href="/"
+          aria-label={`${site.name} — home`}
+          onClick={onLogoClick}
+          className="flex items-center"
+        >
           <Image
             src={logoSrc}
             alt={site.name}

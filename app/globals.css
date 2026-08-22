@@ -367,22 +367,22 @@
   }
 
   /* The About Us CTA spends the whole blue phase underneath an opaque veil,
-     so its own :hover is invisible — and hovering it to the accent colour
-     made it invisible a second way, by matching the field behind it exactly.
-     The mirror inverts instead: a filled white panel with accent ink, which
-     nothing in this palette can swallow. */
-  [data-wipe-root]:has([data-about-cta="base"]:hover) [data-about-cta="reveal"],
-  [data-wipe-root]:has([data-about-cta="base"]:focus-visible) [data-about-cta="reveal"] {
-    background-color: var(--canvas);
-    border-color: var(--canvas);
-    color: var(--accent);
+     where its own :hover paints nothing anyone can see. Replay the bracket
+     splay on the white mirror, which is the copy actually on screen then. */
+  [data-wipe-root]:has([data-about-cta="base"] .group:hover)
+    [data-about-cta="reveal"]
+    [data-bracket="open"],
+  [data-wipe-root]:has([data-about-cta="base"] .group:focus-visible)
+    [data-about-cta="reveal"]
+    [data-bracket="open"] {
+    transform: translateX(-0.25rem);
   }
-  [data-wipe-root]:has([data-about-cta="base"]:hover)
+  [data-wipe-root]:has([data-about-cta="base"] .group:hover)
     [data-about-cta="reveal"]
-    > [aria-hidden="true"],
-  [data-wipe-root]:has([data-about-cta="base"]:focus-visible)
+    [data-bracket="close"],
+  [data-wipe-root]:has([data-about-cta="base"] .group:focus-visible)
     [data-about-cta="reveal"]
-    > [aria-hidden="true"] {
+    [data-bracket="close"] {
     transform: translateX(0.25rem);
   }
 
@@ -441,8 +441,13 @@
   }
 
   /* ---- Tech-stack ticker -----------------------------------------------
-     The track holds its list twice and travels exactly -50%, one full copy's
-     width, so the frame it snaps back on is identical to the frame before it.
+     Two tracks, each travelling exactly -100% of its own width. Not one
+     doubled track at -50%: `gap` sits only BETWEEN flex children, so a single
+     list of 2N items has 2N-1 gaps and its midpoint lands half a gap short of
+     a full copy — enough to jump the row every cycle. Each track carries a
+     trailing pad in place of that missing gap instead, so the two tile exactly
+     and -100% puts one on the other's starting mark.
+
      The mask fades both ends so logos arrive and leave rather than appearing
      at a hard edge. */
   @keyframes logoMarquee {
@@ -450,7 +455,7 @@
       transform: translate3d(0, 0, 0);
     }
     to {
-      transform: translate3d(-50%, 0, 0);
+      transform: translate3d(-100%, 0, 0);
     }
   }
 
@@ -474,6 +479,7 @@
 
   .logo-marquee__track {
     animation-name: logoMarquee;
+    animation-duration: 32s;
     /* linear is load-bearing: any easing varies speed across the cycle, and
        the discontinuity at the wrap shows up as a hitch. */
     animation-timing-function: linear;
@@ -584,7 +590,11 @@
   .menu-label {
     position: relative;
     display: inline-block;
-    width: 5ch;
+    /* 5ch was exactly the advance of CLOSE and nothing more, so the U of MENU
+       lost its right side bearing to the clip edge and read as MENIJ. The box
+       is now wider than either word needs and each word carries its own right
+       pad, so no glyph ever meets the boundary. */
+    min-width: 3.5rem;
     height: 1em;
     line-height: 1;
     overflow: hidden;
@@ -594,6 +604,7 @@
     top: 0;
     left: 0;
     display: block;
+    padding-right: 0.15em;
     transition:
       opacity 0.46s var(--ease-expo),
       transform 0.46s var(--ease-expo);

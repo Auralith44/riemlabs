@@ -46,14 +46,27 @@ export default function Header() {
    * "grid" when the click came cold and the marks have to gather first.
    */
   const [origin, setOrigin] = useState<"grid" | "dot" | "close">("grid");
-  const { stop, start } = useSmoothScroll();
+  const { stop, start, scrollTo } = useSmoothScroll();
 
   const panelRef = useRef<HTMLElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const goneRef = useRef(false);
   const atTopRef = useRef(true);
 
-  const close = useCallback(() => setOpen(false), []);
+  /**
+   * The only way out of the open state.
+   *
+   * It sets the origin as well as the flag, because the marker's return
+   * animation is selected by `data-menu-origin` — and the drawer's own Close
+   * button, the backdrop and Escape all land here rather than going through
+   * the toggle. Without this they closed the panel while leaving the origin on
+   * whatever opened it, no rule matched, and the cross snapped back to a grid
+   * instead of unfolding into one.
+   */
+  const close = useCallback(() => {
+    setOrigin("close");
+    setOpen(false);
+  }, []);
 
   useEffect(() => setOpen(false), [pathname]);
 
@@ -78,7 +91,7 @@ export default function Header() {
     document.body.style.overflow = "hidden";
 
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") close();
     };
     window.addEventListener("keydown", onKey);
 
@@ -95,7 +108,7 @@ export default function Header() {
         toggleRef.current?.focus({ preventScroll: true });
       }
     };
-  }, [open, stop, start]);
+  }, [open, stop, start, close]);
 
   /**
    * Where the bar is, as a 0-to-1 scroll progress on --nav-exit.
@@ -255,15 +268,19 @@ export default function Header() {
 
   useEffect(() => () => markAnchor(false), [markAnchor]);
 
-  const onToggle = () => {
+  const onToggle = (event: React.MouseEvent<HTMLButtonElement>) => {
     const next = !open;
-    setOrigin(
-      next
-        ? document.documentElement.dataset.revealAnchorActive === "menu"
-          ? "dot"
-          : "grid"
-        : "close",
-    );
+
+    // Two ways of asking the same question, because either can be the one that
+    // knows: the shared flag is authoritative while a pointer is driving, but
+    // :hover still answers correctly if the click arrived without one ever
+    // being raised. A pointerless click — touch, keyboard — answers false to
+    // both, which is right: the marks are in their grid and have to gather.
+    const gathered =
+      document.documentElement.dataset.revealAnchorActive === "menu" ||
+      event.currentTarget.matches(":hover");
+
+    setOrigin(next ? (gathered ? "dot" : "grid") : "close");
     setOpen(next);
   };
 
@@ -273,6 +290,26 @@ export default function Header() {
   const hidden = navGone && !open;
   const chromeState = hidden ? "pointer-events-none" : "";
 
+  /**
+   * The wordmark answers to where you already are.
+   *
+   * Scrolled down, it takes you back to the top of the page you are on —
+   * that is the thing you actually wanted, and on the home page it is the
+   * only thing it could mean. Already at the top of a sub-page, there is
+   * nowhere to scroll, so it goes home; the Link's own navigation handles
+   * that, which keeps it a real anchor for middle-click and for crawlers.
+   * Already at the top of the home page, it does nothing at all rather than
+   * re-navigating to the page you are looking at.
+   */
+  const onLogoClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (window.scrollY > TOP_ZONE * 6) {
+      event.preventDefault();
+      scrollTo(0);
+      return;
+    }
+    if (pathname === "/") event.preventDefault();
+  };
+
   const barProps = {
     open,
     bandVisible,
@@ -280,6 +317,7 @@ export default function Header() {
     origin,
     onToggle,
     onAnchor: markAnchor,
+    onLogoClick,
     buttonRef: toggleRef,
   };
 
