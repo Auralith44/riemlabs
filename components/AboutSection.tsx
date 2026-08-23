@@ -151,6 +151,7 @@ export default function AboutSection({
               <div data-about-cta={isReveal ? "reveal" : variant === "base" ? "base" : undefined}>
                 <BracketLink
                   href="/about"
+                  variant="boxed"
                   size="lg"
                   asStatic={isMirror}
                   tone={isReveal ? "reveal" : "light"}

@@ -314,6 +314,7 @@ export default function Header() {
     open,
     bandVisible,
     atTop,
+    showAvailability: pathname === "/",
     origin,
     onToggle,
     onAnchor: markAnchor,
@@ -361,6 +362,7 @@ export default function Header() {
           open={open}
           bandVisible={bandVisible}
           atTop={atTop}
+          showAvailability={pathname === "/"}
           origin={origin}
         />
       </div>

@@ -49,7 +49,9 @@ export default function HomePage() {
           </div>
 
           <Fade className="mt-14 flex justify-end">
-            <BracketLink href="/work">View all work</BracketLink>
+            <BracketLink href="/work" variant="boxed">
+              View all work
+            </BracketLink>
           </Fade>
         </div>
       </RevealSection>
@@ -105,7 +107,9 @@ export default function HomePage() {
           </div>
 
           <Fade className="mt-14 flex justify-end">
-            <BracketLink href="/services">Full breakdown</BracketLink>
+            <BracketLink href="/services" variant="boxed">
+              Full breakdown
+            </BracketLink>
           </Fade>
         </div>
       </RevealSection>

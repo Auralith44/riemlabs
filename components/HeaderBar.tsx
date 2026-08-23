@@ -12,6 +12,8 @@ type HeaderBarProps = {
   bandVisible: boolean;
   /** True while the page is at rest at the very top. */
   atTop: boolean;
+  /** The note belongs to the hero, so only the index page carries it. */
+  showAvailability: boolean;
   /** Where the marker's open animation starts from. */
   origin: "grid" | "dot" | "close";
   onToggle?: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -35,6 +37,7 @@ export default function HeaderBar({
   open,
   bandVisible,
   atTop,
+  showAvailability,
   origin,
   onToggle,
   onAnchor,
@@ -185,23 +188,25 @@ export default function HeaderBar({
           rule instead of straddling it — it belongs to the band between the
           bar and the page, on the same right margin the rule ends on.
 
-          That band is only empty while nothing has scrolled up into it, so the
-          note is shown at rest at the top and withdrawn as soon as the page
-          moves. Left up, it would sit on top of whatever body copy happened to
-          be passing under the rule. */}
-      <span
-        className={`pointer-events-none absolute right-gutter top-full mt-3 hidden items-center gap-2 whitespace-nowrap transition-opacity duration-400 ease-expo sm:inline-flex ${
-          atTop ? "opacity-100" : "opacity-0"
-        }`}
-      >
+          It is a hero detail, so it appears on the index page only, and only
+          while the page is at rest at the top: that band is empty just long
+          enough for it, and left standing it would sit on top of whatever body
+          copy happened to be passing under the rule. */}
+      {showAvailability ? (
         <span
-          data-header-mark={isReveal ? undefined : ""}
-          className={`h-1.5 w-1.5 rounded-full animate-pulse-dot ${badgeDot}`}
-        />
-        <span data-header-tone={isReveal ? undefined : ""} className={`micro ${badgeTone}`}>
-          Available for Hire
+          className={`pointer-events-none absolute right-gutter top-full mt-3 hidden items-center gap-2 whitespace-nowrap transition-opacity duration-400 ease-expo sm:inline-flex ${
+            atTop ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <span
+            data-header-mark={isReveal ? undefined : ""}
+            className={`h-1.5 w-1.5 rounded-full animate-pulse-dot ${badgeDot}`}
+          />
+          <span data-header-tone={isReveal ? undefined : ""} className={`micro ${badgeTone}`}>
+            Available for Hire
+          </span>
         </span>
-      </span>
+      ) : null}
     </div>
   );
 }

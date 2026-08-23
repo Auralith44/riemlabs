@@ -101,7 +101,7 @@ export default function Footer() {
         <div className="hairline-t overflow-hidden py-6">
           <p
             className="select-none whitespace-nowrap font-medium leading-none text-ink/[0.07]"
-            style={{ fontSize: "clamp(3.5rem, 9.5vw, 11rem)", letterSpacing: "-0.045em" }}
+            style={{ fontSize: "clamp(4rem, 11.2vw, 13rem)", letterSpacing: "-0.05em" }}
           >
             {site.name.toUpperCase()}
           </p>

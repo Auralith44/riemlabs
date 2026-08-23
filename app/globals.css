@@ -369,23 +369,18 @@
   }
 
   /* The About Us CTA spends the whole blue phase underneath an opaque veil,
-     where its own :hover paints nothing anyone can see. Replay the bracket
-     splay on the white mirror, which is the copy actually on screen then. */
-  [data-wipe-root]:has([data-about-cta="base"] .group:hover)
+     where its own :hover paints nothing anyone can see — so the fill is
+     replayed on the white mirror, which is the copy actually on screen then.
+     Outlined white on the accent field at rest; solid white with accent type
+     under the pointer, which is the same inversion the light-surface button
+     makes, read the other way up. */
+  [data-wipe-root]:has([data-about-cta="base"] a:hover) [data-about-cta="reveal"] > *,
+  [data-wipe-root]:has([data-about-cta="base"] a:focus-visible)
     [data-about-cta="reveal"]
-    [data-bracket="open"],
-  [data-wipe-root]:has([data-about-cta="base"] .group:focus-visible)
-    [data-about-cta="reveal"]
-    [data-bracket="open"] {
-    transform: translateX(-0.25rem);
-  }
-  [data-wipe-root]:has([data-about-cta="base"] .group:hover)
-    [data-about-cta="reveal"]
-    [data-bracket="close"],
-  [data-wipe-root]:has([data-about-cta="base"] .group:focus-visible)
-    [data-about-cta="reveal"]
-    [data-bracket="close"] {
-    transform: translateX(0.25rem);
+    > * {
+    background-color: var(--canvas);
+    border-color: var(--canvas);
+    color: var(--accent);
   }
 
   /* Same problem in the hero: hovering the real `[ Let's talk ]` splays its
@@ -619,22 +614,29 @@
      rather than collide. */
   .menu-label {
     position: relative;
-    display: inline-block;
-    /* 5ch was exactly the advance of CLOSE and nothing more, so the U of MENU
-       lost its right side bearing to the clip edge and read as MENIJ. The box
-       is now wider than either word needs and each word carries its own right
-       pad, so no glyph ever meets the boundary. */
-    min-width: 3.5rem;
-    height: 1em;
-    line-height: 1;
-    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    /* Nothing here clips. A box tight enough to crop is what turned MENU into
+       MENIJ, and widening it only moved the edge — the fix is to stop having
+       an edge at all. The words are absolutely positioned so the box has no
+       intrinsic width of its own; min-width holds the space, the padding keeps
+       the last glyph off the end of it, and overflow stays visible so a side
+       bearing can never be cut.
+
+       The word swap does not need the clip: the two cross-fade over 0.22em,
+       which is a slide short enough to read as a exchange on its own. */
+    min-width: 4rem;
+    height: 1.15em;
+    line-height: 1.15;
+    overflow: visible;
   }
   .menu-word {
     position: absolute;
-    top: 0;
+    top: 50%;
     left: 0;
     display: block;
     padding-right: 0.15em;
+    margin-top: -0.5em;
     transition:
       opacity 0.46s var(--ease-expo),
       transform 0.46s var(--ease-expo);
@@ -645,6 +647,7 @@
     transform: translateZ(0);
     transition-delay: 0.14s;
   }
+
   .menu-word--close {
     opacity: 0;
     transform: translate3d(0, 0.22em, 0);

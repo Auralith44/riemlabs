@@ -45,7 +45,7 @@ export default function CTABanner({
             </Fade>
 
             <Fade className="flex flex-wrap items-center gap-x-8 gap-y-4">
-              <BracketLink href="/contact" variant="framed" size="lg" tone="dark">
+              <BracketLink href="/contact" variant="boxed" size="lg" tone="dark">
                 Start a project
               </BracketLink>
             </Fade>

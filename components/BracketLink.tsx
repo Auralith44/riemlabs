@@ -3,7 +3,14 @@
 import Link from "next/link";
 import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
 
-type Variant = "inline" | "framed" | "solid";
+/**
+ * `inline` is the bracketed text link — [ Let's talk ] — and keeps its
+ * brackets. `boxed` is the bordered button: no brackets at all, because the
+ * border already does the job they were doing, and a box wrapped in brackets
+ * reads as two containers for one control. `framed` and `solid` are the older
+ * treatments, kept for the forms and the not-found page.
+ */
+type Variant = "inline" | "boxed" | "framed" | "solid";
 type Size = "sm" | "md" | "lg";
 /**
  * `dark` inverts the label for use on the ink surface. `reveal` is the
@@ -71,6 +78,7 @@ export default function BracketLink({
 }: BracketLinkProps) {
   const dark = tone === "dark";
   const reveal = tone === "reveal";
+  const boxed = variant === "boxed";
 
   /**
    * Writes the offsets the .magnetic rules in globals.css read from.
@@ -116,6 +124,17 @@ export default function BracketLink({
       `cta-box border ${reveal ? "border-mist/20" : "hover:border-accent"} ${
         dark ? "border-canvas/20" : reveal ? "" : "border-hairline"
       } ${framePadding[size]}`,
+    // Outlined at rest, solid on hover, with the type inverting to whatever
+    // the fill is not. Each tone names the surface it sits on: `light` is the
+    // white page, `dark` the ink banner, `reveal` the accent field.
+    boxed &&
+      `border ${framePadding[size]} ${
+        reveal
+          ? "border-mist text-mist hover:bg-mist hover:text-accent"
+          : dark
+            ? "border-canvas/40 text-canvas hover:bg-canvas hover:text-ink"
+            : "border-ink/25 text-ink hover:border-ink hover:bg-ink hover:text-canvas"
+      }`,
     variant === "solid" &&
       `hover:bg-accent ${dark ? "bg-canvas text-ink hover:text-canvas" : "bg-ink text-canvas"} ${framePadding[size]}`,
     disabled && "pointer-events-none opacity-40",
@@ -125,7 +144,7 @@ export default function BracketLink({
     .join(" ");
 
   const labelColor =
-    variant === "solid"
+    boxed || variant === "solid"
       ? ""
       : reveal
         ? "text-mist"
@@ -144,7 +163,9 @@ export default function BracketLink({
     ? ""
     : "transition-transform duration-400 ease-expo";
 
-  const inner = (
+  const inner = boxed ? (
+    children
+  ) : (
     <>
       <span
         aria-hidden="true"
