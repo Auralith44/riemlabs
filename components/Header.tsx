@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import HeaderBar from "@/components/HeaderBar";
 import { EXIT_END } from "@/components/SectionWipe";
 import { useSmoothScroll } from "@/components/SmoothScrollProvider";
@@ -29,6 +29,20 @@ const SPY_LINE = 45;
  * is empty space only while nothing has scrolled up into it yet.
  */
 const TOP_ZONE = 8;
+
+/**
+ * `useEffect` runs after the browser has already painted the new DOM — so
+ * the drawer's `data-overlay-state="open"` commits and the panel's slide
+ * transition starts a full frame before a plain `useEffect` gets to call
+ * `stop()`. That gap is exactly the window the scrollbar disappears in,
+ * mid-transition, which is what read as a jump partway through the open
+ * rather than something present for the whole animation. `useLayoutEffect`
+ * runs synchronously before paint, so the lock lands in the very first
+ * frame the panel is visible in. SSR has no window, so it falls back to
+ * `useEffect` there — this component never locks scroll during render
+ * anyway, only from a browser event, so the fallback never actually fires.
+ */
+const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 export default function Header() {
   const pathname = usePathname();
@@ -73,12 +87,27 @@ export default function Header() {
   /**
    * Freeze the page and flag the open state on <html>.
    *
-   * The flag is what both reveal layers key off to suppress themselves, so
-   * nothing is left tracking the pointer or sweeping behind the scrim while
-   * the drawer is up. Lenis is stopped and the body is locked so the page
-   * underneath cannot move at all — the drawer is the only thing on screen.
+   * `data-menu-open` does double duty: both reveal layers key off it to
+   * suppress themselves, so nothing is left tracking the pointer or sweeping
+   * behind the scrim while the drawer is up, and globals.css turns it into
+   * `overflow: hidden` — which is what actually prevents native scroll (wheel
+   * capture alone doesn't stop keyboard or scrollbar-drag scrolling). That's
+   * this component's own flag rather than Lenis's `lenis-stopped` class
+   * because Lenis is never instantiated under `prefers-reduced-motion`, and a
+   * class only Lenis manages would never appear for those visitors — the lock
+   * has to hold whether or not Lenis exists. `stop()` still runs alongside it,
+   * for the wheel/touch interception Lenis itself owns.
+   *
+   * Layout effect, not a plain effect: a plain `useEffect` runs after the
+   * browser has already painted the `data-overlay-state="open"` commit, so
+   * the panel's slide transition would start a frame before this lock lands
+   * — exactly the window the scrollbar would disappear in, mid-transition.
+   *
+   * `--scrollbar-width`, measured once in SmoothScrollProvider and consumed
+   * by the same rule as a `padding-right`, is what keeps that overflow
+   * change from shifting the page by the scrollbar's own width.
    */
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (!open) {
       delete document.documentElement.dataset.menuOpen;
       start();
@@ -87,19 +116,22 @@ export default function Header() {
 
     document.documentElement.dataset.menuOpen = "true";
     stop();
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
     };
     window.addEventListener("keydown", onKey);
 
+    // `preventScroll` matters here specifically: at the moment this runs the
+    // panel is still translated fully off-screen (the slide-in transition
+    // hasn't painted its first frame yet), so an unguarded `.focus()` gives
+    // the browser an off-screen element to scroll toward and it takes the
+    // native "scroll the focused element into view" path — visible as a
+    // jump right as the drawer starts opening.
     const first = panelRef.current?.querySelector<HTMLAnchorElement>("a[href]");
-    first?.focus();
+    first?.focus({ preventScroll: true });
 
     return () => {
-      document.body.style.overflow = previous;
       window.removeEventListener("keydown", onKey);
 
       // Never leave focus stranded inside a panel that is about to become

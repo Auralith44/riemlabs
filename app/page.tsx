@@ -108,7 +108,7 @@ export default function HomePage() {
 
           <Fade className="mt-14 flex justify-end">
             <BracketLink href="/services" variant="boxed">
-              Full breakdown
+              Explore all services
             </BracketLink>
           </Fade>
         </div>

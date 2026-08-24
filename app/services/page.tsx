@@ -11,7 +11,7 @@ import { process, services } from "@/lib/services";
 export const metadata: Metadata = {
   title: "Services",
   description:
-    "Visual direction, web systems, technical execution, and maintainable design systems — the four ways Riem Labs works with teams.",
+    "Web & software development, business systems & automation, data science & analytics, and AI & intelligent solutions — the four ways Riem Labs works with teams.",
 };
 
 const ENGAGEMENTS = [

@@ -40,6 +40,18 @@ export default function SmoothScrollProvider({ children }: { children: ReactNode
   const pathname = usePathname();
   const [, setReady] = useState(false);
 
+  // Measured once, before anything ever locks scroll, so the value is the
+  // real width of a present scrollbar rather than 0 from a moment when it
+  // had already been removed. `scrollbar-gutter: stable` looked like the
+  // cleaner fix for the menu drawer's width jump, but a JS-measured
+  // `padding-right` — the older, universally-supported technique — is what
+  // globals.css's `lenis-stopped` rule actually applies, since it doesn't
+  // depend on browser support for a newer CSS property.
+  useEffect(() => {
+    const width = window.innerWidth - document.documentElement.clientWidth;
+    document.documentElement.style.setProperty("--scrollbar-width", `${width}px`);
+  }, []);
+
   useEffect(() => {
     // Respect the OS preference — no inertia hijacking for reduced-motion users.
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;

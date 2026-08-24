@@ -115,14 +115,14 @@ export default function AboutSection({
         <div className="mt-16 grid gap-x-gutter gap-y-14 lg:grid-cols-5">
           {/* ── Left: copy, stats, CTA ─────────────────────────────── */}
           <div className="lg:col-span-3">
-            <Block as="h2" className={`max-w-[18ch] text-headline font-medium ${headTone}`}>
-              From first pixel to shipped product — we build it right.
+            <Block as="h2" className={`max-w-[22ch] text-headline font-medium ${headTone}`}>
+              Bridging editorial visual direction with production-grade engineering.
             </Block>
 
             <Block as="p" className={`mt-8 max-w-intro text-lede ${bodyTone}`}>
-              Riem Labs is a small studio based in Nairobi. We design and build full-stack
-              products, design systems, and technical execution for teams who need it done
-              properly the first time.
+              Based in Nairobi, Riem Labs crafts high-fidelity digital platforms and scalable
+              software architectures. We build digital assets designed for exceptional user
+              experience, speed, and long-term utility.
             </Block>
 
             <Block className={`mt-14 grid grid-cols-3 border-t ${ruleTone}`}>

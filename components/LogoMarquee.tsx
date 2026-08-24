@@ -169,15 +169,25 @@ const TRACKS = 3;
  */
 export default function LogoMarquee() {
   return (
-    <section aria-label="Tech stack" className="border-y border-hairline bg-canvas py-10">
-      <div className="shell grid items-center gap-y-6 md:grid-cols-12 md:gap-x-gutter">
-        {/* Anchored to the left axis, static, outside the moving rail. */}
-        <div className="md:col-span-3">
-          <p className="micro text-ink/70">Stack &amp; Architecture</p>
-          <p className="micro mt-2 text-ink/35">Production Tools</p>
+    // `.shell` on the section itself, not just on a div inside it — a
+    // full-bleed outer element reads as a different width than every other
+    // row's content (SectionHeader, ProjectCard) even when nothing painted
+    // on the extra width is visually distinct from the page behind it. The
+    // fill is `bg-canvas`, the same colour as the body it sits on, so
+    // widening it never changed what anything looked like — but the box
+    // itself needs to land on the same grid axis as everything above and
+    // below it, not just its content.
+    <section aria-label="Tech stack" className="shell hairline-t hairline-b bg-canvas">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-6 py-10">
+        {/* Anchored to the left axis, static, outside the moving rail. Full
+            width below `sm` so it stacks above the rail instead of the two
+            squeezing onto one cramped row. */}
+        <div className="w-full shrink-0 sm:w-auto">
+          <p className="micro font-semibold text-ink">Stack &amp; Architecture</p>
+          <p className="micro mt-2 font-semibold text-ink/50">Production Tools</p>
         </div>
 
-        <div className="logo-marquee flex md:col-span-9">
+        <div className="logo-marquee flex w-full min-w-0 flex-1">
           {Array.from({ length: TRACKS }, (_, i) => (
             <Track key={i} hidden={i > 0} />
           ))}

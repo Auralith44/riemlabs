@@ -115,8 +115,24 @@
   .lenis.lenis-smooth {
     scroll-behavior: auto !important;
   }
-  .lenis.lenis-stopped {
+
+  /* Scroll lock, keyed off the same flag the reveal layers already suppress
+     themselves on — not off Lenis's own `lenis-stopped` class. Lenis is never
+     instantiated at all under `prefers-reduced-motion`, so a class it manages
+     would simply never appear for those visitors and the drawer would sit
+     over a page that's still free to scroll behind it. `data-menu-open` is
+     set by Header itself, unconditionally, so the lock holds regardless of
+     whether Lenis exists.
+
+     Removing the scrollbar this way is exactly what shifts the layout by the
+     scrollbar's own width — `padding-right` claims that width back on the
+     side the scrollbar vacated, so the content box stays the same size it
+     was a moment ago. `--scrollbar-width` is measured once in
+     SmoothScrollProvider, before anything has ever locked scroll, and falls
+     back to 0px for the one frame before that measurement lands. */
+  html[data-menu-open="true"] {
     overflow: hidden;
+    padding-right: var(--scrollbar-width, 0px);
   }
 
   body {
