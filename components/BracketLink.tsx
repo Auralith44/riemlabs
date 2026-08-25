@@ -4,16 +4,16 @@ import Link from "next/link";
 import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode } from "react";
 
 /**
- * Raw hex values for the wipe-fill pseudo-element's `--wipe-fill`, which is
- * a plain CSS custom property and so can't resolve a Tailwind colour class —
- * kept in step with the same tokens declared in tailwind.config.ts.
+ * `.cta-wipe`/`.cta-wash` both default their fill to `var(--accent)` in
+ * globals.css, which covers every case except one: the `reveal` tone's
+ * boxed CTA sits ON the accent field itself (the About Us reveal band), so
+ * an accent-coloured wash or border there would blend straight into its
+ * own background instead of reading as a highlight. That's the one case
+ * that needs an explicit override — mist, since it's a raw hex here rather
+ * than a Tailwind class because `--wipe-fill` is a plain CSS custom
+ * property that can't resolve one.
  */
-const RAW_COLOR = {
-  canvas: "#FFFFFF",
-  ink: "#0D0D0D",
-  accent: "#1B17FF",
-  mist: "#F6F6F4",
-} as const;
+const REVEAL_WIPE_FILL = "#F6F6F4";
 
 /**
  * `inline` is the bracketed text link — [ Let's talk ] — and keeps its
@@ -136,22 +136,24 @@ export default function BracketLink({
       `cta-box border ${reveal ? "border-mist/20" : "hover:border-accent"} ${
         dark ? "border-canvas/20" : reveal ? "" : "border-hairline"
       } ${framePadding[size]}`,
-    // Outlined at rest, filled on hover via `.cta-wipe`'s directional sweep
-    // rather than a flat colour cross-fade — codedgar's own `.btn` mechanic.
-    // The type still inverts to whatever the fill is not; each tone names
-    // the surface it sits on: `light` is the white page, `dark` the ink
-    // banner, `reveal` the accent field.
+    // Outlined at rest — codedgar's `.btn--secondary`. `.cta-wash` is the
+    // faint 10%-opacity accent slide that CTA gets on hover, not a fill;
+    // border goes to accent too, and — matching codedgar exactly — the text
+    // colour does NOT change on hover here, only border and wash do. The
+    // `reveal` tone skips the border-hover: it already sits on the accent
+    // field itself (the About Us reveal band), so animating its border TO
+    // accent would blend it straight into its own background.
     boxed &&
-      `cta-wipe border ${framePadding[size]} ${
+      `cta-wash border ${framePadding[size]} ${
         reveal
-          ? "border-mist text-mist hover:text-accent"
+          ? "border-mist text-mist"
           : dark
-            ? "border-canvas/40 text-canvas hover:text-ink"
-            : "border-ink/25 text-ink hover:border-ink hover:text-canvas"
+            ? "border-canvas/40 text-canvas hover:border-accent"
+            : "border-ink/25 text-ink hover:border-accent"
       }`,
-    // Always filled; the wipe sweeps in a second, accent-coloured fill on
-    // top of the resting one — the closest match to codedgar's own
-    // `.btn--primary`, which is accent-filled at rest too.
+    // Always filled — codedgar's `.btn--primary`. `.cta-wipe` sweeps in a
+    // second, accent-coloured fill over the resting one, with the same
+    // hover glow that source's primary button gets.
     variant === "solid" &&
       `cta-wipe cta-wipe--glow ${dark ? "bg-canvas text-ink hover:text-canvas" : "bg-ink text-canvas"} ${framePadding[size]}`,
     disabled && "pointer-events-none opacity-40",
@@ -160,21 +162,11 @@ export default function BracketLink({
     .filter(Boolean)
     .join(" ");
 
-  // The wipe pseudo-element's colour, since --wipe-fill is a plain CSS
-  // custom property and can't resolve a Tailwind class — undefined (and so
-  // omitted) for every variant that isn't wearing `.cta-wipe`.
-  const wipeFill = boxed
-    ? reveal
-      ? RAW_COLOR.mist
-      : dark
-        ? RAW_COLOR.canvas
-        : RAW_COLOR.ink
-    : variant === "solid"
-      ? RAW_COLOR.accent
-      : undefined;
-  const wipeStyle: CSSProperties | undefined = wipeFill
-    ? ({ ["--wipe-fill" as string]: wipeFill } as CSSProperties)
-    : undefined;
+  // `--wipe-fill` defaults to `var(--accent)` in globals.css, which is
+  // right for every case except the one above — `reveal`'s boxed CTA needs
+  // mist instead, so this is the only combination that sets it explicitly.
+  const wipeStyle: CSSProperties | undefined =
+    boxed && reveal ? ({ ["--wipe-fill" as string]: REVEAL_WIPE_FILL } as CSSProperties) : undefined;
 
   const labelColor =
     boxed || variant === "solid"

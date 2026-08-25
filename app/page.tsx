@@ -1,4 +1,3 @@
-import Link from "next/link";
 import AboutSection from "@/components/AboutSection";
 import BracketLink from "@/components/BracketLink";
 import CTABanner from "@/components/CTABanner";
@@ -6,10 +5,12 @@ import HeroSpotlight from "@/components/HeroSpotlight";
 import LogoMarquee from "@/components/LogoMarquee";
 import ProjectCard from "@/components/ProjectCard";
 import SectionWipe from "@/components/SectionWipe";
+import ServiceCard from "@/components/ServiceCard";
 import StatsBar from "@/components/StatsBar";
 import RevealSection from "@/components/RevealSection";
 import SectionHeader from "@/components/SectionHeader";
 import { Fade } from "@/components/RevealText";
+import { choreographies } from "@/lib/glyphChoreographies";
 import { featuredProjects } from "@/lib/projects";
 import { services } from "@/lib/services";
 
@@ -70,38 +71,9 @@ export default function HomePage() {
           />
 
           <div className="mt-20 grid gap-px border border-hairline bg-hairline sm:grid-cols-2">
-            {services.map((service) => (
+            {services.map((service, i) => (
               <Fade key={service.index}>
-                <Link
-                  href="/services"
-                  className="group flex h-full flex-col justify-between gap-10 bg-canvas p-8 transition-colors duration-600 ease-expo hover:bg-bone lg:p-12"
-                >
-                  <div>
-                    <div className="flex items-baseline justify-between gap-4">
-                      <span className="micro tnum text-accent">{service.index}</span>
-                      <span
-                        aria-hidden="true"
-                        className="text-ink/20 transition-all duration-600 ease-expo group-hover:translate-x-1 group-hover:text-accent"
-                      >
-                        →
-                      </span>
-                    </div>
-                    <h3 className="mt-8 text-title font-medium transition-colors duration-400 ease-expo group-hover:text-accent">
-                      {service.title}
-                    </h3>
-                    <p className="mt-4 max-w-sm text-sm leading-relaxed text-ink/55">
-                      {service.short}
-                    </p>
-                  </div>
-
-                  <ul className="flex flex-wrap gap-2">
-                    {service.stack.map((tag) => (
-                      <li key={tag} className="micro border border-hairline px-2 py-1 text-ink/45">
-                        {tag}
-                      </li>
-                    ))}
-                  </ul>
-                </Link>
+                <ServiceCard service={service} choreography={choreographies[i % choreographies.length]} />
               </Fade>
             ))}
           </div>

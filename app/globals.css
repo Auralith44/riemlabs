@@ -385,18 +385,18 @@
   }
 
   /* The About Us CTA spends the whole blue phase underneath an opaque veil,
-     where its own :hover paints nothing anyone can see — so the fill is
-     replayed on the white mirror, which is the copy actually on screen then.
-     Outlined white on the accent field at rest; solid white with accent type
-     under the pointer, which is the same inversion the light-surface button
-     makes, read the other way up. */
+     where its own :hover paints nothing anyone can see — so the hover state
+     is replayed directly on the white mirror, which is the copy actually on
+     screen then. Kept in step with the real link's own `.cta-wash` hover
+     (see BracketLink): a faint 10%-opacity mist wash, not a solid invert —
+     an earlier version of this rule snapped to a full solid `canvas` fill
+     with `accent` text, tuned for a hover treatment the real control no
+     longer has. */
   [data-wipe-root]:has([data-about-cta="base"] a:hover) [data-about-cta="reveal"] > *,
   [data-wipe-root]:has([data-about-cta="base"] a:focus-visible)
     [data-about-cta="reveal"]
     > * {
-    background-color: var(--canvas);
-    border-color: var(--canvas);
-    color: var(--accent);
+    background-color: rgb(246 246 244 / 0.1);
   }
 
   /* Same problem in the hero: hovering the real `[ Let's talk ]` splays its
@@ -867,7 +867,7 @@
     inset: -5px;
   }
 
-  /* ---- Wipe-fill CTA (boxed/solid buttons) ------------------------------
+  /* ---- Wipe-fill CTA (solid buttons only) -------------------------------
      Ported from codedgar.com's own `.btn--primary`, read directly from its
      shipped CSS: the fill isn't a colour cross-fade, it's a pseudo-element
      that sweeps in as a directional wipe — `scaleX(0)→scaleX(1)` with the
@@ -876,7 +876,15 @@
      `--wipe-fill` is set inline per tone/variant in BracketLink, so this one
      rule serves every combination. `isolation:isolate` is what keeps the
      pseudo-element's `z-index:-1` scoped to sitting behind this control's
-     own text rather than the whole stacking context it lives in. */
+     own text rather than the whole stacking context it lives in.
+
+     Scoped to `solid` only — codedgar itself splits this into two distinct
+     mechanics depending on whether the button is filled or outlined at
+     rest, and `boxed` (outlined at rest here) gets `.cta-wash` below to
+     match its `.btn--secondary` instead. An earlier pass put both variants
+     on this same wipe, which is wrong for an outlined button: a full solid
+     sweep IS the codedgar `.btn--primary` look, not what `.btn--secondary`
+     does. */
   .cta-wipe {
     position: relative;
     overflow: hidden;
@@ -887,7 +895,7 @@
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: var(--wipe-fill, transparent);
+    background: var(--wipe-fill, var(--accent));
     transform: scaleX(0);
     transform-origin: right;
     transition: transform 0.3s var(--ease-expo);
@@ -904,6 +912,44 @@
   .cta-wipe--glow:hover,
   .cta-wipe--glow:focus-visible {
     box-shadow: 0 4px 20px rgb(27 23 255 / 0.25);
+  }
+
+  /* ---- Wash-fill CTA (boxed/outlined buttons) ---------------------------
+     codedgar's `.btn--secondary`: a hard 50/50 solid-then-transparent
+     gradient at double width, animated by sliding `background-position`
+     rather than a transform — the solid half starts scrolled out of view
+     at `100% 0` and slides to `0 0` on hover, capped at 10% opacity so it
+     reads as a faint accent wash rather than a fill. Cheaper than the
+     `.cta-wipe` transform, and correctly reads as the lighter-weight
+     treatment an outlined button gets versus a filled one. */
+  .cta-wash {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .cta-wash::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+    opacity: 0;
+    background-image: linear-gradient(
+      90deg,
+      var(--wipe-fill, var(--accent)) 0%,
+      var(--wipe-fill, var(--accent)) 50%,
+      transparent 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    background-position: 100% 0;
+    transition:
+      background-position 0.4s var(--ease-expo),
+      opacity 0.4s var(--ease-expo);
+  }
+  .cta-wash:hover::before,
+  .cta-wash:focus-visible::before {
+    background-position: 0 0;
+    opacity: 0.1;
   }
 
   /* ---- Magnetic bracket CTA ------------------------------------------- */

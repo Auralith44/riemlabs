@@ -163,6 +163,16 @@ export default function DataRain({
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
     const color = tone === "bright" ? "#F6F6F4" : "#191818";
 
+    // Canvas's `font` setter parses its string as a standalone CSS font
+    // shorthand, outside any element's cascade — `var(--font-mono)` cannot
+    // resolve there the way it does in a stylesheet. Resolved once here via
+    // the real computed value instead, so this can't quietly fail closed to
+    // the context's default `10px sans-serif` and flatten every depth tier
+    // to the same small, uniform size regardless of `fontSize`.
+    const fontFamily =
+      getComputedStyle(document.documentElement).getPropertyValue("--font-mono").trim() ||
+      "ui-monospace, SFMono-Regular, monospace";
+
     let width = 0;
     let height = 0;
     let columnX: number[] = [];
@@ -214,7 +224,7 @@ export default function DataRain({
 
     const drawStream = (s: Stream, x: number) => {
       if (!s.active) return;
-      ctx.font = `${s.fontSize}px var(--font-mono, ui-monospace, monospace)`;
+      ctx.font = `${s.fontSize}px ${fontFamily}`;
 
       const headY = s.headRow * s.fontSize;
       if (headY >= 0 && headY < height) {
