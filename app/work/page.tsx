@@ -22,8 +22,9 @@ export default function WorkPage() {
       <PageIntro
         index="03"
         label="Work"
-        lines={["Systems that", "shipped, and", "stayed shipped."]}
-        lede="Every project below is live and maintained by the client's own team. Open a preview for the brief, the role we played, and what it was built on."
+        lines={["Real infrastructure", "powering actual", "business operations."]}
+        lede="Every project in our index represents an active digital system built to solve real operational bottlenecks. From B2B product catalogues to custom platforms, we build for longevity and ongoing performance."
+        showClock={false}
         meta={[
           { label: "Projects", value: `${projects.length} in the public index` },
           { label: "Span", value: span },
@@ -49,26 +50,26 @@ export default function WorkPage() {
           <SectionHeader
             index="02"
             label="Engagement"
-            lines={["Not seeing your", "kind of problem?"]}
-            description="Roughly a third of our work never becomes a public case study. If your project sits under NDA, that's normal here."
+            lines={["Engagements tailored", "to complex operational", "challenges."]}
+            description="A significant portion of our work involves internal management portals, proprietary workflows, and non-disclosure agreements. If your specific technical challenge isn't represented in our public index, we engineer custom solutions to fit your exact setup."
           />
 
           <div className="mt-16 grid gap-x-gutter gap-y-10 md:grid-cols-3">
             {[
               {
                 index: "01",
-                title: "Confidential work",
-                body: "Internal tools, pre-launch products, and regulated interfaces. References available on request.",
+                title: "Confidential & Custom Software",
+                body: "Internal operational tools, proprietary business portals, and B2B platforms built under strict NDA. References and architectural walk-throughs are available upon request.",
               },
               {
                 index: "02",
-                title: "Retained partnerships",
-                body: "Ongoing design and front-end capacity for teams shipping continuously rather than in projects.",
+                title: "Retained System Evolution",
+                body: "Ongoing engineering capacity for growing businesses. We stay embedded post-launch to continuously expand your stack into custom web applications, workflow automation, data analytics, and AI.",
               },
               {
                 index: "03",
-                title: "System rescues",
-                body: "Inheriting a codebase that drifted. We audit, stabilise, and document before touching the surface.",
+                title: "Codebase & System Rescues",
+                body: "Inheriting fragile, unmaintained, or technical-debt-heavy codebases. We perform a complete structural audit, stabilize backend infrastructure, fix performance bottlenecks, and properly document the stack.",
               },
             ].map((item) => (
               <Fade key={item.index} className="border-t border-hairline pt-6">
@@ -84,7 +85,8 @@ export default function WorkPage() {
       <CTABanner
         index="03"
         label="Contact"
-        lines={["Your project", "could be next."]}
+        lines={["Your platform could", "be the next system", "we engineer."]}
+        note="Every system in our index started with a single operational bottleneck. Whether you need a high-performance web platform, a confidential internal portal, or a codebase rescue, tell us what you're building and we'll outline a direct technical roadmap within 24 hours."
       />
     </>
   );
