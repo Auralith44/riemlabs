@@ -101,23 +101,23 @@ export const principles = [
 export const process = [
   {
     index: "01",
-    title: "Signal",
-    body: "A short paid discovery. We read the existing system, talk to the people using it, and write down what the project is actually for.",
+    title: "Discovery & System Architecture",
+    body: "We audit your existing workflows, map data schemas, and define system boundaries. Before writing production code, we deliver a concrete architectural blueprint with explicit milestone exit conditions and zero fluff.",
   },
   {
     index: "02",
-    title: "Direction",
-    body: "Typographic scale, grid, palette, and motion vocabulary — tested against real content until the rules hold on their own.",
+    title: "Dual-Track Execution",
+    body: "Interface engineering and backend infrastructure run in parallel. Instead of waiting weeks for static comps, you interact with working code in a live preview staging environment early in the cycle.",
   },
   {
     index: "03",
-    title: "Form",
-    body: "Design and engineering run together. You see working pages in a preview environment from week two, not static comps at week eight.",
+    title: "Hardening & Deployment",
+    body: "Backend APIs, third-party services, data pipelines, and automation flows are fully integrated and stress-tested. We execute security audits, performance tuning, and a seamless production deployment.",
   },
   {
     index: "04",
-    title: "Handover",
-    body: "Tokens, documentation, and working sessions. We leave a system your team can extend without us in the room.",
+    title: "Autonomous Handover & Evolution",
+    body: "We deliver complete repository ownership, clean documentation, and hands-on team walkthroughs. We leave a system your team can operate independently, while remaining embedded for high-level scaling and feature expansion.",
   },
 ];
 
