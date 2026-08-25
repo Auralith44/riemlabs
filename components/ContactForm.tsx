@@ -288,16 +288,7 @@ export default function ContactForm() {
           ) : null}
         </div>
 
-        <p className="meta max-w-xs text-ink/35">
-          Or email{" "}
-          <a
-            href={`mailto:${site.email}`}
-            className="text-ink/60 transition-colors duration-400 ease-expo hover:text-accent"
-          >
-            {site.email}
-          </a>{" "}
-          — we reply within 24 hours.
-        </p>
+        <p className="meta max-w-xs text-ink/35">We reply within 24 hours.</p>
       </div>
     </form>
   );

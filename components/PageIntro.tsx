@@ -12,6 +12,14 @@ type PageIntroProps = {
   meta?: MetaItem[];
   /** The "Based in Nairobi [time] EAT" badge on the right of the corner row. */
   showClock?: boolean;
+  /** Overrides the h1's size/width from the site default (`text-display`,
+   *  full-bleed) — for the one page whose headline needs to run narrower.
+   *  A prop rather than an appended className: two `text-*` size utilities
+   *  on the same element don't reliably override one another by string
+   *  order, only by where Tailwind happens to emit them in the stylesheet,
+   *  so the default has to be left out entirely rather than fought with a
+   *  second class. */
+  headlineClassName?: string;
 };
 
 /** Shared masthead for the interior pages. Corner anchors frame the type. */
@@ -22,6 +30,7 @@ export default function PageIntro({
   lede,
   meta = [],
   showClock = true,
+  headlineClassName = "text-display",
 }: PageIntroProps) {
   return (
     <RevealSection className="relative">
@@ -40,7 +49,7 @@ export default function PageIntro({
           <RevealLines
             as="h1"
             lines={lines}
-            className="mt-14 text-display font-medium lg:mt-20"
+            className={`mt-14 font-medium lg:mt-20 ${headlineClassName}`}
           />
 
           <div className="mt-14 grid gap-x-gutter gap-y-10 md:grid-cols-12 lg:mt-20">
