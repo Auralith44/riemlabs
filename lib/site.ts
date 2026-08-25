@@ -4,7 +4,7 @@ export const site = {
   tagline: "Design & web systems studio",
   description:
     "Riem Labs is an independent design studio building digital products, interfaces, and web systems — shaped from first idea to working form.",
-  email: "hello@studio.com",
+  email: "hello@riemlabs.com",
   phone: "+254 700 000 000",
   city: "Nairobi",
   country: "Kenya",

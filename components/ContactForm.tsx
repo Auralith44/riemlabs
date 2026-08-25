@@ -7,12 +7,11 @@ import { site } from "@/lib/site";
 const BUDGETS = ["< $10k", "$10k — $25k", "$25k — $50k", "$50k — $100k", "$100k +"];
 
 const SCOPES = [
-  "Visual direction",
-  "Web systems",
-  "Technical execution",
-  "Design system",
-  "Brand identity",
-  "Commerce",
+  "Web & Software Development",
+  "Business Systems & Automation",
+  "Data Science & Analytics",
+  "AI & Intelligent Solutions",
+  "System & Code Audit",
 ];
 
 const TIMELINES = ["As soon as possible", "1 — 3 months", "3 — 6 months", "Just exploring"];
@@ -98,8 +97,7 @@ export default function ContactForm() {
         </p>
         <h3 className="mt-8 text-headline font-medium">Thank you — that&apos;s in.</h3>
         <p className="mt-6 max-w-md text-lede text-ink/55">
-          We read every brief ourselves and reply within two working days, even when the
-          answer is no.
+          We read every brief ourselves and reply within 24 hours, even when the answer is no.
         </p>
         <div className="mt-10 flex flex-wrap items-center gap-8">
           <BracketLink href="/work" variant="framed">
@@ -189,7 +187,7 @@ export default function ContactForm() {
           })}
         </div>
         <p className="meta mt-5 text-ink/30">
-          A range is enough. It tells us what shape of engagement is realistic.
+          A range helps us structure a realistic technical engagement model.
         </p>
       </fieldset>
 
@@ -257,7 +255,7 @@ export default function ContactForm() {
 
         <label className="block">
           <span className="meta text-ink/40">
-            What are you building, and what makes it hard?
+            What are you building, and what operational bottleneck are you trying to solve?
           </span>
           <textarea
             name="message"
@@ -298,7 +296,7 @@ export default function ContactForm() {
           >
             {site.email}
           </a>{" "}
-          — we reply within two working days.
+          — we reply within 24 hours.
         </p>
       </div>
     </form>

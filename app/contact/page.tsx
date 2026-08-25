@@ -3,7 +3,6 @@ import ContactForm from "@/components/ContactForm";
 import LiveClock from "@/components/LiveClock";
 import PageIntro from "@/components/PageIntro";
 import RevealSection from "@/components/RevealSection";
-import SectionHeader from "@/components/SectionHeader";
 import { Fade } from "@/components/RevealText";
 import { site, socials } from "@/lib/site";
 
@@ -13,41 +12,19 @@ export const metadata: Metadata = {
     "Start a project with Riem Labs. Tell us the shape of the problem, the budget range, and the timeline.",
 };
 
-const FAQ = [
-  {
-    index: "01",
-    q: "How quickly do you reply?",
-    a: "Within two working days, always — including when the answer is that we're not the right studio for it.",
-  },
-  {
-    index: "02",
-    q: "Do you work with early-stage teams?",
-    a: "Often. What matters is that someone on your side can make decisions quickly, not the size of the round.",
-  },
-  {
-    index: "03",
-    q: "Can you work with our engineers?",
-    a: "Yes. Roughly half our engagements hand the front-end to an in-house team, which is why the documentation is part of the deliverable.",
-  },
-  {
-    index: "04",
-    q: "What if we only need part of it?",
-    a: "Any of the four disciplines can be scoped on its own. An audit is usually the cheapest way to find out which you need.",
-  },
-];
-
 export default function ContactPage() {
   return (
     <>
       <PageIntro
         index="05"
         label="Contact"
-        lines={["Start a", "project."]}
-        lede="The more specific the brief, the more useful our first reply. Tell us what you're building, what's hard about it, and roughly what you can spend."
+        lines={["Scope your roadmap", "with our engineering team."]}
+        lede="Whether you need a high-conversion platform, custom business automation, or a legacy codebase audit, tell us where your infrastructure stands today and we'll outline a structured roadmap forward."
+        showClock={false}
         meta={[
           { label: "Email", value: site.email },
           { label: "Studio", value: `${site.city}, ${site.country}` },
-          { label: "Response", value: "Within 2 working days" },
+          { label: "Response", value: "Within 24 hours" },
           { label: "Availability", value: "Q3 2026 — 2 slots" },
         ]}
       />
@@ -128,33 +105,11 @@ export default function ContactPage() {
                     Available for hire
                   </p>
                   <p className="mt-4 text-sm leading-relaxed text-ink/55">
-                    Two engagement slots open for Q3 2026. Discovery typically starts four to
-                    six weeks after signature.
+                    Q3 2026 — 2 slots open.
                   </p>
                 </Fade>
               </div>
             </aside>
-          </div>
-        </div>
-      </RevealSection>
-
-      {/* ── 04.2 / Questions ───────────────────────────────────────── */}
-      <RevealSection className="bg-bone">
-        <div className="shell py-section">
-          <SectionHeader
-            index="07"
-            label="Before you write"
-            lines={["The questions", "we get most."]}
-          />
-
-          <div className="mt-20 grid gap-x-gutter gap-y-12 md:grid-cols-2">
-            {FAQ.map((item) => (
-              <Fade key={item.index} className="border-t border-hairline pt-6">
-                <span className="micro tnum text-accent">{item.index}</span>
-                <h3 className="mt-6 text-title font-medium">{item.q}</h3>
-                <p className="mt-4 max-w-md text-sm leading-relaxed text-ink/55">{item.a}</p>
-              </Fade>
-            ))}
           </div>
         </div>
       </RevealSection>
