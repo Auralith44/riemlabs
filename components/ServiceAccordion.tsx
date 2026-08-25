@@ -3,19 +3,25 @@
 import { useId, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import BracketLink from "@/components/BracketLink";
+import Glyph, { type GlyphHandle } from "@/components/Glyph";
+import { choreographies } from "@/lib/glyphChoreographies";
 import { EASE, ScrollTrigger, gsap } from "@/lib/gsap";
+import type { Choreography } from "@/lib/glyphChoreographies";
 import type { Service } from "@/lib/services";
 
 function AccordionRow({
   service,
+  choreography,
   open,
   onToggle,
 }: {
   service: Service;
+  choreography: Choreography;
   open: boolean;
   onToggle: () => void;
 }) {
   const contentRef = useRef<HTMLDivElement>(null);
+  const glyphRef = useRef<GlyphHandle>(null);
   const panelId = useId();
 
   useGSAP(
@@ -43,16 +49,22 @@ function AccordionRow({
         <button
           type="button"
           onClick={onToggle}
+          onMouseEnter={() => glyphRef.current?.play()}
+          onMouseLeave={() => glyphRef.current?.reset()}
           aria-expanded={open}
           aria-controls={panelId}
           className="group grid w-full grid-cols-12 items-baseline gap-x-gutter gap-y-3 py-8 text-left transition-colors duration-400 ease-expo hover:text-accent lg:py-10"
         >
+          {/* Same glyph as the homepage cards, sized down for this denser
+              row — the 40px card size measured off codedgar would crowd a
+              row this text-heavy, and nothing in the source material speaks
+              to sizing it for an accordion layout at all. */}
           <span
-            className={`micro tnum col-span-2 transition-colors duration-400 ease-expo md:col-span-1 ${
+            className={`col-span-2 transition-colors duration-400 ease-expo md:col-span-1 ${
               open ? "text-accent" : "text-ink/30 group-hover:text-accent"
             }`}
           >
-            {service.index}
+            <Glyph ref={glyphRef} choreography={choreography} className="h-6 w-6" />
           </span>
 
           <span
@@ -140,10 +152,11 @@ export default function ServiceAccordion({ services }: { services: Service[] }) 
 
   return (
     <div className="border-t border-hairline">
-      {services.map((service) => (
+      {services.map((service, i) => (
         <AccordionRow
           key={service.index}
           service={service}
+          choreography={choreographies[i % choreographies.length]}
           open={openIndex === service.index}
           onToggle={() =>
             setOpenIndex((current) => (current === service.index ? null : service.index))

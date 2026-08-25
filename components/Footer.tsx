@@ -58,7 +58,7 @@ export default function Footer() {
           below it, so leaving the content at its implicit stacking would
           have let this canvas sit on top of the nav links and swallow
           their clicks. */}
-      <DataRain tone="ambient" fadeColor="bg-bone" opacity={0.35} className="absolute inset-0 z-0" />
+      <DataRain tone="ambient" fadeColor="bg-bone" opacity={0.11} className="absolute inset-0 z-0" />
 
       <div className="shell relative z-10">
         {/* The band is deliberately shallow. Everything in it sits down against

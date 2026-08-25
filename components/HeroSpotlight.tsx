@@ -245,7 +245,7 @@ export default function HeroSpotlight() {
           positioned (absolute) sibling at z-0 paints ABOVE plain in-flow
           content per the CSS stacking order, not below it. */}
       <div className="relative z-0">
-        <DataRain tone="ambient" className="absolute inset-0 z-0" />
+        <DataRain tone="ambient" opacity={0.025} className="absolute inset-0 z-0" />
         <div className="relative z-10">
           <HeroContent variant="base" />
         </div>

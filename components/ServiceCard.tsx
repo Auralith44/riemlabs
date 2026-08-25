@@ -31,11 +31,15 @@ export default function ServiceCard({
       className="group flex h-full flex-col justify-between gap-10 bg-canvas p-8 transition-colors duration-600 ease-expo hover:bg-bone lg:p-12"
     >
       <div>
-        <div className="flex items-baseline justify-between gap-4">
-          <Glyph ref={glyphRef} choreography={choreography} className="h-4 w-4 text-accent" />
+        {/* `items-start`, not `items-baseline` — the row was tuned for a
+            small text index next to the arrow glyph; a 40px icon has no
+            text baseline of its own to align against, and baseline
+            alignment left it sitting oddly low next to the arrow. */}
+        <div className="flex items-start justify-between gap-4">
+          <Glyph ref={glyphRef} choreography={choreography} className="h-10 w-10 text-accent" />
           <span
             aria-hidden="true"
-            className="text-ink/20 transition-all duration-600 ease-expo group-hover:translate-x-1 group-hover:text-accent"
+            className="mt-1 text-ink/20 transition-all duration-600 ease-expo group-hover:translate-x-1 group-hover:text-accent"
           >
             →
           </span>

@@ -4,18 +4,6 @@ import Link from "next/link";
 import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode } from "react";
 
 /**
- * `.cta-wipe`/`.cta-wash` both default their fill to `var(--accent)` in
- * globals.css, which covers every case except one: the `reveal` tone's
- * boxed CTA sits ON the accent field itself (the About Us reveal band), so
- * an accent-coloured wash or border there would blend straight into its
- * own background instead of reading as a highlight. That's the one case
- * that needs an explicit override — mist, since it's a raw hex here rather
- * than a Tailwind class because `--wipe-fill` is a plain CSS custom
- * property that can't resolve one.
- */
-const REVEAL_WIPE_FILL = "#F6F6F4";
-
-/**
  * `inline` is the bracketed text link — [ Let's talk ] — and keeps its
  * brackets. `boxed` is the bordered button: no brackets at all, because the
  * border already does the job they were doing, and a box wrapped in brackets
@@ -142,9 +130,12 @@ export default function BracketLink({
     // colour does NOT change on hover here, only border and wash do. The
     // `reveal` tone skips the border-hover: it already sits on the accent
     // field itself (the About Us reveal band), so animating its border TO
-    // accent would blend it straight into its own background.
+    // accent would blend it straight into its own background. `.cta-corners`
+    // is codedgar's separate corner-bracket layer on top — its default
+    // 14px/2px sizing is the smaller of its two variants, the one it uses
+    // for outlined buttons, so nothing extra needs setting here.
     boxed &&
-      `cta-wash border ${framePadding[size]} ${
+      `cta-wash cta-corners border ${framePadding[size]} ${
         reveal
           ? "border-mist text-mist"
           : dark
@@ -153,20 +144,23 @@ export default function BracketLink({
       }`,
     // Always filled — codedgar's `.btn--primary`. `.cta-wipe` sweeps in a
     // second, accent-coloured fill over the resting one, with the same
-    // hover glow that source's primary button gets.
+    // hover glow that source's primary button gets, plus the bigger
+    // 18px/3px corner-bracket variant that source uses for its primary/CTA
+    // buttons specifically (set via inline style below).
     variant === "solid" &&
-      `cta-wipe cta-wipe--glow ${dark ? "bg-canvas text-ink hover:text-canvas" : "bg-ink text-canvas"} ${framePadding[size]}`,
+      `cta-wipe cta-wipe--glow cta-corners ${dark ? "bg-canvas text-ink hover:text-canvas" : "bg-ink text-canvas"} ${framePadding[size]}`,
     disabled && "pointer-events-none opacity-40",
     className,
   ]
     .filter(Boolean)
     .join(" ");
 
-  // `--wipe-fill` defaults to `var(--accent)` in globals.css, which is
-  // right for every case except the one above — `reveal`'s boxed CTA needs
-  // mist instead, so this is the only combination that sets it explicitly.
-  const wipeStyle: CSSProperties | undefined =
-    boxed && reveal ? ({ ["--wipe-fill" as string]: REVEAL_WIPE_FILL } as CSSProperties) : undefined;
+  // `.cta-corners` defaults to codedgar's smaller, 14px/2px bracket
+  // variant — only `solid` needs an override, to its bigger 18px/3px one.
+  const cornerStyle: CSSProperties | undefined =
+    variant === "solid"
+      ? ({ ["--corner-size" as string]: "18px", ["--corner-width" as string]: "3px" } as CSSProperties)
+      : undefined;
 
   const labelColor =
     boxed || variant === "solid"
@@ -218,7 +212,7 @@ export default function BracketLink({
 
   if (asStatic) {
     return (
-      <span className={base} style={wipeStyle}>
+      <span className={base} style={cornerStyle}>
         {inner}
       </span>
     );
@@ -232,7 +226,7 @@ export default function BracketLink({
         <a
           href={href}
           className={base}
-          style={wipeStyle}
+          style={cornerStyle}
           {...magnetProps}
           {...(href.startsWith("http")
             ? { target: "_blank", rel: "noreferrer noopener" }
@@ -244,7 +238,7 @@ export default function BracketLink({
     }
 
     return (
-      <Link href={href} className={base} style={wipeStyle} {...magnetProps}>
+      <Link href={href} className={base} style={cornerStyle} {...magnetProps}>
         {inner}
       </Link>
     );
@@ -256,7 +250,7 @@ export default function BracketLink({
       onClick={onClick}
       disabled={disabled}
       className={base}
-      style={wipeStyle}
+      style={cornerStyle}
       {...magnetProps}
     >
       {inner}

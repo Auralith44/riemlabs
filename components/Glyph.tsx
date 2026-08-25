@@ -128,7 +128,7 @@ const Glyph = forwardRef<GlyphHandle, { choreography: Choreography; className?: 
     return (
       <div
         aria-hidden="true"
-        className={`grid grid-cols-3 grid-rows-3 gap-[3px] ${className}`}
+        className={`grid grid-cols-3 grid-rows-3 gap-0.5 ${className}`}
       >
         {Array.from({ length: 9 }, (_, i) => (
           <div

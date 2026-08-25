@@ -387,16 +387,20 @@
   /* The About Us CTA spends the whole blue phase underneath an opaque veil,
      where its own :hover paints nothing anyone can see — so the hover state
      is replayed directly on the white mirror, which is the copy actually on
-     screen then. Kept in step with the real link's own `.cta-wash` hover
-     (see BracketLink): a faint 10%-opacity mist wash, not a solid invert —
-     an earlier version of this rule snapped to a full solid `canvas` fill
-     with `accent` text, tuned for a hover treatment the real control no
-     longer has. */
+     screen then. This is a snap-to-state replay, not an eased transition —
+     no `.cta-wash` pseudo-element or `background-position` slide, since the
+     mirror is a static, non-hoverable span — so it can afford to sit a
+     little stronger than the real wash's own 10%: an instant swap has no
+     animation build-up giving it presence, only the flat colour itself. An
+     earlier version of this rule snapped to a full solid `canvas` fill with
+     `accent` text — tuned for a hover treatment the real control no longer
+     has — and the 10% that replaced it turned out too faint to register at
+     all in a before/after comparison. */
   [data-wipe-root]:has([data-about-cta="base"] a:hover) [data-about-cta="reveal"] > *,
   [data-wipe-root]:has([data-about-cta="base"] a:focus-visible)
     [data-about-cta="reveal"]
     > * {
-    background-color: rgb(246 246 244 / 0.1);
+    background-color: rgb(246 246 244 / 0.28);
   }
 
   /* Same problem in the hero: hovering the real `[ Let's talk ]` splays its
@@ -867,16 +871,30 @@
     inset: -5px;
   }
 
+  /* `--wipe-fill` defaults to accent, invisible when a `.cta-wash`/
+     `.cta-wipe` CTA sits on an accent-coloured surface itself — the About
+     Us CTA, on the accent reveal band, was confirmed showing no visible
+     hover change there. Set on the surface, not per-tone in the component:
+     any container painted with the site's own `bg-accent` utility now
+     hands its CTAs a light fill instead, inherited automatically rather
+     than the component having to know in advance which of its callers sit
+     on blue. An earlier version special-cased this by `tone` prop inside
+     BracketLink itself — brittle, since it only covered the one tone the
+     component happened to be told about, not every context that might
+     ever paint `bg-accent` behind a CTA. */
+  .bg-accent {
+    --wipe-fill: #f6f6f4;
+  }
+
   /* ---- Wipe-fill CTA (solid buttons only) -------------------------------
      Ported from codedgar.com's own `.btn--primary`, read directly from its
      shipped CSS: the fill isn't a colour cross-fade, it's a pseudo-element
      that sweeps in as a directional wipe — `scaleX(0)→scaleX(1)` with the
      transform-origin flipped between rest and hover, so it visibly travels
      left-to-right rather than growing from the centre or just appearing.
-     `--wipe-fill` is set inline per tone/variant in BracketLink, so this one
-     rule serves every combination. `isolation:isolate` is what keeps the
-     pseudo-element's `z-index:-1` scoped to sitting behind this control's
-     own text rather than the whole stacking context it lives in.
+     `isolation:isolate` is what keeps the pseudo-element's `z-index:-1`
+     scoped to sitting behind this control's own text rather than the whole
+     stacking context it lives in.
 
      Scoped to `solid` only — codedgar itself splits this into two distinct
      mechanics depending on whether the button is filled or outlined at
@@ -884,10 +902,16 @@
      match its `.btn--secondary` instead. An earlier pass put both variants
      on this same wipe, which is wrong for an outlined button: a full solid
      sweep IS the codedgar `.btn--primary` look, not what `.btn--secondary`
-     does. */
+     does.
+
+     No `overflow: hidden` — the pseudo-element is `inset: 0`, exactly the
+     button's own box, and `scaleX` shrinks/grows from within that box
+     rather than pushing it past its own edges, so nothing here actually
+     needs clipping. That matters now that `.cta-corners` also lives on this
+     same element: its brackets deliberately sit OUTSIDE the box on hover,
+     which `overflow: hidden` would have cut off. */
   .cta-wipe {
     position: relative;
-    overflow: hidden;
     isolation: isolate;
   }
   .cta-wipe::before {
@@ -921,16 +945,21 @@
      at `100% 0` and slides to `0 0` on hover, capped at 10% opacity so it
      reads as a faint accent wash rather than a fill. Cheaper than the
      `.cta-wipe` transform, and correctly reads as the lighter-weight
-     treatment an outlined button gets versus a filled one. */
+     treatment an outlined button gets versus a filled one.
+
+     `inset: 0`, not codedgar's `-1px` — that 1px used to rely on
+     `overflow: hidden` to get clipped back down to the button's own edge;
+     dropped now that `overflow: hidden` is gone too (see `.cta-wipe`'s own
+     note — `.cta-corners` below needs its brackets to sit outside the box,
+     which clipping would cut off). The 1px was never visible either way. */
   .cta-wash {
     position: relative;
-    overflow: hidden;
     isolation: isolate;
   }
   .cta-wash::before {
     content: "";
     position: absolute;
-    inset: -1px;
+    inset: 0;
     z-index: -1;
     opacity: 0;
     background-image: linear-gradient(
@@ -950,6 +979,69 @@
   .cta-wash:focus-visible::before {
     background-position: 0 0;
     opacity: 0.1;
+  }
+
+  /* ---- Corner brackets (boxed/solid CTAs) -------------------------------
+     codedgar's real mechanism here is a single page-wide cursor-follower —
+     a fixed `[data-cursor-target]` box that JS resizes/repositions to hug
+     whatever's hovered, 6px outside its edges, holding four static corner
+     divs whose CSS this is read directly from (`.cursor-target__corner`).
+     Built self-contained per button instead of porting the whole
+     cursor-tracking system: the same eight-gradient trick `.cta-box`
+     already uses for `framed`, parametrized via `--corner-size` /
+     `--corner-width` so one rule covers codedgar's two sizes (14px/2px
+     outlined, 18px/3px solid) rather than duplicating the block. Kept
+     separate from `.cta-box` itself rather than generalizing it in place,
+     so its own tuned framed-CTA timing can't regress from a shared edit.
+
+     This layers with `.cta-wash`/`.cta-wipe` on the same element — both
+     effects are present together on codedgar's real buttons, not a choice
+     between them — which is exactly why neither of those carries
+     `overflow: hidden` any more: these brackets sit outside the box on
+     hover, and clipping would have cut them off. The 0.1s transition delay
+     is codedgar's own — the brackets visibly follow a beat behind the
+     fill/wash rather than arriving in the same instant. */
+  .cta-corners {
+    position: relative;
+  }
+  .cta-corners::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition:
+      opacity 0.2s ease-out 0.1s,
+      inset 0.2s ease-out 0.1s;
+    background-repeat: no-repeat;
+    background-image:
+      linear-gradient(var(--accent), var(--accent)),
+      linear-gradient(var(--accent), var(--accent)),
+      linear-gradient(var(--accent), var(--accent)),
+      linear-gradient(var(--accent), var(--accent)),
+      linear-gradient(var(--accent), var(--accent)),
+      linear-gradient(var(--accent), var(--accent)),
+      linear-gradient(var(--accent), var(--accent)),
+      linear-gradient(var(--accent), var(--accent));
+    background-size:
+      var(--corner-size, 14px) var(--corner-width, 2px),
+      var(--corner-width, 2px) var(--corner-size, 14px),
+      var(--corner-size, 14px) var(--corner-width, 2px),
+      var(--corner-width, 2px) var(--corner-size, 14px),
+      var(--corner-size, 14px) var(--corner-width, 2px),
+      var(--corner-width, 2px) var(--corner-size, 14px),
+      var(--corner-size, 14px) var(--corner-width, 2px),
+      var(--corner-width, 2px) var(--corner-size, 14px);
+    background-position:
+      left top, left top,
+      right top, right top,
+      left bottom, left bottom,
+      right bottom, right bottom;
+  }
+  .cta-corners:hover::after,
+  .cta-corners:focus-visible::after {
+    opacity: 1;
+    inset: -6px;
   }
 
   /* ---- Magnetic bracket CTA ------------------------------------------- */

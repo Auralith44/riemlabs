@@ -35,19 +35,24 @@ export type Choreography = {
 };
 
 /**
- * The brief's one concrete example (`data-pattern="101000101"`) is the only
- * idle pattern actually given — reused across all four cards rather than
- * invented per-card, since nothing distinguishes one card's rest state from
- * another's in the source material.
+ * Four distinct idle patterns, one per card — an earlier pass reused a
+ * single pattern (the four-corner mark) for all four, which is why every
+ * card looked identical at rest. Paired thematically with each
+ * choreography's own name below, not by any required mapping.
  */
-const IDLE_PATTERN = "101000101";
+const IDLE = {
+  fourCorners: "101000101",
+  topRow: "111000000",
+  centerOnly: "000010000",
+  diagonal: "100010001",
+};
 
 const t = { cellDuration: 0.08, staggerUnit: 0.02 };
 
 export const choreographies: Choreography[] = [
   {
     name: "Diagnosing Complexity",
-    idlePattern: IDLE_PATTERN,
+    idlePattern: IDLE.fourCorners,
     frames: [
       { ...t, pattern: "100000001", transitionStyle: "cascade", holdDuration: 0.06 },
       { ...t, pattern: "000010000", transitionStyle: "implode", holdDuration: 0.06 },
@@ -63,7 +68,7 @@ export const choreographies: Choreography[] = [
   },
   {
     name: "Building",
-    idlePattern: IDLE_PATTERN,
+    idlePattern: IDLE.topRow,
     frames: [
       { ...t, pattern: "000000100", transitionStyle: "build-up", holdDuration: 0.05 },
       { ...t, pattern: "000000111", transitionStyle: "build-up", holdDuration: 0.06 },
@@ -79,7 +84,7 @@ export const choreographies: Choreography[] = [
   },
   {
     name: "Expanding Influence",
-    idlePattern: IDLE_PATTERN,
+    idlePattern: IDLE.centerOnly,
     frames: [
       { ...t, pattern: "010010010", transitionStyle: "columns", holdDuration: 0.05 },
       { ...t, pattern: "010111010", transitionStyle: "radial", holdDuration: 0.06 },
@@ -94,7 +99,7 @@ export const choreographies: Choreography[] = [
   },
   {
     name: "Connecting Nodes",
-    idlePattern: IDLE_PATTERN,
+    idlePattern: IDLE.diagonal,
     frames: [
       { ...t, pattern: "100010000", transitionStyle: "simultaneous", holdDuration: 0.04 },
       { ...t, pattern: "100010001", transitionStyle: "cascade", holdDuration: 0.05 },
