@@ -10,7 +10,7 @@ export const site = {
   country: "Kenya",
   timeZone: "Africa/Nairobi",
   timeZoneLabel: "EAT",
-  founded: 2017,
+  founded: 2022,
   availability: "Available for hire — Q3 2026",
 } as const;
 

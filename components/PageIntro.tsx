@@ -10,10 +10,19 @@ type PageIntroProps = {
   lines: string[];
   lede: string;
   meta?: MetaItem[];
+  /** The "Based in Nairobi [time] EAT" badge on the right of the corner row. */
+  showClock?: boolean;
 };
 
 /** Shared masthead for the interior pages. Corner anchors frame the type. */
-export default function PageIntro({ index, label, lines, lede, meta = [] }: PageIntroProps) {
+export default function PageIntro({
+  index,
+  label,
+  lines,
+  lede,
+  meta = [],
+  showClock = true,
+}: PageIntroProps) {
   return (
     <RevealSection className="relative">
       <div className="shell pb-16 pt-[calc(var(--header-h)+4rem)] lg:pb-24 lg:pt-[calc(var(--header-h)+7rem)]">
@@ -25,7 +34,7 @@ export default function PageIntro({ index, label, lines, lede, meta = [] }: Page
               <span className="text-ink/25">/</span>
               <span>{label}</span>
             </p>
-            <LiveClock />
+            {showClock ? <LiveClock /> : null}
           </div>
 
           <RevealLines

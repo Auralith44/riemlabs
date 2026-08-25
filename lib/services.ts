@@ -78,31 +78,24 @@ export const services: Service[] = [
 export const principles = [
   {
     index: "01",
-    title: "Structure before surface",
-    body: "The grid, the scale, and the content model come first. Decoration applied to a weak structure is just expensive noise.",
+    title: "Systems Over Static Shells",
+    body: "A web application should never be a dead-end visual brochure. We architect every build on modular backends, clean APIs, and structured data—built from day one to integrate future automation and AI capabilities.",
   },
   {
     index: "02",
-    title: "One accent, held back",
-    body: "A single interactive colour, used only where the interface responds. Restraint is what makes the signal readable.",
+    title: "Continuity After Handover",
+    body: "Shipping is where the real lifecycle of a digital system begins. We don't deliver code and disappear; we remain embedded alongside our clients to support, optimize, and grow their infrastructure as operations scale.",
   },
   {
     index: "03",
-    title: "Motion with a reason",
-    body: "Animation exists to explain a change in state. If it can be removed without losing meaning, it gets removed.",
+    title: "Utility Before Ornament",
+    body: "High-end design is meaningless if it doesn't solve an operational bottleneck. We prioritize intuitive workflows, clean data collection, and process automation that save hours of manual effort and drive real sales.",
   },
   {
     index: "04",
-    title: "Built to be handed over",
-    body: "Every project ships with the notes, tokens, and conventions the next team needs. We design for our own replaceability.",
+    title: "Depth Over Volume",
+    body: "We intentionally constrain the number of active engagements we take each year. This guarantees direct, hands-on engineering attention from senior practitioners without agency bloat or diluted execution.",
   },
-];
-
-export const metrics = [
-  { value: "9", suffix: "yrs", label: "Experience", note: "Independent since 2017" },
-  { value: "120", suffix: "+", label: "Projects", note: "Shipped across 14 countries" },
-  { value: "98", suffix: "%", label: "Client satisfaction", note: "Post-engagement survey" },
-  { value: "100", suffix: "%", label: "On-time rate", note: "Across the last 40 builds" },
 ];
 
 export const process = [
@@ -125,5 +118,34 @@ export const process = [
     index: "04",
     title: "Handover",
     body: "Tokens, documentation, and working sessions. We leave a system your team can extend without us in the room.",
+  },
+];
+
+/**
+ * The About page's own process breakdown — deliberately separate from
+ * `process` above, which /services still uses for its own "Every engagement
+ * runs the same four phases" section. Updating the shared array instead
+ * would have silently changed that page's content too.
+ */
+export const aboutProcess = [
+  {
+    index: "01",
+    title: "Discovery & Architecture",
+    body: "We audit your existing workflows, data structures, and operational bottlenecks. Before writing code, we map out the system requirements—defining schema design, API boundaries, and clear business outcomes.",
+  },
+  {
+    index: "02",
+    title: "Dual-Track Engineering",
+    body: "Interface design and full-stack development run together. Instead of waiting weeks for static design comps, you interact with functional code in a live preview environment early in the build cycle.",
+  },
+  {
+    index: "03",
+    title: "Integration & Launch",
+    body: "We connect backend APIs, third-party services, payment pipelines, and automated workflows. After security checks and performance tuning, we execute a seamless production deployment.",
+  },
+  {
+    index: "04",
+    title: "Embedded Evolution",
+    body: "Launch is the start of the system lifecycle, not the end. We stay embedded to maintain uptime, optimize performance, and continuously expand your stack into custom web apps, analytics, and AI as you scale.",
   },
 ];

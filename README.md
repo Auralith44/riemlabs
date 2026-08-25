@@ -81,7 +81,7 @@ Pre-hidden states are scoped to a `.js` class set on `<html>` before first paint
 
 ## Components
 
-`Header` · `Footer` · `HeroSpotlight` · `HeroContent` · `SectionHeader` · `ProjectCard` · `ProjectVisual` · `ProjectPreview` · `WorkGallery` · `ServiceAccordion` · `ContactForm` · `MetricGrid` · `BracketLink` · `LiveClock` · `Marquee` · `PageIntro` · `CTABanner` · `SmoothScrollProvider` · `RevealSection` / `RevealText`
+`Header` · `Footer` · `HeroSpotlight` · `HeroContent` · `SectionHeader` · `ProjectCard` · `ProjectVisual` · `ProjectPreview` · `WorkGallery` · `ServiceAccordion` · `ContactForm` · `BracketLink` · `LiveClock` · `Marquee` · `PageIntro` · `CTABanner` · `SmoothScrollProvider` · `RevealSection` / `RevealText`
 
 Content lives in [lib/](lib/) — [`projects.ts`](lib/projects.ts), [`services.ts`](lib/services.ts), [`site.ts`](lib/site.ts). Add a project or service there and every page that lists it updates.
 
