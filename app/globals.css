@@ -867,6 +867,45 @@
     inset: -5px;
   }
 
+  /* ---- Wipe-fill CTA (boxed/solid buttons) ------------------------------
+     Ported from codedgar.com's own `.btn--primary`, read directly from its
+     shipped CSS: the fill isn't a colour cross-fade, it's a pseudo-element
+     that sweeps in as a directional wipe — `scaleX(0)→scaleX(1)` with the
+     transform-origin flipped between rest and hover, so it visibly travels
+     left-to-right rather than growing from the centre or just appearing.
+     `--wipe-fill` is set inline per tone/variant in BracketLink, so this one
+     rule serves every combination. `isolation:isolate` is what keeps the
+     pseudo-element's `z-index:-1` scoped to sitting behind this control's
+     own text rather than the whole stacking context it lives in. */
+  .cta-wipe {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .cta-wipe::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--wipe-fill, transparent);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s var(--ease-expo);
+  }
+  .cta-wipe:hover::before,
+  .cta-wipe:focus-visible::before {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  /* codedgar's `.btn--primary` also gains a soft accent glow on hover —
+     kept to the `solid` variant here, the one CTA that's accent-filled by
+     the wipe rather than ink or canvas, the closest match to that source's
+     own always-blue default state. */
+  .cta-wipe--glow:hover,
+  .cta-wipe--glow:focus-visible {
+    box-shadow: 0 4px 20px rgb(27 23 255 / 0.25);
+  }
+
   /* ---- Magnetic bracket CTA ------------------------------------------- */
   .magnetic {
     --site-button-bracket-x: 0px;

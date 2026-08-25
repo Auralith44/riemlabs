@@ -1,7 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
+import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode } from "react";
+
+/**
+ * Raw hex values for the wipe-fill pseudo-element's `--wipe-fill`, which is
+ * a plain CSS custom property and so can't resolve a Tailwind colour class —
+ * kept in step with the same tokens declared in tailwind.config.ts.
+ */
+const RAW_COLOR = {
+  canvas: "#FFFFFF",
+  ink: "#0D0D0D",
+  accent: "#1B17FF",
+  mist: "#F6F6F4",
+} as const;
 
 /**
  * `inline` is the bracketed text link — [ Let's talk ] — and keeps its
@@ -124,24 +136,45 @@ export default function BracketLink({
       `cta-box border ${reveal ? "border-mist/20" : "hover:border-accent"} ${
         dark ? "border-canvas/20" : reveal ? "" : "border-hairline"
       } ${framePadding[size]}`,
-    // Outlined at rest, solid on hover, with the type inverting to whatever
-    // the fill is not. Each tone names the surface it sits on: `light` is the
-    // white page, `dark` the ink banner, `reveal` the accent field.
+    // Outlined at rest, filled on hover via `.cta-wipe`'s directional sweep
+    // rather than a flat colour cross-fade — codedgar's own `.btn` mechanic.
+    // The type still inverts to whatever the fill is not; each tone names
+    // the surface it sits on: `light` is the white page, `dark` the ink
+    // banner, `reveal` the accent field.
     boxed &&
-      `border ${framePadding[size]} ${
+      `cta-wipe border ${framePadding[size]} ${
         reveal
-          ? "border-mist text-mist hover:bg-mist hover:text-accent"
+          ? "border-mist text-mist hover:text-accent"
           : dark
-            ? "border-canvas/40 text-canvas hover:bg-canvas hover:text-ink"
-            : "border-ink/25 text-ink hover:border-ink hover:bg-ink hover:text-canvas"
+            ? "border-canvas/40 text-canvas hover:text-ink"
+            : "border-ink/25 text-ink hover:border-ink hover:text-canvas"
       }`,
+    // Always filled; the wipe sweeps in a second, accent-coloured fill on
+    // top of the resting one — the closest match to codedgar's own
+    // `.btn--primary`, which is accent-filled at rest too.
     variant === "solid" &&
-      `hover:bg-accent ${dark ? "bg-canvas text-ink hover:text-canvas" : "bg-ink text-canvas"} ${framePadding[size]}`,
+      `cta-wipe cta-wipe--glow ${dark ? "bg-canvas text-ink hover:text-canvas" : "bg-ink text-canvas"} ${framePadding[size]}`,
     disabled && "pointer-events-none opacity-40",
     className,
   ]
     .filter(Boolean)
     .join(" ");
+
+  // The wipe pseudo-element's colour, since --wipe-fill is a plain CSS
+  // custom property and can't resolve a Tailwind class — undefined (and so
+  // omitted) for every variant that isn't wearing `.cta-wipe`.
+  const wipeFill = boxed
+    ? reveal
+      ? RAW_COLOR.mist
+      : dark
+        ? RAW_COLOR.canvas
+        : RAW_COLOR.ink
+    : variant === "solid"
+      ? RAW_COLOR.accent
+      : undefined;
+  const wipeStyle: CSSProperties | undefined = wipeFill
+    ? ({ ["--wipe-fill" as string]: wipeFill } as CSSProperties)
+    : undefined;
 
   const labelColor =
     boxed || variant === "solid"
@@ -192,7 +225,11 @@ export default function BracketLink({
   );
 
   if (asStatic) {
-    return <span className={base}>{inner}</span>;
+    return (
+      <span className={base} style={wipeStyle}>
+        {inner}
+      </span>
+    );
   }
 
   if (href) {
@@ -203,6 +240,7 @@ export default function BracketLink({
         <a
           href={href}
           className={base}
+          style={wipeStyle}
           {...magnetProps}
           {...(href.startsWith("http")
             ? { target: "_blank", rel: "noreferrer noopener" }
@@ -214,7 +252,7 @@ export default function BracketLink({
     }
 
     return (
-      <Link href={href} className={base} {...magnetProps}>
+      <Link href={href} className={base} style={wipeStyle} {...magnetProps}>
         {inner}
       </Link>
     );
@@ -226,6 +264,7 @@ export default function BracketLink({
       onClick={onClick}
       disabled={disabled}
       className={base}
+      style={wipeStyle}
       {...magnetProps}
     >
       {inner}

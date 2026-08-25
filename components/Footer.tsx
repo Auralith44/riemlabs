@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import BracketLink from "@/components/BracketLink";
+import DataRain from "@/components/DataRain";
 import SocialIcon from "@/components/SocialIcon";
 import { useSmoothScroll } from "@/components/SmoothScrollProvider";
 import { services } from "@/lib/services";
@@ -43,8 +44,23 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="hairline-t bg-bone">
-      <div className="shell">
+    <footer className="hairline-t relative bg-bone">
+      {/* The same ambient rain as the hero's base layer — no hover reveal
+          here (there's nothing playing that role in the footer, unlike the
+          hero's cursor band), so it's the plain "ambient" tone, with its own
+          radial edge-fade. Opacity bumped well above the hero's 8% — dark
+          ink at codedgar's own level reads as nearly invisible against a
+          footer this much busier (five nav columns, a wordmark, a status
+          bar) even though it holds up fine over the hero's much emptier
+          field. z-0 plus an explicit z-10 wrapper below is what keeps it
+          under the content: a positioned (absolute) z-0 sibling paints
+          ABOVE plain in-flow content by default CSS stacking rules, not
+          below it, so leaving the content at its implicit stacking would
+          have let this canvas sit on top of the nav links and swallow
+          their clicks. */}
+      <DataRain tone="ambient" fadeColor="bg-bone" opacity={0.35} className="absolute inset-0 z-0" />
+
+      <div className="shell relative z-10">
         {/* The band is deliberately shallow. Everything in it sits down against
             the rule below rather than floating in the middle of a tall block,
             so the wordmark under that rule reads as the floor of the page. */}

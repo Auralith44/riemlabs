@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import DataRain from "@/components/DataRain";
 import HeroContent from "@/components/HeroContent";
 
 /** How much of the gap to close each frame — lower trails the cursor further. */
@@ -237,9 +238,17 @@ export default function HeroSpotlight() {
       data-hero
       className="relative isolate overflow-hidden bg-mist"
     >
-      {/* Layer 1 — the real, interactive hero. */}
+      {/* Layer 1 — the real, interactive hero.
+
+          The rain sits behind it at its own z-0; HeroContent gets an
+          explicit z-10 rather than relying on default stacking, since a
+          positioned (absolute) sibling at z-0 paints ABOVE plain in-flow
+          content per the CSS stacking order, not below it. */}
       <div className="relative z-0">
-        <HeroContent variant="base" />
+        <DataRain tone="ambient" className="absolute inset-0 z-0" />
+        <div className="relative z-10">
+          <HeroContent variant="base" />
+        </div>
       </div>
 
       {/* Laid out to the band's live geometry so its getBoundingClientRect()
@@ -256,14 +265,27 @@ export default function HeroSpotlight() {
         }}
       />
 
-      {/* Layer 2 — inverted mirror, clipped to the band. */}
+      {/* Layer 2 — inverted mirror, clipped to the band.
+
+          `DataRain tone="bright"` needs no mask, opacity transition, or
+          pointer listener of its own here — this whole div already carries
+          `.reveal-clip`, driven by the same --reveal-position/--reveal-width
+          HeroSpotlight's own pointer tracking publishes for the text
+          reveal. Rain drawn inside it brightens and fades exactly in step
+          with that existing band, for free. `fade={false}` because the
+          radial edge-fade is what makes the ambient layer taper off before
+          the section boundary — inside a band already this narrow, it would
+          just double up on clipping the same handful of characters. */}
       <div
         ref={layerRef}
         aria-hidden="true"
         inert
         className="reveal-clip reveal-layer pointer-events-none absolute inset-0 z-20 bg-accent"
       >
-        <HeroContent variant="reveal" />
+        <DataRain tone="bright" fade={false} className="absolute inset-0 z-0" />
+        <div className="relative z-10">
+          <HeroContent variant="reveal" />
+        </div>
       </div>
     </section>
   );
