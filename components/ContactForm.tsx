@@ -4,8 +4,6 @@ import { useState } from "react";
 import BracketLink from "@/components/BracketLink";
 import { site } from "@/lib/site";
 
-const BUDGETS = ["< $10k", "$10k — $25k", "$25k — $50k", "$50k — $100k", "$100k +"];
-
 const SCOPES = [
   "Web & Software Development",
   "Business Systems & Automation",
@@ -32,7 +30,6 @@ function Legend({ index, children }: { index: string; children: React.ReactNode 
 }
 
 export default function ContactForm() {
-  const [budget, setBudget] = useState("");
   const [scope, setScope] = useState<string[]>([]);
   const [timeline, setTimeline] = useState(TIMELINES[1]);
   const [status, setStatus] = useState<Status>("idle");
@@ -56,7 +53,6 @@ export default function ContactForm() {
       email: String(data.get("email") ?? ""),
       company: String(data.get("company") ?? ""),
       message: String(data.get("message") ?? ""),
-      budget,
       scope,
       timeline,
     };
@@ -162,38 +158,9 @@ export default function ContactForm() {
         </div>
       </fieldset>
 
-      {/* 02 — Budget */}
+      {/* 02 — Scope */}
       <fieldset className="border-t border-hairline pt-8">
-        <Legend index="02">Budget *</Legend>
-
-        <div className="flex flex-wrap gap-3">
-          {BUDGETS.map((option) => {
-            const active = budget === option;
-            return (
-              <button
-                key={option}
-                type="button"
-                onClick={() => setBudget(option)}
-                aria-pressed={active}
-                className={`meta border px-4 py-3 transition-colors duration-400 ease-expo ${
-                  active
-                    ? "border-accent bg-accent text-canvas"
-                    : `${flagged("budget") ? "border-accent/40" : "border-hairline"} text-ink/60 hover:border-accent hover:text-accent`
-                }`}
-              >
-                {option}
-              </button>
-            );
-          })}
-        </div>
-        <p className="meta mt-5 text-ink/30">
-          A range helps us structure a realistic technical engagement model.
-        </p>
-      </fieldset>
-
-      {/* 03 — Scope */}
-      <fieldset className="border-t border-hairline pt-8">
-        <Legend index="03">Scope * — select all that apply</Legend>
+        <Legend index="02">Scope * — select all that apply</Legend>
 
         <div className="flex flex-wrap gap-3">
           {SCOPES.map((option) => {
@@ -223,9 +190,9 @@ export default function ContactForm() {
         </div>
       </fieldset>
 
-      {/* 04 — Timeline */}
+      {/* 03 — Timeline */}
       <fieldset className="border-t border-hairline pt-8">
-        <Legend index="04">Timeline</Legend>
+        <Legend index="03">Timeline</Legend>
 
         <div className="flex flex-wrap gap-3">
           {TIMELINES.map((option) => {
@@ -249,9 +216,9 @@ export default function ContactForm() {
         </div>
       </fieldset>
 
-      {/* 05 — Brief */}
+      {/* 04 — Brief */}
       <fieldset className="border-t border-hairline pt-8">
-        <Legend index="05">The brief *</Legend>
+        <Legend index="04">The brief *</Legend>
 
         <label className="block">
           <span className="meta text-ink/40">

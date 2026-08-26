@@ -59,6 +59,10 @@
 
     /* Hero type scale */
     --hero-headline-size: clamp(2.5rem, 0.75rem + 9.1vw, 5.25rem);
+    /* 24ch on mobile/tablet, where nothing sits to the right of the headline
+       to line up against. The desktop override below replaces this with a
+       width tied to the header's availability badge instead. */
+    --hero-headline-max-width: 24ch;
     --hero-heading-tracking: -0.04em;
     /* 0.94 matched the reference's ratio, but not its typeface: Geist hangs
        shallower descenders than Inter at the same number, so the comma on one
@@ -93,7 +97,13 @@
      hero; at this scale it carries the viewport the way it is meant to. */
   @media (min-width: 75rem) and ((min-height: 42rem) or ((hover: hover) and (pointer: fine))) {
     :root {
-      --hero-headline-size: clamp(4.5rem, 7vw, 8.5rem);
+      --hero-headline-size: clamp(4.5rem, 6.7vw, 8.5rem);
+      /* 10.5rem reserves roughly the header's "Available for Hire" badge's
+         own width, so the headline's longest line stops at the badge's left
+         edge instead of running past it — the badge sits right-gutter, same
+         as this container's own right edge, so subtracting a fixed width
+         from 100% tracks the badge's left edge across viewport sizes. */
+      --hero-headline-max-width: calc(100% - 10.5rem);
     }
   }
 
@@ -387,20 +397,31 @@
   /* The About Us CTA spends the whole blue phase underneath an opaque veil,
      where its own :hover paints nothing anyone can see — so the hover state
      is replayed directly on the white mirror, which is the copy actually on
-     screen then. This is a snap-to-state replay, not an eased transition —
-     no `.cta-wash` pseudo-element or `background-position` slide, since the
-     mirror is a static, non-hoverable span — so it can afford to sit a
-     little stronger than the real wash's own 10%: an instant swap has no
-     animation build-up giving it presence, only the flat colour itself. An
-     earlier version of this rule snapped to a full solid `canvas` fill with
-     `accent` text — tuned for a hover treatment the real control no longer
-     has — and the 10% that replaced it turned out too faint to register at
-     all in a before/after comparison. */
-  [data-wipe-root]:has([data-about-cta="base"] a:hover) [data-about-cta="reveal"] > *,
+     screen then.
+
+     This drives the mirror's OWN `.cta-wash`/`.cta-corners` pseudo-elements
+     into their hover state, rather than hand-rolling a separate flat tint —
+     the mirror's BracketLink renders with `asStatic`, which still carries
+     both classes (see BracketLink.tsx), so the real wash slide and corner
+     brackets already exist on it, just never triggered, since a `span`
+     inside a `pointer-events-none` veil can never match `:hover` itself.
+     Reusing the real pseudo-elements also means the mirror inherits the
+     correct fill for free: it sits inside the veil's own `bg-accent`, and
+     `.bg-accent` is what sets `--wipe-fill` to the light tone in the first
+     place — the same mechanism any other CTA on a blue surface gets. */
+  [data-wipe-root]:has([data-about-cta="base"] a:hover) [data-about-cta="reveal"] .cta-wash::before,
   [data-wipe-root]:has([data-about-cta="base"] a:focus-visible)
     [data-about-cta="reveal"]
-    > * {
-    background-color: rgb(246 246 244 / 0.28);
+    .cta-wash::before {
+    background-position: 0 0;
+    opacity: 0.1;
+  }
+  [data-wipe-root]:has([data-about-cta="base"] a:hover) [data-about-cta="reveal"] .cta-corners::after,
+  [data-wipe-root]:has([data-about-cta="base"] a:focus-visible)
+    [data-about-cta="reveal"]
+    .cta-corners::after {
+    opacity: 1;
+    inset: -6px;
   }
 
   /* Same problem in the hero: hovering the real `[ Let's talk ]` splays its

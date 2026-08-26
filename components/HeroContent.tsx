@@ -63,8 +63,8 @@ export default function HeroContent({ variant }: { variant: "base" | "reveal" })
           </p>
 
           <Heading
-            className={`hero-rise hero-headline max-w-[24ch] ${headingTone}`}
-            style={{ animationDelay: "0.08s" }}
+            className={`hero-rise hero-headline ${headingTone}`}
+            style={{ animationDelay: "0.08s", maxWidth: "var(--hero-headline-max-width)" }}
           >
             {HERO_HEADLINE}
           </Heading>

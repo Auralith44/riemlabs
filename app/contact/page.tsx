@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import AvailabilityLine from "@/components/AvailabilityLine";
 import ContactForm from "@/components/ContactForm";
 import LiveClock from "@/components/LiveClock";
 import PageIntro from "@/components/PageIntro";
@@ -9,13 +10,13 @@ import { site, socials } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Start a project with Riem Labs. Tell us the shape of the problem, the budget range, and the timeline.",
+    "Start a project with Riem Labs. Tell us the shape of the problem, the scope, and the timeline.",
 };
 
 /** The Direct block's real inbox — deliberately not site.email, which is
  *  the legal pages' address. See the block below for why. */
 const CONTACT_EMAIL = "riemlabs@gmail.com";
-/** Secondary contact number, local to this page — site.phone is the primary. */
+/** The WhatsApp-reachable number, local to this page — site.phone is calls-only. */
 const SECONDARY_PHONE = "+254 790 775 636";
 
 export default function ContactPage() {
@@ -74,38 +75,27 @@ export default function ContactPage() {
                     </dd>
                   </Fade>
 
-                  {/* Two numbers, both tel: links and both WhatsApp-reachable
-                      — site.phone is the primary (also what the Elsewhere
-                      row's shared WhatsApp link below points to), the
-                      secondary is local to this block since nothing else on
-                      the site needs it. */}
+                  {/* Two numbers, plain, no labels — site.phone is calls-only
+                      (no WhatsApp link), SECONDARY_PHONE is reachable on both
+                      and is what the Elsewhere row's shared WhatsApp link
+                      below points to. */}
                   <Fade>
                     <dt className="meta text-ink/35">Telephone</dt>
-                    <dd className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <dd className="mt-2">
                       <a
                         href={`tel:${site.phone.replace(/\s/g, "")}`}
                         className="link-wipe text-sm text-ink"
                       >
                         {site.phone}
                       </a>
-                      <span className="micro text-ink/30">Primary</span>
-                      <a
-                        href={`https://wa.me/${site.phone.replace(/\D/g, "")}`}
-                        target="_blank"
-                        rel="noreferrer noopener"
-                        className="micro text-ink/40 transition-colors duration-400 ease-expo hover:text-accent"
-                      >
-                        WhatsApp
-                      </a>
                     </dd>
                     <dd className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
                       <a
                         href={`tel:${SECONDARY_PHONE.replace(/\s/g, "")}`}
-                        className="link-wipe text-sm text-ink/70"
+                        className="link-wipe text-sm text-ink"
                       >
                         {SECONDARY_PHONE}
                       </a>
-                      <span className="micro text-ink/30">Secondary</span>
                       <a
                         href={`https://wa.me/${SECONDARY_PHONE.replace(/\D/g, "")}`}
                         target="_blank"
@@ -150,9 +140,7 @@ export default function ContactPage() {
                     <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse-dot" />
                     Available for hire
                   </p>
-                  <p className="mt-4 text-sm leading-relaxed text-ink/55">
-                    Q3 2026 — 2 slots open.
-                  </p>
+                  <AvailabilityLine />
                 </Fade>
               </div>
             </aside>

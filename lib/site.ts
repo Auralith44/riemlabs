@@ -5,7 +5,7 @@ export const site = {
   description:
     "Riem Labs is an independent design studio building digital products, interfaces, and web systems — shaped from first idea to working form.",
   email: "hello@riemlabs.com",
-  /** Primary contact number — the Contact page's Direct block also shows a secondary one. */
+  /** Calls only, not on WhatsApp — the Contact page's Direct block also shows a second, WhatsApp-reachable number. */
   phone: "+254 794 989 397",
   city: "Nairobi",
   country: "Kenya",
@@ -39,7 +39,7 @@ export const legalLinks = [
 
 /** `icon` keys the inline mark the footer draws for each. */
 export const socials = [
-  { label: "WhatsApp", href: "https://wa.me/254794989397", icon: "whatsapp" },
+  { label: "WhatsApp", href: "https://wa.me/254790775636", icon: "whatsapp" },
   { label: "Instagram", href: "https://instagram.com", icon: "instagram" },
   { label: "LinkedIn", href: "https://linkedin.com", icon: "linkedin" },
   { label: "GitHub", href: "https://github.com", icon: "github" },

@@ -12,6 +12,13 @@ type CTABannerProps = {
   note?: string;
 };
 
+/* A touch smaller than the site's general `text-display` scale, and the
+   headline column a little wider (9/12 instead of 8/12) — together these
+   give every explicit `.reveal-line` here enough room to render as one
+   visual line at this section's typical line lengths, instead of the last
+   word occasionally wrapping onto its own line inside the span. */
+const HEADLINE_CLASS = "text-[clamp(2.75rem,6.2vw,8.25rem)] leading-none tracking-[-0.045em]";
+
 /** Inverted closing block used at the foot of every page above the footer. */
 export default function CTABanner({
   id,
@@ -32,14 +39,14 @@ export default function CTABanner({
           <p className="meta text-canvas/40">{site.city.toUpperCase()} — WORLDWIDE</p>
         </div>
 
-        <div className="mt-16 grid gap-x-gutter gap-y-12 md:grid-cols-12">
+        <div className="mt-16 grid items-end gap-x-gutter gap-y-12 md:grid-cols-12">
           <RevealLines
             as="h2"
             lines={lines}
-            className="text-display font-medium md:col-span-8"
+            className={`${HEADLINE_CLASS} font-medium md:col-span-9`}
           />
 
-          <div className="flex flex-col justify-end gap-8 md:col-span-4">
+          <div className="flex flex-col justify-end gap-8 md:col-span-3">
             <Fade as="p" className="text-sm leading-relaxed text-canvas/55">
               {note}
             </Fade>

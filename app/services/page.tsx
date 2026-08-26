@@ -18,7 +18,6 @@ const ENGAGEMENTS = [
   {
     index: "01",
     title: "Fixed Project Build",
-    price: "From $18k",
     tagline: "Defined scope, guaranteed timeline, complete execution.",
     body: "End-to-end architecture and build of a custom web platform, automated system, or business application. We define clear milestones from day one and handle everything from schema design to production deployment and post-launch handover.",
     fit: "Product launches, custom web apps, complete system rebuilds, and automated workflow rollouts.",
@@ -26,7 +25,6 @@ const ENGAGEMENTS = [
   {
     index: "02",
     title: "Embedded Capacity (Retainer)",
-    price: "From $7k / month",
     tagline: "Dedicated senior engineering depth without full-time hiring overhead.",
     body: "Ongoing monthly capacity embedded alongside your team. Operating on a transparent sprint cadence, we handle continuous feature rollouts, database optimization, backend scaling, and AI capabilities as your business grows.",
     fit: "Fast-moving teams needing continuous technical momentum, system expansion, and ongoing technical advisory.",
@@ -34,7 +32,6 @@ const ENGAGEMENTS = [
   {
     index: "03",
     title: "System & Code Audit",
-    price: "From $4k",
     tagline: "Diagnostic teardown and actionable technical roadmap.",
     body: "A focused multi-week audit examining your software architecture, database query bottlenecks, security vulnerabilities, and code quality. We deliver a prioritized, non-jargon remediation blueprint you own outright.",
     fit: "Fragile or drifting codebases, performance degradation, tech-debt cleanup, or pre-scale system assessments.",
@@ -90,10 +87,7 @@ export default function ServicesPage() {
                 className="flex h-full flex-col justify-between gap-12 bg-canvas p-8 transition-colors duration-600 ease-expo hover:bg-bone lg:p-12"
               >
                 <div>
-                  <div className="flex items-baseline justify-between gap-4">
-                    <span className="micro tnum text-accent">{model.index}</span>
-                    <span className="meta text-ink/35">{model.price}</span>
-                  </div>
+                  <span className="micro tnum text-accent">{model.index}</span>
                   <h3 className="mt-8 text-title font-medium">{model.title}</h3>
                   <p className="mt-3 text-sm font-medium text-ink/70">{model.tagline}</p>
                   <p className="mt-3 text-sm leading-relaxed text-ink/55">{model.body}</p>

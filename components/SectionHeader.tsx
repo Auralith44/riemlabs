@@ -40,17 +40,23 @@ export default function SectionHeader({
       {lines || description ? (
         <div className="mt-12 grid gap-x-gutter gap-y-8 md:grid-cols-12 lg:mt-16">
           {lines ? (
+            // A shade narrower than `text-headline`'s default vw coefficient
+            // and a wider column (8/9 instead of 7/8) — a couple of this
+            // component's longer two- and three-line headlines were sitting
+            // close enough to their column's edge for the last word to wrap
+            // onto its own line inside its `.reveal-line` span; this gives
+            // every instance more headroom rather than patching call sites.
             <RevealLines
               as="h2"
               lines={lines}
-              className="text-headline font-medium md:col-span-7 lg:col-span-8"
+              className="text-[clamp(2rem,3.9vw,4.5rem)] font-medium leading-none tracking-[-0.035em] md:col-span-8 lg:col-span-9"
             />
           ) : null}
 
           {description ? (
             <Fade
               as="p"
-              className="text-lede text-ink/55 md:col-span-5 md:pt-1 lg:col-span-4"
+              className="text-lede text-ink/55 md:col-span-4 md:pt-1 lg:col-span-3"
             >
               {description}
             </Fade>
