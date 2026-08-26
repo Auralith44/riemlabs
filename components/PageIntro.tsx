@@ -54,7 +54,14 @@ export default function PageIntro({
           {headlineAside ? (
             <div className="mt-14 flex items-start justify-between gap-8 lg:mt-20">
               <RevealLines as="h1" lines={lines} className={`font-medium ${headlineClassName}`} />
-              <div className="hidden h-48 w-full max-w-sm shrink-0 lg:block">{headlineAside}</div>
+              {/* flex-1, not a capped width — grows to the row's own right
+                  edge (the shell's padding boundary) instead of floating a
+                  small fixed box short of it. Height well beyond the
+                  headline's own: this is deliberately taller than its flex
+                  row's content-driven height, so it pushes the lede/meta
+                  grid below it down rather than sitting pinned to the top
+                  as a small square — that's the point, not a side effect. */}
+              <div className="hidden flex-1 lg:block lg:h-[26rem]">{headlineAside}</div>
             </div>
           ) : (
             <RevealLines
