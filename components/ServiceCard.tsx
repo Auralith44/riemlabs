@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import Glyph, { type GlyphHandle } from "@/components/Glyph";
 import type { Choreography } from "@/lib/glyphChoreographies";
-import type { Service } from "@/lib/services";
+import { serviceSlug, type Service } from "@/lib/services";
 
 /**
  * One homepage service card. Split out from the server-rendered page so the
@@ -26,7 +26,7 @@ export default function ServiceCard({
 
   return (
     <Link
-      href="/services"
+      href={`/services#${serviceSlug(service.title)}`}
       onMouseEnter={() => {
         setHovered(true);
         glyphRef.current?.play();

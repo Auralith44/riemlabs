@@ -6,7 +6,7 @@ import PageIntro from "@/components/PageIntro";
 import RevealSection from "@/components/RevealSection";
 import SectionHeader from "@/components/SectionHeader";
 import { Fade, RevealLines } from "@/components/RevealText";
-import { choreographies } from "@/lib/glyphChoreographies";
+import { CHOREO_OFFSETS, choreographyPool } from "@/lib/glyphChoreographies";
 import { aboutProcess, principles } from "@/lib/services";
 import { site } from "@/lib/site";
 
@@ -81,7 +81,7 @@ export default function AboutPage() {
             {principles.map((p, i) => (
               <GlyphPanel
                 key={p.index}
-                choreography={choreographies[i % choreographies.length]}
+                choreography={choreographyPool[CHOREO_OFFSETS.aboutPrinciples + i]}
                 color="orange"
                 className="bg-canvas p-8 transition-colors duration-600 ease-expo hover:bg-bone lg:p-12"
               >
@@ -123,7 +123,7 @@ export default function AboutPage() {
             {aboutProcess.map((step, i) => (
               <GlyphPanel
                 key={step.index}
-                choreography={choreographies[i % choreographies.length]}
+                choreography={choreographyPool[CHOREO_OFFSETS.aboutProcess + i]}
                 color="black"
                 glyphClassName="h-7 w-7"
                 className="border-t border-hairline pt-6"

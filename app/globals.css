@@ -414,7 +414,10 @@
     [data-about-cta="reveal"]
     .cta-wash::before {
     background-position: 0 0;
-    opacity: 0.1;
+    /* 0.2, not the usual 0.1 — a light fill needs more strength to read
+       against a fully saturated blue field than a blue wash needs against
+       near-white, which is what the default 10% is tuned for. */
+    opacity: 0.2;
   }
   [data-wipe-root]:has([data-about-cta="base"] a:hover) [data-about-cta="reveal"] .cta-corners::after,
   [data-wipe-root]:has([data-about-cta="base"] a:focus-visible)
@@ -1057,15 +1060,19 @@
       opacity 0.2s ease-out 0.1s,
       inset 0.2s ease-out 0.1s;
     background-repeat: no-repeat;
+    /* var(--wipe-fill, var(--accent)), matching .cta-wash — these were
+       hardcoded to --accent with no fallback chain, so a CTA on a
+       .bg-accent surface tried to show blue corner brackets against a
+       blue field: genuinely invisible, not just faint. */
     background-image:
-      linear-gradient(var(--accent), var(--accent)),
-      linear-gradient(var(--accent), var(--accent)),
-      linear-gradient(var(--accent), var(--accent)),
-      linear-gradient(var(--accent), var(--accent)),
-      linear-gradient(var(--accent), var(--accent)),
-      linear-gradient(var(--accent), var(--accent)),
-      linear-gradient(var(--accent), var(--accent)),
-      linear-gradient(var(--accent), var(--accent));
+      linear-gradient(var(--wipe-fill, var(--accent)), var(--wipe-fill, var(--accent))),
+      linear-gradient(var(--wipe-fill, var(--accent)), var(--wipe-fill, var(--accent))),
+      linear-gradient(var(--wipe-fill, var(--accent)), var(--wipe-fill, var(--accent))),
+      linear-gradient(var(--wipe-fill, var(--accent)), var(--wipe-fill, var(--accent))),
+      linear-gradient(var(--wipe-fill, var(--accent)), var(--wipe-fill, var(--accent))),
+      linear-gradient(var(--wipe-fill, var(--accent)), var(--wipe-fill, var(--accent))),
+      linear-gradient(var(--wipe-fill, var(--accent)), var(--wipe-fill, var(--accent))),
+      linear-gradient(var(--wipe-fill, var(--accent)), var(--wipe-fill, var(--accent)));
     background-size:
       var(--corner-size, 14px) var(--corner-width, 2px),
       var(--corner-width, 2px) var(--corner-size, 14px),

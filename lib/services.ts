@@ -8,6 +8,18 @@ export type Service = {
   duration: string;
 };
 
+/** Stable identifier derived from a service's title, e.g. "Web & Software
+ *  Development" -> "web-software-development" — used as the accordion
+ *  row's id/data-service and as the fragment other pages deep-link with,
+ *  so it doesn't depend on array order or React's own useId() output. */
+export function serviceSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/&/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export const services: Service[] = [
   {
     index: "01",

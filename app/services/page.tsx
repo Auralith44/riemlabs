@@ -6,7 +6,7 @@ import PageIntro from "@/components/PageIntro";
 import RevealSection from "@/components/RevealSection";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceAccordion from "@/components/ServiceAccordion";
-import { choreographies } from "@/lib/glyphChoreographies";
+import { CHOREO_OFFSETS, choreographyPool } from "@/lib/glyphChoreographies";
 import { process, services } from "@/lib/services";
 
 export const metadata: Metadata = {
@@ -85,8 +85,7 @@ export default function ServicesPage() {
             {ENGAGEMENTS.map((model, i) => (
               <GlyphPanel
                 key={model.index}
-                choreography={choreographies[i % choreographies.length]}
-                color="blue"
+                choreography={choreographyPool[CHOREO_OFFSETS.servicesEngagementModels + i]}
                 className="flex h-full flex-col justify-between gap-12 bg-canvas p-8 transition-colors duration-600 ease-expo hover:bg-bone lg:p-12"
               >
                 <div>
@@ -119,7 +118,7 @@ export default function ServicesPage() {
             {process.map((step, i) => (
               <GlyphPanel
                 key={step.index}
-                choreography={choreographies[i % choreographies.length]}
+                choreography={choreographyPool[CHOREO_OFFSETS.servicesProcess + i]}
                 color="orange"
                 glyphClassName="col-span-2 h-6 w-6 md:col-span-1"
                 className="grid grid-cols-12 items-start gap-x-gutter gap-y-4 border-b border-hairline py-10"

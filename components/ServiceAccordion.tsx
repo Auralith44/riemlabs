@@ -1,13 +1,13 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import BracketLink from "@/components/BracketLink";
 import Glyph, { type GlyphHandle } from "@/components/Glyph";
-import { choreographies } from "@/lib/glyphChoreographies";
+import { CHOREO_OFFSETS, choreographyPool } from "@/lib/glyphChoreographies";
 import { EASE, ScrollTrigger, gsap } from "@/lib/gsap";
 import type { Choreography } from "@/lib/glyphChoreographies";
-import type { Service } from "@/lib/services";
+import { serviceSlug, type Service } from "@/lib/services";
 
 function AccordionRow({
   service,
@@ -24,6 +24,7 @@ function AccordionRow({
   const glyphRef = useRef<GlyphHandle>(null);
   const panelId = useId();
   const [hovered, setHovered] = useState(false);
+  const slug = serviceSlug(service.title);
 
   useGSAP(
     () => {
@@ -45,7 +46,7 @@ function AccordionRow({
   );
 
   return (
-    <div className="border-b border-hairline">
+    <div id={`service-${slug}`} data-service={slug} className="scroll-mt-[calc(var(--header-h)+2rem)] border-b border-hairline">
       <h3>
         <button
           type="button"
@@ -164,13 +165,34 @@ function AccordionRow({
 export default function ServiceAccordion({ services }: { services: Service[] }) {
   const [openIndex, setOpenIndex] = useState<string | null>(services[0]?.index ?? null);
 
+  // Deep-link support: /services#<slug> (e.g. from a home-page Services
+  // card) opens that specific accordion row and scrolls it into view,
+  // instead of just landing at the top of the page.
+  useEffect(() => {
+    const hash = window.location.hash.slice(1);
+    if (!hash) return;
+    const target = services.find((s) => serviceSlug(s.title) === hash);
+    if (!target) return;
+
+    setOpenIndex(target.index);
+    // Wait a frame so the row (and its expanding panel) has a chance to
+    // lay out before scrolling — an immediate scrollIntoView can measure
+    // against the pre-expand height and land short.
+    requestAnimationFrame(() => {
+      document.getElementById(`service-${hash}`)?.scrollIntoView({ block: "start" });
+    });
+    // Deliberately run once on mount only — this is for landing on the
+    // page via a link, not for reacting to in-page hash changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="border-t border-hairline">
       {services.map((service, i) => (
         <AccordionRow
           key={service.index}
           service={service}
-          choreography={choreographies[i % choreographies.length]}
+          choreography={choreographyPool[CHOREO_OFFSETS.servicesOfferings + i]}
           open={openIndex === service.index}
           onToggle={() =>
             setOpenIndex((current) => (current === service.index ? null : service.index))

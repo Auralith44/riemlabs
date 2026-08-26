@@ -10,7 +10,7 @@ import StatsBar from "@/components/StatsBar";
 import RevealSection from "@/components/RevealSection";
 import SectionHeader from "@/components/SectionHeader";
 import { Fade } from "@/components/RevealText";
-import { choreographies } from "@/lib/glyphChoreographies";
+import { CHOREO_OFFSETS, choreographyPool } from "@/lib/glyphChoreographies";
 import { featuredProjects } from "@/lib/projects";
 import { services } from "@/lib/services";
 
@@ -49,8 +49,7 @@ export default function HomePage() {
                 key={project.slug}
                 project={project}
                 layout="row"
-                choreography={choreographies[i % choreographies.length]}
-                glyphColor="blue"
+                choreography={choreographyPool[CHOREO_OFFSETS.homeWork + i]}
               />
             ))}
           </div>
@@ -79,7 +78,7 @@ export default function HomePage() {
           <div className="mt-20 grid gap-px border border-hairline bg-hairline sm:grid-cols-2">
             {services.map((service, i) => (
               <Fade key={service.index}>
-                <ServiceCard service={service} choreography={choreographies[i % choreographies.length]} />
+                <ServiceCard service={service} choreography={choreographyPool[CHOREO_OFFSETS.homeServices + i]} />
               </Fade>
             ))}
           </div>

@@ -5,7 +5,7 @@ import PageIntro from "@/components/PageIntro";
 import RevealSection from "@/components/RevealSection";
 import SectionHeader from "@/components/SectionHeader";
 import WorkGallery from "@/components/WorkGallery";
-import { choreographies } from "@/lib/glyphChoreographies";
+import { CHOREO_OFFSETS, choreographyPool } from "@/lib/glyphChoreographies";
 import { projects } from "@/lib/projects";
 
 export const metadata: Metadata = {
@@ -75,7 +75,7 @@ export default function WorkPage() {
             ].map((item, i) => (
               <GlyphPanel
                 key={item.index}
-                choreography={choreographies[i % choreographies.length]}
+                choreography={choreographyPool[CHOREO_OFFSETS.workEngagement + i]}
                 color="green"
                 glyphClassName="h-7 w-7"
                 className="border-t border-hairline pt-6"
