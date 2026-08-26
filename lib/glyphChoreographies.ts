@@ -118,23 +118,27 @@ export const choreographies: Choreography[] = [
 /**
  * Site-wide pattern uniqueness.
  *
- * Only four full choreographies (idle pattern + real per-frame motion) were
- * ever transcribed from codedgar's source, and with ~30 Glyph instances now
- * live across the site, cycling those four repeatedly meant the same
- * pattern showed up both within a section and across different ones.
+ * An earlier version of this pool deduplicated on the *full* sequence —
+ * idle pattern plus every frame — which is the wrong granularity: several
+ * of the sourced idle patterns (four corners, a lone center dot) are
+ * themselves symmetric under some or all of the grid's eight symmetry
+ * operations (three rotations, the two axis mirrors, the two diagonal
+ * reflections, on top of the identity), so multiple "unique" full
+ * sequences still shared the exact same *resting* pattern — the one thing
+ * actually visible almost all the time, since a visitor is hovering a
+ * given card for a fraction of a second at most. Home `03/Work`'s four
+ * cards all landing on the four-corners idle, or About Principles and home
+ * Services ending up with the identical four-pattern set in a different
+ * order, both trace back to that: different full sequences, same idle.
  *
- * Rather than inventing disconnected new shapes, every 9-cell pattern here
- * — idle and every frame — is put through the 3×3 grid's own symmetry
- * group (the eight operations that map a square onto itself: the identity,
- * three rotations, the two axis mirrors, and the two diagonal reflections).
- * Applying the same transform to a whole choreography's idle pattern and
- * every one of its frames keeps the motion internally coherent — a
- * genuinely different-looking shape, moving the same real way, rather than
- * a static pattern swap. Transition styles, durations, and stagger order
- * are left as sourced; only cell geometry moves. Four base choreographies
- * × eight symmetries is 32 candidates, more than the ~30 instances need
- * even after true duplicates (a base pattern that happens to be symmetric
- * under a given transform) are filtered out below.
+ * This dedupes on the idle pattern alone instead. Every 9-cell pattern
+ * that appears anywhere in the four real transcribed choreographies —
+ * not just their idle patterns, every one of their real intermediate
+ * frames too, all genuinely sourced motion — is put through the same
+ * eight-symmetry group, keeping only the first occurrence of each
+ * resulting *pattern*. That alone yields several dozen genuinely distinct
+ * resting shapes, comfortably past the ~30 instances live on the site,
+ * without inventing anything disconnected from the real source data.
  */
 function toGrid(bits: string): string[][] {
   return [0, 1, 2].map((r) => [0, 1, 2].map((c) => bits[r * 3 + c]));
@@ -170,99 +174,62 @@ function transpose(bits: string): string {
   return fromGrid(out);
 }
 
-const SYMMETRIES: Array<{ suffix: string; apply: (bits: string) => string }> = [
-  { suffix: "", apply: (b) => b },
-  { suffix: " · rot90", apply: rotate90 },
-  { suffix: " · rot180", apply: (b) => rotate90(rotate90(b)) },
-  { suffix: " · rot270", apply: (b) => rotate90(rotate90(rotate90(b))) },
-  { suffix: " · mirror-h", apply: mirrorH },
-  { suffix: " · mirror-v", apply: mirrorV },
-  { suffix: " · transpose", apply: transpose },
-  { suffix: " · anti-transpose", apply: (b) => mirrorH(mirrorV(transpose(b))) },
+const SYMMETRIES: Array<(bits: string) => string> = [
+  (b) => b,
+  rotate90,
+  (b) => rotate90(rotate90(b)),
+  (b) => rotate90(rotate90(rotate90(b))),
+  mirrorH,
+  mirrorV,
+  transpose,
+  (b) => mirrorH(mirrorV(transpose(b))),
 ];
 
-function transformChoreography(
-  base: Choreography,
-  { suffix, apply }: { suffix: string; apply: (bits: string) => string },
-): Choreography {
-  return {
-    name: `${base.name}${suffix}`,
-    idlePattern: apply(base.idlePattern),
-    frames: base.frames.map((f) => ({ ...f, pattern: apply(f.pattern) })),
-    returnTransitionStyle: base.returnTransitionStyle,
-  };
-}
-
-function signature(c: Choreography): string {
-  return `${c.idlePattern}|${c.frames.map((f) => f.pattern).join(",")}`;
-}
-
-const expanded: Choreography[] = [];
-const seen = new Set<string>();
-for (const base of choreographies) {
-  for (const symmetry of SYMMETRIES) {
-    const variant = transformChoreography(base, symmetry);
-    const sig = signature(variant);
-    if (seen.has(sig)) continue;
-    seen.add(sig);
-    expanded.push(variant);
+// Every pattern that appears anywhere in the real, transcribed source data
+// — each choreography's idle pattern, and every one of its real frames.
+const sourcePatterns: string[] = (() => {
+  const set = new Set<string>();
+  for (const c of choreographies) {
+    set.add(c.idlePattern);
+    for (const f of c.frames) set.add(f.pattern);
   }
-}
+  return [...set];
+})();
+
+// Every distinct pattern reachable from that source set via the grid's own
+// symmetries, keeping only the first occurrence of each result.
+const uniqueIdlePatterns: string[] = (() => {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const pattern of sourcePatterns) {
+    for (const apply of SYMMETRIES) {
+      const transformed = apply(pattern);
+      if (seen.has(transformed)) continue;
+      seen.add(transformed);
+      out.push(transformed);
+    }
+  }
+  return out;
+})();
 
 /**
- * The symmetry expansion above only reaches 24 unique choreographies, not
- * the 32 its 4 bases × 8 symmetries would suggest — several of the sourced
- * patterns (a checkerboard, a plus/cross, a full 3×3) are themselves
- * symmetric under one or more of these operations, so some transforms
- * collapse onto ones already generated. 24 is short of the ~30 instances
- * actually in use site-wide, so this tops the pool up using idle patterns
- * confirmed directly from codedgar's own source that the transform pass
- * above hadn't produced on its own — the batch-3 spot-check's eight
- * patterns, plus a few more pulled from mid-sequence frames of the four
- * real choreographies above (equally sourced data, just not anyone's
- * *resting* pattern until now). Each pairs with one of the four real frame
- * sequences (cycled for variety) rather than inventing new motion — only
- * the resting pattern is new here, same principle as the transform pass:
- * genuinely distinct at rest, not a disconnected new shape.
+ * One full choreography per unique idle pattern — frame sequence and
+ * return style borrowed from one of the four real ones (cycled for
+ * variety), since only the resting pattern needs to be unique per
+ * instance; the hover motion repeating across a few instances is fine.
+ * Each entry's idlePattern is, by construction, distinct from every other
+ * entry's — the property CHOREO_OFFSETS below relies on to guarantee no
+ * two site-wide instances render the same pattern.
  */
-const IDLE_TOP_UP = [
-  "010010010",
-  "101010101",
-  "111101111",
-  "010111010",
-  "100010001",
-  "101000101",
-  "000111000",
-  "000010000",
-  "110111011",
-  "101111101",
-  "100110001",
-  "010101010",
-  "100000001",
-  "000000100",
-];
-const usedIdles = new Set(expanded.map((c) => c.idlePattern));
-let baseCursor = 0;
-for (const pattern of IDLE_TOP_UP) {
-  if (usedIdles.has(pattern)) continue;
-  const base = choreographies[baseCursor % choreographies.length];
-  baseCursor += 1;
-  expanded.push({
-    name: `${base.name} · idle ${pattern}`,
-    idlePattern: pattern,
+export const choreographyPool: Choreography[] = uniqueIdlePatterns.map((idlePattern, i) => {
+  const base = choreographies[i % choreographies.length];
+  return {
+    name: `${base.name} · pattern ${i}`,
+    idlePattern,
     frames: base.frames,
     returnTransitionStyle: base.returnTransitionStyle,
-  });
-  usedIdles.add(pattern);
-}
-
-/**
- * The full expanded pool. Each section on the site indexes into this with
- * its own fixed offset (see the CHOREO_OFFSETS below) rather than
- * `i % choreographies.length`, which is what caused the repeats across
- * sections in the first place.
- */
-export const choreographyPool: Choreography[] = expanded;
+  };
+});
 
 /**
  * Fixed starting index per section, sized to that section's item count,

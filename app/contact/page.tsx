@@ -23,17 +23,21 @@ const SECONDARY_PHONE = "+254 790 775 636";
 export default function ContactPage() {
   return (
     <>
-      {/* headlineClassName: text-display, the site default size — same
-          ~97-103px neighborhood as About/Work/Services' own heroes, only
-          the width is capped so its rendered line lines up with the
-          01/About You column below rather than spanning full width. */}
+      {/* headlineClassName: text-display's own scale reflows this specific
+          copy to 4 visual lines inside a capped column that narrow — each
+          authored line was still wide enough to wrap a second time inside
+          itself. Rebroken into 3 shorter authored lines (same words, no
+          rewrite) at a size a step down from text-display's own, plus a
+          slightly wider cap — matches About's ~3-line hero proportions
+          instead of either the earlier too-small text-headline or a bare
+          text-display overflowing to 4 lines. */}
       <PageIntro
         index="05"
         label="Contact"
-        lines={["Scope your roadmap", "with our engineering team."]}
+        lines={["Scope your", "roadmap with our", "engineering team."]}
         lede="Whether you need a high-conversion platform, custom business automation, or a legacy codebase audit, tell us where your infrastructure stands today and we'll outline a structured roadmap forward."
         showClock={false}
-        headlineClassName="text-display max-w-[48rem]"
+        headlineClassName="text-[clamp(2.75rem,6.2vw,8.25rem)] leading-none tracking-[-0.045em] max-w-[52rem]"
         headlineAside={<GameOfLifeCanvas />}
       />
 
