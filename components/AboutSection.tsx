@@ -143,12 +143,14 @@ export default function AboutSection({
             </Block>
 
             {/* One action for the section, in the bracketed form the rest of
-                the site uses. It carries `data-about-cta` on both layers so the
-                stylesheet can replay the real link's hover on the mirror — the
-                real one spends the whole blue phase under an opaque veil, where
-                its own :hover paints nothing anyone can see. */}
+                the site uses. It carries `data-about-cta` on all three layers
+                so the stylesheet can replay the real link's hover on whichever
+                mirror is actually on screen — the real one spends the whole
+                blue phase under an opaque veil (where its own :hover paints
+                nothing anyone can see) and, once scrolled past, sits behind
+                the trail mirror instead, which has the exact same problem. */}
             <Block className="mt-12">
-              <div data-about-cta={isReveal ? "reveal" : variant === "base" ? "base" : undefined}>
+              <div data-about-cta={isReveal ? "reveal" : variant === "trail" ? "trail" : "base"}>
                 <BracketLink
                   href="/about"
                   variant="boxed"
@@ -167,9 +169,19 @@ export default function AboutSection({
             <div
               className={`flex min-h-[28rem] flex-col p-10 lg:min-h-[30rem] lg:p-12 ${cardSurface}`}
             >
+              {/* -0.05em left margin cancels the "R" glyph's own left-side
+                  bearing at this size/tracking — its bounding box already
+                  lines up with "Riem Labs" and "Based in" below it, but the
+                  stroke itself sits far enough inside that box to read as
+                  shifted right. em-relative so it scales with the fluid
+                  clamp() size instead of needing per-breakpoint tuning. */}
               <p
                 className="font-medium tracking-[-0.05em]"
-                style={{ fontSize: "clamp(4rem, 7vw, 7.5rem)", lineHeight: "0.9" }}
+                style={{
+                  fontSize: "clamp(4rem, 7vw, 7.5rem)",
+                  lineHeight: "0.9",
+                  marginLeft: "-0.05em",
+                }}
               >
                 RL
               </p>
@@ -177,7 +189,7 @@ export default function AboutSection({
 
               <ul className="mt-12 space-y-4">
                 {services.map((service) => (
-                  <li key={service.index} className="flex items-baseline gap-4 text-sm">
+                  <li key={service.index} className="flex items-center gap-4 text-sm">
                     <span aria-hidden="true" className="h-px w-4 shrink-0 bg-accent" />
                     <span className={cardBody}>{service.title}</span>
                   </li>

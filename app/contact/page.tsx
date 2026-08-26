@@ -66,7 +66,7 @@ export default function ContactPage() {
                       page, so the two addresses never appear side by side
                       to read as inconsistent. */}
                   <Fade>
-                    <dt className="meta text-ink/35">Email</dt>
+                    <dt className="meta text-ink/60">Email</dt>
                     <dd className="mt-2">
                       <a
                         href={`mailto:${CONTACT_EMAIL}`}
@@ -82,7 +82,7 @@ export default function ContactPage() {
                       and is what the Elsewhere row's shared WhatsApp link
                       below points to. */}
                   <Fade>
-                    <dt className="meta text-ink/35">Telephone</dt>
+                    <dt className="meta text-ink/60">Telephone</dt>
                     <dd className="mt-2">
                       <a
                         href={`tel:${site.phone.replace(/\s/g, "")}`}
@@ -91,26 +91,18 @@ export default function ContactPage() {
                         {site.phone}
                       </a>
                     </dd>
-                    <dd className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <dd className="mt-2">
                       <a
                         href={`tel:${SECONDARY_PHONE.replace(/\s/g, "")}`}
                         className="link-wipe text-sm text-ink"
                       >
                         {SECONDARY_PHONE}
                       </a>
-                      <a
-                        href={`https://wa.me/${SECONDARY_PHONE.replace(/\D/g, "")}`}
-                        target="_blank"
-                        rel="noreferrer noopener"
-                        className="micro text-ink/40 transition-colors duration-400 ease-expo hover:text-accent"
-                      >
-                        WhatsApp
-                      </a>
                     </dd>
                   </Fade>
 
                   <Fade>
-                    <dt className="meta text-ink/35">Studio</dt>
+                    <dt className="meta text-ink/60">Studio</dt>
                     <dd className="mt-2 text-sm text-ink/70">
                       {site.city}, {site.country}
                     </dd>
@@ -120,7 +112,7 @@ export default function ContactPage() {
                   </Fade>
 
                   <Fade>
-                    <dt className="meta text-ink/35">Elsewhere</dt>
+                    <dt className="meta text-ink/60">Elsewhere</dt>
                     <dd className="mt-3 flex flex-wrap gap-x-5 gap-y-2">
                       {socials.map((s) => (
                         <a

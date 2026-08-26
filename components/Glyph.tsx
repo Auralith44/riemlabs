@@ -68,17 +68,27 @@ type GlyphProps = {
   className?: string;
   /** One of codedgar's Glyph colors — defaults to the site's own accent
    *  blue so the two already-shipped instances (Services, home Services)
-   *  keep their exact current color when only adding glow. */
+   *  keep their exact current color. */
   color?: GlyphColor | "accent";
-  glow?: "none" | "soft";
   /** Mirrors the parent card's own hover state — CSS `:hover` on the glyph
    *  itself is unreliable here, since a visitor typically hovers the card's
    *  title or body copy, not the small icon specifically. */
   hovered?: boolean;
 };
 
+/**
+ * Glow is derived from color, not passed in per call site — confirmed
+ * decision: only the orange and green instances keep `data-glow="soft"`;
+ * blue and black (including the "accent" default, the site's own blue)
+ * revert to flat color. Deriving it here means a call site can never drift
+ * out of sync with which colors are supposed to glow.
+ */
+function glowFor(color: GlyphColor | "accent"): "none" | "soft" {
+  return color === "orange" || color === "green" ? "soft" : "none";
+}
+
 const Glyph = forwardRef<GlyphHandle, GlyphProps>(function Glyph(
-  { choreography, className = "", color = "accent", glow = "none", hovered = false },
+  { choreography, className = "", color = "accent", hovered = false },
   ref,
 ) {
     const cellRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -170,7 +180,7 @@ const Glyph = forwardRef<GlyphHandle, GlyphProps>(function Glyph(
     return (
       <div
         aria-hidden="true"
-        data-glow={glow}
+        data-glow={glowFor(color)}
         data-hovered={hovered}
         className={`glyph grid grid-cols-3 grid-rows-3 gap-0.5 ${className}`}
         style={{ ["--glyph-color" as string]: glyphColor }}

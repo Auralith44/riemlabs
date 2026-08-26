@@ -56,7 +56,6 @@ export default function ProjectCard({
               ref={glyphRef}
               choreography={choreography}
               color={glyphColor}
-              glow="soft"
               hovered={hovered}
               className="col-span-2 h-6 w-6 text-ink/35 transition-colors duration-400 ease-expo group-hover:text-accent md:col-span-1"
             />

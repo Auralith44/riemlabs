@@ -424,6 +424,28 @@
     inset: -6px;
   }
 
+  /* Same problem, third copy: once the wipe has swept past, the trail
+     mirror (`.section-trail`, normal dark-on-light) is what's actually on
+     screen, and it's just as non-interactive as the veil mirror above —
+     same fix, same selector shape, just targeting `[data-about-cta="trail"]`
+     instead of `"reveal"`. The trail sits on the page's own light
+     background, not `bg-accent`, so its `.cta-wash::before` correctly falls
+     back to the default `var(--accent)` fill with no override needed here. */
+  [data-wipe-root]:has([data-about-cta="base"] a:hover) [data-about-cta="trail"] .cta-wash::before,
+  [data-wipe-root]:has([data-about-cta="base"] a:focus-visible)
+    [data-about-cta="trail"]
+    .cta-wash::before {
+    background-position: 0 0;
+    opacity: 0.1;
+  }
+  [data-wipe-root]:has([data-about-cta="base"] a:hover) [data-about-cta="trail"] .cta-corners::after,
+  [data-wipe-root]:has([data-about-cta="base"] a:focus-visible)
+    [data-about-cta="trail"]
+    .cta-corners::after {
+    opacity: 1;
+    inset: -6px;
+  }
+
   /* Same problem in the hero: hovering the real `[ Let's talk ]` splays its
      brackets, but wherever the band covers that corner the visitor is looking
      at the mirror, which would sit perfectly still. Replay the splay — and the

@@ -46,7 +46,6 @@ export default function ServiceCard({
           <Glyph
             ref={glyphRef}
             choreography={choreography}
-            glow="soft"
             hovered={hovered}
             className="h-10 w-10"
           />

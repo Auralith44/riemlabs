@@ -76,7 +76,6 @@ function AccordionRow({
             <Glyph
               ref={glyphRef}
               choreography={choreography}
-              glow="soft"
               hovered={hovered}
               className="h-6 w-6"
             />

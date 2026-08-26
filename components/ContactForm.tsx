@@ -12,7 +12,14 @@ const SCOPES = [
   "System & Code Audit",
 ];
 
-const TIMELINES = ["As soon as possible", "1 — 3 months", "3 — 6 months", "Just exploring"];
+const TIMELINES = [
+  "As soon as possible",
+  "Within 1 month",
+  "1 — 3 months",
+  "3 — 6 months",
+  "6+ months",
+  "Not sure yet",
+];
 
 type Status = "idle" | "submitting" | "success" | "error";
 
@@ -31,7 +38,7 @@ function Legend({ index, children }: { index: string; children: React.ReactNode 
 
 export default function ContactForm() {
   const [scope, setScope] = useState<string[]>([]);
-  const [timeline, setTimeline] = useState(TIMELINES[1]);
+  const [timeline, setTimeline] = useState<string | null>(null);
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
   const [invalid, setInvalid] = useState<string[]>([]);
@@ -201,7 +208,7 @@ export default function ContactForm() {
               <button
                 key={option}
                 type="button"
-                onClick={() => setTimeline(option)}
+                onClick={() => setTimeline((current) => (current === option ? null : option))}
                 aria-pressed={active}
                 className={`meta border px-4 py-3 transition-colors duration-400 ease-expo ${
                   active

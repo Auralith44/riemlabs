@@ -51,7 +51,6 @@ export default function GlyphPanel({
         ref={glyphRef}
         choreography={choreography}
         color={color}
-        glow="soft"
         hovered={hovered}
         className={glyphClassName}
       />

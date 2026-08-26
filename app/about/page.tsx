@@ -139,7 +139,7 @@ export default function AboutPage() {
       <CTABanner
         index="05"
         label="Contact"
-        lines={["Let's engineer your next", "digital milestone."]}
+        lines={["Let's engineer your", "next digital milestone."]}
         note="Whether you need a high-conversion web platform or an integrated data and automation system, we're ready to help you plan the roadmap. Tell us what you're building, and we'll outline a direct path forward within 24 hours."
       />
     </>

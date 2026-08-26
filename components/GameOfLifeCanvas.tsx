@@ -239,10 +239,15 @@ export default function GameOfLifeCanvas({ className = "" }: { className?: strin
   }, []);
 
   return (
+    // h-full w-full, not left to intrinsic sizing — the only child is the
+    // absolutely-positioned canvas, which contributes nothing to this div's
+    // own height, so without an explicit size this collapses to 0px and the
+    // canvas gets floored to a 1px-tall buffer. The parent (PageIntro's
+    // `headlineAside` slot) always gives this a real, definite box to fill.
     <div
       aria-hidden="true"
       role="presentation"
-      className={`relative overflow-hidden ${className}`}
+      className={`relative h-full w-full overflow-hidden ${className}`}
     >
       <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
     </div>
