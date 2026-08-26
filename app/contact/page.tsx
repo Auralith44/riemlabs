@@ -23,21 +23,24 @@ const SECONDARY_PHONE = "+254 790 775 636";
 export default function ContactPage() {
   return (
     <>
-      {/* headlineClassName: text-display's own scale reflows this specific
-          copy to 4 visual lines inside a capped column that narrow — each
-          authored line was still wide enough to wrap a second time inside
-          itself. Rebroken into 3 shorter authored lines (same words, no
-          rewrite) at a size a step down from text-display's own, plus a
-          slightly wider cap — matches About's ~3-line hero proportions
-          instead of either the earlier too-small text-headline or a bare
-          text-display overflowing to 4 lines. */}
+      {/* headlineClassName: the lg: size is a fixed rem value, not vw-driven
+          — a vw-scaled size paired with this fixed max-w-[52rem] column
+          meant the type kept growing with window width while the space it
+          had to fit in didn't, so the same 3-line wrap that looked right at
+          one width silently became 4 or 5 lines at another. 5.94rem
+          (~95.1px) is the exact size confirmed live to wrap this copy to
+          "Scope your" / "roadmap with our" / "engineering team." — fixed,
+          so it can't drift out of sync with the equally-fixed container the
+          way the old 6.2vw component did. Below lg the headlineAside/2-col
+          layout this is tuned for doesn't apply at all (hidden until lg),
+          so it falls back to text-display's own mobile minimum instead. */}
       <PageIntro
         index="05"
         label="Contact"
         lines={["Scope your", "roadmap with our", "engineering team."]}
         lede="Whether you need a high-conversion platform, custom business automation, or a legacy codebase audit, tell us where your infrastructure stands today and we'll outline a structured roadmap forward."
         showClock={false}
-        headlineClassName="text-[clamp(2.75rem,6.2vw,8.25rem)] leading-none tracking-[-0.045em] max-w-[52rem]"
+        headlineClassName="text-[2.75rem] leading-none tracking-[-0.045em] max-w-[52rem] lg:text-[5.94rem]"
         headlineAside={<GameOfLifeCanvas />}
       />
 
