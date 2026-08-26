@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import Glyph, { type GlyphHandle } from "@/components/Glyph";
 import type { Choreography } from "@/lib/glyphChoreographies";
 import type { Service } from "@/lib/services";
@@ -22,12 +22,19 @@ export default function ServiceCard({
   choreography: Choreography;
 }) {
   const glyphRef = useRef<GlyphHandle>(null);
+  const [hovered, setHovered] = useState(false);
 
   return (
     <Link
       href="/services"
-      onMouseEnter={() => glyphRef.current?.play()}
-      onMouseLeave={() => glyphRef.current?.reset()}
+      onMouseEnter={() => {
+        setHovered(true);
+        glyphRef.current?.play();
+      }}
+      onMouseLeave={() => {
+        setHovered(false);
+        glyphRef.current?.reset();
+      }}
       className="group flex h-full flex-col justify-between gap-10 bg-canvas p-8 transition-colors duration-600 ease-expo hover:bg-bone lg:p-12"
     >
       <div>
@@ -36,7 +43,13 @@ export default function ServiceCard({
             text baseline of its own to align against, and baseline
             alignment left it sitting oddly low next to the arrow. */}
         <div className="flex items-start justify-between gap-4">
-          <Glyph ref={glyphRef} choreography={choreography} className="h-10 w-10 text-accent" />
+          <Glyph
+            ref={glyphRef}
+            choreography={choreography}
+            glow="soft"
+            hovered={hovered}
+            className="h-10 w-10"
+          />
           <span
             aria-hidden="true"
             className="mt-1 text-ink/20 transition-all duration-600 ease-expo group-hover:translate-x-1 group-hover:text-accent"

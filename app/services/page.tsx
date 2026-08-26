@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import CTABanner from "@/components/CTABanner";
+import GlyphPanel from "@/components/GlyphPanel";
 import LogoMarquee from "@/components/LogoMarquee";
 import PageIntro from "@/components/PageIntro";
 import RevealSection from "@/components/RevealSection";
 import SectionHeader from "@/components/SectionHeader";
 import ServiceAccordion from "@/components/ServiceAccordion";
-import { Fade } from "@/components/RevealText";
+import { choreographies } from "@/lib/glyphChoreographies";
 import { process, services } from "@/lib/services";
 
 export const metadata: Metadata = {
@@ -81,13 +82,14 @@ export default function ServicesPage() {
           />
 
           <div className="mt-20 grid gap-px border border-hairline bg-hairline lg:grid-cols-3">
-            {ENGAGEMENTS.map((model) => (
-              <Fade
+            {ENGAGEMENTS.map((model, i) => (
+              <GlyphPanel
                 key={model.index}
+                choreography={choreographies[i % choreographies.length]}
+                color="blue"
                 className="flex h-full flex-col justify-between gap-12 bg-canvas p-8 transition-colors duration-600 ease-expo hover:bg-bone lg:p-12"
               >
                 <div>
-                  <span className="micro tnum text-accent">{model.index}</span>
                   <h3 className="mt-8 text-title font-medium">{model.title}</h3>
                   <p className="mt-3 text-sm font-medium text-ink/70">{model.tagline}</p>
                   <p className="mt-3 text-sm leading-relaxed text-ink/55">{model.body}</p>
@@ -97,7 +99,7 @@ export default function ServicesPage() {
                   <p className="meta text-ink/35">Best for</p>
                   <p className="mt-2 text-sm text-ink/70">{model.fit}</p>
                 </div>
-              </Fade>
+              </GlyphPanel>
             ))}
           </div>
         </div>
@@ -114,20 +116,21 @@ export default function ServicesPage() {
           />
 
           <div className="mt-20 border-t border-hairline">
-            {process.map((step) => (
-              <Fade key={step.index}>
-                <div className="grid grid-cols-12 items-start gap-x-gutter gap-y-4 border-b border-hairline py-10">
-                  <span className="micro tnum col-span-2 text-accent md:col-span-1">
-                    {step.index}
-                  </span>
-                  <h3 className="col-span-10 text-title font-medium md:col-span-4">
-                    {step.title}
-                  </h3>
-                  <p className="col-span-12 col-start-1 text-sm leading-relaxed text-ink/55 md:col-span-6 md:col-start-7">
-                    {step.body}
-                  </p>
-                </div>
-              </Fade>
+            {process.map((step, i) => (
+              <GlyphPanel
+                key={step.index}
+                choreography={choreographies[i % choreographies.length]}
+                color="orange"
+                glyphClassName="col-span-2 h-6 w-6 md:col-span-1"
+                className="grid grid-cols-12 items-start gap-x-gutter gap-y-4 border-b border-hairline py-10"
+              >
+                <h3 className="col-span-10 text-title font-medium md:col-span-4">
+                  {step.title}
+                </h3>
+                <p className="col-span-12 col-start-1 text-sm leading-relaxed text-ink/55 md:col-span-6 md:col-start-7">
+                  {step.body}
+                </p>
+              </GlyphPanel>
             ))}
           </div>
         </div>

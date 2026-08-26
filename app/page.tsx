@@ -44,8 +44,14 @@ export default function HomePage() {
           />
 
           <div className="mt-20 border-t border-hairline">
-            {featuredProjects.map((project) => (
-              <ProjectCard key={project.slug} project={project} layout="row" />
+            {featuredProjects.map((project, i) => (
+              <ProjectCard
+                key={project.slug}
+                project={project}
+                layout="row"
+                choreography={choreographies[i % choreographies.length]}
+                glyphColor="blue"
+              />
             ))}
           </div>
 

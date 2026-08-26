@@ -48,10 +48,45 @@ export type GlyphHandle = {
  * `play`/`reset` via a ref and the card triggers them from its own
  * onMouseEnter/onMouseLeave.
  */
-const Glyph = forwardRef<GlyphHandle, { choreography: Choreography; className?: string }>(
-  function Glyph({ choreography, className = "" }, ref) {
+export type GlyphColor = "blue" | "orange" | "black" | "green";
+
+/**
+ * Codedgar's three real Glyph colors, plus green as a deliberate extension
+ * using the site's own existing `--status` token value rather than a
+ * literal codedgar color — codedgar never applies green to this component
+ * itself (see the color-variant note in globals.css, above the glow rules).
+ */
+const GLYPH_COLORS: Record<GlyphColor, string> = {
+  blue: "#1B5DEF",
+  orange: "#E25327",
+  black: "#191818",
+  green: "#22c55e",
+};
+
+type GlyphProps = {
+  choreography: Choreography;
+  className?: string;
+  /** One of codedgar's Glyph colors — defaults to the site's own accent
+   *  blue so the two already-shipped instances (Services, home Services)
+   *  keep their exact current color when only adding glow. */
+  color?: GlyphColor | "accent";
+  glow?: "none" | "soft";
+  /** Mirrors the parent card's own hover state — CSS `:hover` on the glyph
+   *  itself is unreliable here, since a visitor typically hovers the card's
+   *  title or body copy, not the small icon specifically. */
+  hovered?: boolean;
+};
+
+const Glyph = forwardRef<GlyphHandle, GlyphProps>(function Glyph(
+  { choreography, className = "", color = "accent", glow = "none", hovered = false },
+  ref,
+) {
     const cellRefs = useRef<(HTMLDivElement | null)[]>([]);
     const timelineRef = useRef<gsap.core.Timeline | null>(null);
+
+    const setFilled = (el: HTMLDivElement, bit: string) => {
+      el.dataset.filled = bit === "1" ? "true" : "false";
+    };
 
     // Idle pattern painted on mount, and whenever the assigned choreography
     // changes — instant, no tween, since this is the resting state rather
@@ -59,7 +94,10 @@ const Glyph = forwardRef<GlyphHandle, { choreography: Choreography; className?: 
     useGSAP(() => {
       choreography.idlePattern.split("").forEach((bit, i) => {
         const el = cellRefs.current[i];
-        if (el) gsap.set(el, { opacity: bit === "1" ? 1 : 0, scale: bit === "1" ? 1 : 0.8 });
+        if (el) {
+          gsap.set(el, { opacity: bit === "1" ? 1 : 0, scale: bit === "1" ? 1 : 0.8 });
+          setFilled(el, bit);
+        }
       });
     }, [choreography]);
 
@@ -91,6 +129,7 @@ const Glyph = forwardRef<GlyphHandle, { choreography: Choreography; className?: 
                 },
                 cursor + delay,
               );
+              tl.call(() => setFilled(el, bit), [], cursor + delay);
               frameEnd = Math.max(frameEnd, delay + cellDuration);
             });
             cursor += frameEnd + frame.holdDuration;
@@ -118,6 +157,7 @@ const Glyph = forwardRef<GlyphHandle, { choreography: Choreography; className?: 
               },
               delay,
             );
+            tl.call(() => setFilled(el, bit), [], delay);
           });
           timelineRef.current = tl;
         },
@@ -125,10 +165,15 @@ const Glyph = forwardRef<GlyphHandle, { choreography: Choreography; className?: 
       [choreography],
     );
 
+    const glyphColor = color === "accent" ? "var(--accent)" : GLYPH_COLORS[color];
+
     return (
       <div
         aria-hidden="true"
-        className={`grid grid-cols-3 grid-rows-3 gap-0.5 ${className}`}
+        data-glow={glow}
+        data-hovered={hovered}
+        className={`glyph grid grid-cols-3 grid-rows-3 gap-0.5 ${className}`}
+        style={{ ["--glyph-color" as string]: glyphColor }}
       >
         {Array.from({ length: 9 }, (_, i) => (
           <div
@@ -136,7 +181,7 @@ const Glyph = forwardRef<GlyphHandle, { choreography: Choreography; className?: 
             ref={(el) => {
               cellRefs.current[i] = el;
             }}
-            className="h-full w-full rounded-[1px] bg-current"
+            className="glyph__cell h-full w-full rounded-[1px] bg-[var(--glyph-color)]"
           />
         ))}
       </div>

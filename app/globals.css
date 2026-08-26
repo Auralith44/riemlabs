@@ -1065,6 +1065,32 @@
     inset: -6px;
   }
 
+  /* ---- Glyph glow -------------------------------------------------------
+     Ported from codedgar.com's shipped CSS for its 3×3 Glyph component,
+     read directly rather than approximated. `--glyph-color` is set per
+     instance (see components/Glyph.tsx); every color variant — including
+     green, which is a deliberate extension using the site's own existing
+     `--status` value, since codedgar itself never applies green to this
+     component — uses this exact same glow, just tinted by whatever that
+     variable resolves to. `data-hovered` mirrors the parent card's own
+     hover state, published from React rather than relying on `:hover`
+     directly on the glyph, which a visitor hovering the card's title or
+     body copy — not the small icon itself — would never trigger. */
+  .glyph[data-glow="soft"] .glyph__cell[data-filled="true"] {
+    box-shadow:
+      0 0 4px 0 var(--glyph-color),
+      0 0 8px -2px var(--glyph-color);
+  }
+  .glyph[data-glow="soft"]:hover .glyph__cell[data-filled="true"],
+  .glyph[data-glow="soft"][data-hovered="true"] .glyph__cell[data-filled="true"] {
+    box-shadow:
+      0 0 6px 1px var(--glyph-color),
+      0 0 12px -2px var(--glyph-color);
+  }
+  .glyph[data-glow="soft"] .glyph__cell {
+    transition: box-shadow 0.24s cubic-bezier(0, 0, 0.2, 1);
+  }
+
   /* ---- Magnetic bracket CTA ------------------------------------------- */
   .magnetic {
     --site-button-bracket-x: 0px;

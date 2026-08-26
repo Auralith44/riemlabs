@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import CTABanner from "@/components/CTABanner";
+import ExperienceTimeline from "@/components/ExperienceTimeline";
+import GlyphPanel from "@/components/GlyphPanel";
 import PageIntro from "@/components/PageIntro";
 import RevealSection from "@/components/RevealSection";
 import SectionHeader from "@/components/SectionHeader";
 import { Fade, RevealLines } from "@/components/RevealText";
+import { choreographies } from "@/lib/glyphChoreographies";
 import { aboutProcess, principles } from "@/lib/services";
 import { site } from "@/lib/site";
 
@@ -12,13 +15,6 @@ export const metadata: Metadata = {
   description:
     "Riem Labs is a small, senior design and engineering studio in Nairobi working on interfaces and the systems underneath them.",
 };
-
-const TEAM = [
-  { name: "Practice lead", role: "Direction, typography, client strategy", since: "2017" },
-  { name: "Systems lead", role: "Architecture, design systems, front-end", since: "2019" },
-  { name: "Motion & interaction", role: "Choreography, prototyping, performance", since: "2021" },
-  { name: "Production", role: "QA, accessibility, delivery", since: "2022" },
-];
 
 export default function AboutPage() {
   return (
@@ -82,46 +78,33 @@ export default function AboutPage() {
           />
 
           <div className="mt-20 grid gap-px border border-hairline bg-hairline sm:grid-cols-2">
-            {principles.map((p) => (
-              <Fade key={p.index} className="bg-canvas p-8 lg:p-12">
-                <span className="micro tnum text-accent">{p.index}</span>
+            {principles.map((p, i) => (
+              <GlyphPanel
+                key={p.index}
+                choreography={choreographies[i % choreographies.length]}
+                color="orange"
+                className="bg-canvas p-8 transition-colors duration-600 ease-expo hover:bg-bone lg:p-12"
+              >
                 <h3 className="mt-8 text-title font-medium">{p.title}</h3>
                 <p className="mt-4 max-w-md text-sm leading-relaxed text-ink/55">{p.body}</p>
-              </Fade>
+              </GlyphPanel>
             ))}
           </div>
         </div>
       </RevealSection>
 
-      {/* ── 02.3 / Practice ────────────────────────────────────────── */}
+      {/* ── 02.3 / Experience ──────────────────────────────────────── */}
       <RevealSection className="bg-bone">
         <div className="shell py-section">
           <SectionHeader
             index="03"
-            label="Practice"
-            lines={["Who does", "the work."]}
-            description="Four seats, all senior. Every engagement is staffed by the same people from kickoff to handover."
+            label="Experience"
+            lines={["Built one engagement", "at a time."]}
+            description="A running record of the studio itself — from founding through the systems currently in production."
           />
 
-          <div className="mt-20 border-t border-hairline">
-            {TEAM.map((member, i) => (
-              <Fade key={member.name}>
-                <div className="group grid grid-cols-12 items-baseline gap-x-gutter gap-y-2 border-b border-hairline py-7 transition-colors duration-400 ease-expo hover:text-accent">
-                  <span className="micro tnum col-span-2 text-ink/30 transition-colors duration-400 ease-expo group-hover:text-accent md:col-span-1">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <h3 className="col-span-10 text-title font-medium md:col-span-4">
-                    {member.name}
-                  </h3>
-                  <p className="col-span-10 col-start-3 text-sm text-ink/55 transition-colors duration-400 ease-expo group-hover:text-accent md:col-span-5 md:col-start-6">
-                    {member.role}
-                  </p>
-                  <span className="meta tnum col-span-12 text-ink/30 md:col-span-2 md:text-right">
-                    Since {member.since}
-                  </span>
-                </div>
-              </Fade>
-            ))}
+          <div className="mt-20">
+            <ExperienceTimeline />
           </div>
         </div>
       </RevealSection>
@@ -137,12 +120,17 @@ export default function AboutPage() {
           />
 
           <div className="mt-20 grid gap-x-gutter gap-y-14 md:grid-cols-4">
-            {aboutProcess.map((step) => (
-              <Fade key={step.index} className="border-t border-hairline pt-6">
-                <span className="micro tnum text-accent">{step.index}</span>
+            {aboutProcess.map((step, i) => (
+              <GlyphPanel
+                key={step.index}
+                choreography={choreographies[i % choreographies.length]}
+                color="black"
+                glyphClassName="h-7 w-7"
+                className="border-t border-hairline pt-6"
+              >
                 <h3 className="mt-6 text-title font-medium">{step.title}</h3>
                 <p className="mt-4 text-sm leading-relaxed text-ink/55">{step.body}</p>
-              </Fade>
+              </GlyphPanel>
             ))}
           </div>
         </div>

@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import CTABanner from "@/components/CTABanner";
+import GlyphPanel from "@/components/GlyphPanel";
 import PageIntro from "@/components/PageIntro";
 import RevealSection from "@/components/RevealSection";
 import SectionHeader from "@/components/SectionHeader";
 import WorkGallery from "@/components/WorkGallery";
-import { Fade } from "@/components/RevealText";
+import { choreographies } from "@/lib/glyphChoreographies";
 import { projects } from "@/lib/projects";
 
 export const metadata: Metadata = {
@@ -71,12 +72,17 @@ export default function WorkPage() {
                 title: "Codebase & System Rescues",
                 body: "Inheriting fragile, unmaintained, or technical-debt-heavy codebases. We perform a complete structural audit, stabilize backend infrastructure, fix performance bottlenecks, and properly document the stack.",
               },
-            ].map((item) => (
-              <Fade key={item.index} className="border-t border-hairline pt-6">
-                <span className="micro tnum text-accent">{item.index}</span>
+            ].map((item, i) => (
+              <GlyphPanel
+                key={item.index}
+                choreography={choreographies[i % choreographies.length]}
+                color="green"
+                glyphClassName="h-7 w-7"
+                className="border-t border-hairline pt-6"
+              >
                 <h3 className="mt-6 text-title font-medium">{item.title}</h3>
                 <p className="mt-4 text-sm leading-relaxed text-ink/55">{item.body}</p>
-              </Fade>
+              </GlyphPanel>
             ))}
           </div>
         </div>

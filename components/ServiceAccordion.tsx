@@ -23,6 +23,7 @@ function AccordionRow({
   const contentRef = useRef<HTMLDivElement>(null);
   const glyphRef = useRef<GlyphHandle>(null);
   const panelId = useId();
+  const [hovered, setHovered] = useState(false);
 
   useGSAP(
     () => {
@@ -49,8 +50,14 @@ function AccordionRow({
         <button
           type="button"
           onClick={onToggle}
-          onMouseEnter={() => glyphRef.current?.play()}
-          onMouseLeave={() => glyphRef.current?.reset()}
+          onMouseEnter={() => {
+            setHovered(true);
+            glyphRef.current?.play();
+          }}
+          onMouseLeave={() => {
+            setHovered(false);
+            glyphRef.current?.reset();
+          }}
           aria-expanded={open}
           aria-controls={panelId}
           className="group grid w-full grid-cols-12 items-baseline gap-x-gutter gap-y-3 py-8 text-left transition-colors duration-400 ease-expo hover:text-accent lg:py-10"
@@ -58,13 +65,21 @@ function AccordionRow({
           {/* Same glyph as the homepage cards, sized down for this denser
               row — the 40px card size measured off codedgar would crowd a
               row this text-heavy, and nothing in the source material speaks
-              to sizing it for an accordion layout at all. */}
+              to sizing it for an accordion layout at all. Dimmed via
+              opacity rather than currentColor now that the glyph's own
+              fill comes from --glyph-color, not the wrapper's text color. */}
           <span
-            className={`col-span-2 transition-colors duration-400 ease-expo md:col-span-1 ${
-              open ? "text-accent" : "text-ink/30 group-hover:text-accent"
+            className={`col-span-2 transition-opacity duration-400 ease-expo md:col-span-1 ${
+              open ? "opacity-100" : "opacity-30 group-hover:opacity-100"
             }`}
           >
-            <Glyph ref={glyphRef} choreography={choreography} className="h-6 w-6" />
+            <Glyph
+              ref={glyphRef}
+              choreography={choreography}
+              glow="soft"
+              hovered={hovered}
+              className="h-6 w-6"
+            />
           </span>
 
           <span

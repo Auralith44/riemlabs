@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import LiveClock from "@/components/LiveClock";
 import RevealSection from "@/components/RevealSection";
 import { Fade, RevealBlock, RevealLines } from "@/components/RevealText";
@@ -20,6 +21,9 @@ type PageIntroProps = {
    *  so the default has to be left out entirely rather than fought with a
    *  second class. */
   headlineClassName?: string;
+  /** Rendered beside the headline, in the whitespace to its right — unused
+   *  by every page except Contact, which fills it with the world-map canvas. */
+  headlineAside?: ReactNode;
 };
 
 /** Shared masthead for the interior pages. Corner anchors frame the type. */
@@ -31,6 +35,7 @@ export default function PageIntro({
   meta = [],
   showClock = true,
   headlineClassName = "text-display",
+  headlineAside,
 }: PageIntroProps) {
   return (
     <RevealSection className="relative">
@@ -46,11 +51,18 @@ export default function PageIntro({
             {showClock ? <LiveClock /> : null}
           </div>
 
-          <RevealLines
-            as="h1"
-            lines={lines}
-            className={`mt-14 font-medium lg:mt-20 ${headlineClassName}`}
-          />
+          {headlineAside ? (
+            <div className="mt-14 flex items-start justify-between gap-8 lg:mt-20">
+              <RevealLines as="h1" lines={lines} className={`font-medium ${headlineClassName}`} />
+              <div className="hidden h-48 w-full max-w-sm shrink-0 lg:block">{headlineAside}</div>
+            </div>
+          ) : (
+            <RevealLines
+              as="h1"
+              lines={lines}
+              className={`mt-14 font-medium lg:mt-20 ${headlineClassName}`}
+            />
+          )}
 
           <div className="mt-14 grid gap-x-gutter gap-y-10 md:grid-cols-12 lg:mt-20">
             <Fade as="p" className="text-lede text-ink/60 md:col-span-6 lg:col-span-5">

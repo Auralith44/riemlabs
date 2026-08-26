@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import AvailabilityLine from "@/components/AvailabilityLine";
 import ContactForm from "@/components/ContactForm";
+import GameOfLifeCanvas from "@/components/GameOfLifeCanvas";
 import LiveClock from "@/components/LiveClock";
 import PageIntro from "@/components/PageIntro";
 import RevealSection from "@/components/RevealSection";
@@ -36,6 +37,7 @@ export default function ContactPage() {
         lede="Whether you need a high-conversion platform, custom business automation, or a legacy codebase audit, tell us where your infrastructure stands today and we'll outline a structured roadmap forward."
         showClock={false}
         headlineClassName="text-headline max-w-[48rem]"
+        headlineAside={<GameOfLifeCanvas />}
       />
 
       {/* ── 04.1 / Inquiry ─────────────────────────────────────────── */}

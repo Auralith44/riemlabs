@@ -1,4 +1,9 @@
+"use client";
+
+import { useRef, useState } from "react";
+import Glyph, { type GlyphColor, type GlyphHandle } from "@/components/Glyph";
 import ProjectVisual from "@/components/ProjectVisual";
+import type { Choreography } from "@/lib/glyphChoreographies";
 import type { Project } from "@/lib/projects";
 
 type ProjectCardProps = {
@@ -11,6 +16,10 @@ type ProjectCardProps = {
   onPreview?: (project: Project) => void;
   /** Adds the reveal hook attribute so a parent RevealSection staggers it in. */
   reveal?: boolean;
+  /** Row layout only — replaces the plain index number with the animated
+   *  glyph, choreographed on hover. Unused (and unneeded) in card layout. */
+  choreography?: Choreography;
+  glyphColor?: GlyphColor;
 };
 
 export default function ProjectCard({
@@ -18,8 +27,12 @@ export default function ProjectCard({
   layout = "card",
   onPreview,
   reveal = true,
+  choreography,
+  glyphColor,
 }: ProjectCardProps) {
   const revealAttr = reveal ? { "data-reveal-fade": "" } : {};
+  const glyphRef = useRef<GlyphHandle>(null);
+  const [hovered, setHovered] = useState(false);
 
   if (layout === "row") {
     return (
@@ -28,11 +41,30 @@ export default function ProjectCard({
           href={project.href}
           target="_blank"
           rel="noreferrer noopener"
+          onMouseEnter={() => {
+            setHovered(true);
+            glyphRef.current?.play();
+          }}
+          onMouseLeave={() => {
+            setHovered(false);
+            glyphRef.current?.reset();
+          }}
           className="grid grid-cols-12 items-center gap-x-gutter gap-y-4 py-7 md:py-9"
         >
-          <span className="meta tnum col-span-2 text-ink/35 transition-colors duration-400 ease-expo group-hover:text-accent md:col-span-1">
-            {project.index}
-          </span>
+          {choreography ? (
+            <Glyph
+              ref={glyphRef}
+              choreography={choreography}
+              color={glyphColor}
+              glow="soft"
+              hovered={hovered}
+              className="col-span-2 h-6 w-6 text-ink/35 transition-colors duration-400 ease-expo group-hover:text-accent md:col-span-1"
+            />
+          ) : (
+            <span className="meta tnum col-span-2 text-ink/35 transition-colors duration-400 ease-expo group-hover:text-accent md:col-span-1">
+              {project.index}
+            </span>
+          )}
 
           <h3 className="col-span-10 text-title font-medium transition-[color,transform] duration-600 ease-expo group-hover:translate-x-2 group-hover:text-accent md:col-span-6">
             {project.title}
