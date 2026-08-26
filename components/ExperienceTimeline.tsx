@@ -120,15 +120,26 @@ export default function ExperienceTimeline() {
           </div>
 
           <div className="relative flex flex-col items-center pt-1">
+            {/* Two layers, matching muvevi's own .tl-dot: a solid static
+                base (plus a ring outline for current entries) and, only for
+                current entries, a second identically-shaped span scaled up
+                via animate-ping — the expanding, fading "radar blip". The
+                base itself doesn't animate; the ping layer is the whole
+                effect, not a glow alongside it. */}
             <div
               data-tl-dot
               data-current={entry.current ? "true" : undefined}
               className={`relative z-10 h-3.5 w-3.5 shrink-0 rounded-full transition-colors duration-400 ease-expo ${
-                entry.current
-                  ? "bg-accent shadow-[0_0_4px_0_var(--accent),0_0_8px_-2px_var(--accent)]"
-                  : "bg-ink/25"
+                entry.current ? "bg-accent ring-2 ring-offset-2 ring-offset-bone ring-accent" : "bg-ink/25"
               }`}
-            />
+            >
+              {entry.current ? (
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-0 animate-ping rounded-full bg-accent opacity-60"
+                />
+              ) : null}
+            </div>
           </div>
 
           <div className="flex flex-col gap-3 pt-0">

@@ -52,41 +52,50 @@ export default function PageIntro({
           </div>
 
           {headlineAside ? (
-            <div className="mt-14 flex items-start justify-between gap-8 lg:mt-20">
-              <RevealLines as="h1" lines={lines} className={`font-medium ${headlineClassName}`} />
-              {/* flex-1, not a capped width — grows to the row's own right
-                  edge (the shell's padding boundary) instead of floating a
-                  small fixed box short of it. Height well beyond the
-                  headline's own: this is deliberately taller than its flex
-                  row's content-driven height, so it pushes the lede/meta
-                  grid below it down rather than sitting pinned to the top
-                  as a small square — that's the point, not a side effect. */}
-              <div className="hidden flex-1 lg:block lg:h-[26rem]">{headlineAside}</div>
+            // Headline and lede share one column here instead of the
+            // headline getting its own row above a separate lede/meta grid
+            // (the no-aside layout below) — a CSS grid row stretches both
+            // columns to the height of its tallest content by default, so
+            // the aside's own `h-full` tracks the headline+lede column's
+            // real height automatically. No fixed guess, and it can't drift
+            // out of sync if either block's height changes later.
+            <div className="mt-14 grid gap-x-gutter gap-y-10 lg:mt-20 lg:grid-cols-12">
+              <div className="lg:col-span-7">
+                <RevealLines as="h1" lines={lines} className={`font-medium ${headlineClassName}`} />
+                <Fade as="p" className="mt-8 text-lede text-ink/60 lg:mt-10">
+                  {lede}
+                </Fade>
+              </div>
+              <div className="hidden lg:col-span-5 lg:block">
+                <div className="h-full">{headlineAside}</div>
+              </div>
             </div>
           ) : (
-            <RevealLines
-              as="h1"
-              lines={lines}
-              className={`mt-14 font-medium lg:mt-20 ${headlineClassName}`}
-            />
+            <>
+              <RevealLines
+                as="h1"
+                lines={lines}
+                className={`mt-14 font-medium lg:mt-20 ${headlineClassName}`}
+              />
+
+              <div className="mt-14 grid gap-x-gutter gap-y-10 md:grid-cols-12 lg:mt-20">
+                <Fade as="p" className="text-lede text-ink/60 md:col-span-6 lg:col-span-5">
+                  {lede}
+                </Fade>
+
+                {meta.length > 0 ? (
+                  <dl className="grid grid-cols-2 gap-x-gutter gap-y-8 md:col-span-6 md:col-start-8 lg:col-span-4 lg:col-start-9">
+                    {meta.map((item) => (
+                      <Fade key={item.label}>
+                        <dt className="meta text-ink/35">{item.label}</dt>
+                        <dd className="mt-2 text-sm">{item.value}</dd>
+                      </Fade>
+                    ))}
+                  </dl>
+                ) : null}
+              </div>
+            </>
           )}
-
-          <div className="mt-14 grid gap-x-gutter gap-y-10 md:grid-cols-12 lg:mt-20">
-            <Fade as="p" className="text-lede text-ink/60 md:col-span-6 lg:col-span-5">
-              {lede}
-            </Fade>
-
-            {meta.length > 0 ? (
-              <dl className="grid grid-cols-2 gap-x-gutter gap-y-8 md:col-span-6 md:col-start-8 lg:col-span-4 lg:col-start-9">
-                {meta.map((item) => (
-                  <Fade key={item.label}>
-                    <dt className="meta text-ink/35">{item.label}</dt>
-                    <dd className="mt-2 text-sm">{item.value}</dd>
-                  </Fade>
-                ))}
-              </dl>
-            ) : null}
-          </div>
         </RevealBlock>
       </div>
     </RevealSection>

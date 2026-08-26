@@ -23,20 +23,17 @@ const SECONDARY_PHONE = "+254 790 775 636";
 export default function ContactPage() {
   return (
     <>
-      {/* headlineClassName: this page's headline runs noticeably narrower
-          than every other page's — text-headline instead of the site
-          default text-display, capped besides, so its rendered width lines
-          up with the 01/About You column below rather than spanning full
-          width. No metadata block below it any more (Part 1: removed
-          outright, not just its values), so nothing else on this row needs
-          to change to compensate. */}
+      {/* headlineClassName: text-display, the site default size — same
+          ~97-103px neighborhood as About/Work/Services' own heroes, only
+          the width is capped so its rendered line lines up with the
+          01/About You column below rather than spanning full width. */}
       <PageIntro
         index="05"
         label="Contact"
         lines={["Scope your roadmap", "with our engineering team."]}
         lede="Whether you need a high-conversion platform, custom business automation, or a legacy codebase audit, tell us where your infrastructure stands today and we'll outline a structured roadmap forward."
         showClock={false}
-        headlineClassName="text-headline max-w-[48rem]"
+        headlineClassName="text-display max-w-[48rem]"
         headlineAside={<GameOfLifeCanvas />}
       />
 

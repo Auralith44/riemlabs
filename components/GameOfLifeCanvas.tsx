@@ -6,7 +6,11 @@ const CELL_SIZE = 8;
 const GAP = 1;
 const PITCH = CELL_SIZE + GAP;
 const STEP_MS = 280;
-const DEAD_ALPHA = 0.03;
+/** Dead cells target fully transparent, not a faint constant fill — a
+ *  nonzero resting opacity here was what made the whole box read as a
+ *  static grid/checkerboard sitting under the animation rather than just
+ *  clusters of cells appearing and dissolving against a clean background. */
+const DEAD_ALPHA = 0;
 const LIVE_ALPHA = 0.22;
 /** Per-frame ease rate toward the current target opacity — codedgar's own. */
 const EASE = 0.08;
