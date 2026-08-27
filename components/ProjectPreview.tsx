@@ -102,7 +102,7 @@ export default function ProjectPreview({ project, onClose }: ProjectPreviewProps
         <div className="grid lg:grid-cols-2">
           <div
             data-preview-item
-            className="relative aspect-[4/3] overflow-hidden border-b border-hairline lg:border-b-0 lg:border-r"
+            className="relative aspect-[16/9] overflow-hidden border-b border-hairline lg:border-b-0 lg:border-r"
           >
             <Image
               src={project.image}
