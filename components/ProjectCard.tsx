@@ -57,7 +57,7 @@ export default function ProjectCard({
               choreography={choreography}
               color={glyphColor}
               hovered={hovered}
-              className="col-span-2 h-6 w-6 text-ink/35 transition-colors duration-400 ease-expo group-hover:text-accent md:col-span-1"
+              className="col-span-2 h-9 w-9 text-ink/35 transition-colors duration-400 ease-expo group-hover:text-accent md:col-span-1"
             />
           ) : (
             <span className="meta tnum col-span-2 text-ink/35 transition-colors duration-400 ease-expo group-hover:text-accent md:col-span-1">

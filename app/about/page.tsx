@@ -82,7 +82,7 @@ export default function AboutPage() {
               <GlyphPanel
                 key={p.index}
                 choreography={choreographyPool[CHOREO_OFFSETS.aboutPrinciples + i]}
-                color="orange"
+                color="black"
                 className="bg-canvas p-8 transition-colors duration-600 ease-expo hover:bg-bone lg:p-12"
               >
                 <h3 className="mt-8 text-title font-medium">{p.title}</h3>
@@ -125,8 +125,8 @@ export default function AboutPage() {
                 key={step.index}
                 choreography={choreographyPool[CHOREO_OFFSETS.aboutProcess + i]}
                 color="black"
-                glyphClassName="h-7 w-7"
-                className="border-t border-hairline pt-6"
+                glyphClassName="h-9 w-9"
+                className="border-t border-hairline bg-canvas p-6 transition-colors duration-600 ease-expo hover:bg-bone"
               >
                 <h3 className="mt-6 text-title font-medium">{step.title}</h3>
                 <p className="mt-4 text-sm leading-relaxed text-ink/55">{step.body}</p>

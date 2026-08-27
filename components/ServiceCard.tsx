@@ -47,7 +47,7 @@ export default function ServiceCard({
             ref={glyphRef}
             choreography={choreography}
             hovered={hovered}
-            className="h-10 w-10"
+            className="h-9 w-9"
           />
           <span
             aria-hidden="true"

@@ -86,6 +86,7 @@ export default function ServicesPage() {
               <GlyphPanel
                 key={model.index}
                 choreography={choreographyPool[CHOREO_OFFSETS.servicesEngagementModels + i]}
+                color="black"
                 className="flex h-full flex-col justify-between gap-12 bg-canvas p-8 transition-colors duration-600 ease-expo hover:bg-bone lg:p-12"
               >
                 <div>
@@ -119,9 +120,9 @@ export default function ServicesPage() {
               <GlyphPanel
                 key={step.index}
                 choreography={choreographyPool[CHOREO_OFFSETS.servicesProcess + i]}
-                color="orange"
-                glyphClassName="col-span-2 h-6 w-6 md:col-span-1"
-                className="grid grid-cols-12 items-start gap-x-gutter gap-y-4 border-b border-hairline py-10"
+                color="black"
+                glyphClassName="col-span-2 h-9 w-9 md:col-span-1"
+                className="grid grid-cols-12 items-start gap-x-gutter gap-y-4 border-b border-hairline bg-canvas px-6 py-10 transition-colors duration-600 ease-expo hover:bg-bone"
               >
                 <h3 className="col-span-10 text-title font-medium md:col-span-4">
                   {step.title}

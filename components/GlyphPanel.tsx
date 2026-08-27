@@ -28,7 +28,7 @@ export default function GlyphPanel({
   choreography,
   color,
   className = "",
-  glyphClassName = "h-8 w-8",
+  glyphClassName = "h-9 w-9",
   children,
 }: GlyphPanelProps) {
   const glyphRef = useRef<GlyphHandle>(null);

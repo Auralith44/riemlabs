@@ -24,13 +24,13 @@ const TIMELINES = [
 type Status = "idle" | "submitting" | "success" | "error";
 
 const fieldClass =
-  "w-full border-b border-hairline bg-transparent pb-3 pt-2 text-lg outline-none transition-colors duration-400 ease-expo placeholder:text-ink/25 focus:border-accent";
+  "w-full border-b border-canvas/25 bg-transparent pb-3 pt-2 text-lg text-canvas outline-none transition-colors duration-400 ease-expo placeholder:text-canvas/30 focus:border-accent";
 
 function Legend({ index, children }: { index: string; children: React.ReactNode }) {
   return (
     <legend className="meta flex items-baseline gap-2 pb-6">
       <span className="tnum text-accent">{index}</span>
-      <span className="text-ink/25">/</span>
+      <span className="text-canvas/25">/</span>
       <span>{children}</span>
     </legend>
   );
@@ -93,22 +93,22 @@ export default function ContactForm() {
 
   if (status === "success") {
     return (
-      <div className="border border-hairline p-10 lg:p-16">
+      <div className="border border-canvas/20 p-10 lg:p-16">
         <p className="meta flex items-center gap-2 text-accent">
           <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse-dot" />
           Brief received
         </p>
-        <h3 className="mt-8 text-headline font-medium">Thank you — that&apos;s in.</h3>
-        <p className="mt-6 max-w-md text-lede text-ink/55">
+        <h3 className="mt-8 text-headline font-medium text-canvas">Thank you — that&apos;s in.</h3>
+        <p className="mt-6 max-w-md text-lede text-canvas/60">
           We read every brief ourselves and reply within 24 hours, even when the answer is no.
         </p>
         <div className="mt-10 flex flex-wrap items-center gap-8">
-          <BracketLink href="/work" variant="framed">
+          <BracketLink href="/work" variant="framed" tone="dark">
             Browse the work
           </BracketLink>
           <a
             href={`mailto:${site.email}`}
-            className="meta text-ink/45 transition-colors duration-400 ease-expo hover:text-accent"
+            className="meta text-canvas/50 transition-colors duration-400 ease-expo hover:text-accent"
           >
             {site.email}
           </a>
@@ -122,12 +122,12 @@ export default function ContactForm() {
   return (
     <form onSubmit={onSubmit} noValidate className="space-y-20">
       {/* 01 — Who */}
-      <fieldset className="border-t border-hairline pt-8">
+      <fieldset className="border-t border-canvas/20 pt-8">
         <Legend index="01">About you</Legend>
 
         <div className="grid gap-x-gutter gap-y-10 md:grid-cols-2">
           <label className="block">
-            <span className="meta text-ink/40">Name *</span>
+            <span className="meta text-canvas/50">Name *</span>
             <input
               name="name"
               type="text"
@@ -140,7 +140,7 @@ export default function ContactForm() {
           </label>
 
           <label className="block">
-            <span className="meta text-ink/40">Email *</span>
+            <span className="meta text-canvas/50">Email *</span>
             <input
               name="email"
               type="email"
@@ -153,7 +153,7 @@ export default function ContactForm() {
           </label>
 
           <label className="block md:col-span-2">
-            <span className="meta text-ink/40">Company or project</span>
+            <span className="meta text-canvas/50">Company or project</span>
             <input
               name="company"
               type="text"
@@ -166,7 +166,7 @@ export default function ContactForm() {
       </fieldset>
 
       {/* 02 — Scope */}
-      <fieldset className="border-t border-hairline pt-8">
+      <fieldset className="border-t border-canvas/20 pt-8">
         <Legend index="02">Scope * — select all that apply</Legend>
 
         <div className="flex flex-wrap gap-3">
@@ -181,12 +181,12 @@ export default function ContactForm() {
                 className={`meta group inline-flex items-baseline gap-1.5 border px-4 py-3 transition-colors duration-400 ease-expo ${
                   active
                     ? "border-accent text-accent"
-                    : `${flagged("scope") ? "border-accent/40" : "border-hairline"} text-ink/60 hover:border-accent hover:text-accent`
+                    : `${flagged("scope") ? "border-accent/40" : "border-canvas/25"} text-canvas/70 hover:border-accent hover:text-accent`
                 }`}
               >
                 <span
                   aria-hidden="true"
-                  className={active ? "text-accent" : "text-ink/20 group-hover:text-accent"}
+                  className={active ? "text-accent" : "text-canvas/30 group-hover:text-accent"}
                 >
                   {active ? "×" : "+"}
                 </span>
@@ -198,7 +198,7 @@ export default function ContactForm() {
       </fieldset>
 
       {/* 03 — Timeline */}
-      <fieldset className="border-t border-hairline pt-8">
+      <fieldset className="border-t border-canvas/20 pt-8">
         <Legend index="03">Timeline</Legend>
 
         <div className="flex flex-wrap gap-3">
@@ -213,7 +213,7 @@ export default function ContactForm() {
                 className={`meta border px-4 py-3 transition-colors duration-400 ease-expo ${
                   active
                     ? "border-accent text-accent"
-                    : "border-hairline text-ink/60 hover:border-accent hover:text-accent"
+                    : "border-canvas/25 text-canvas/70 hover:border-accent hover:text-accent"
                 }`}
               >
                 {option}
@@ -224,11 +224,11 @@ export default function ContactForm() {
       </fieldset>
 
       {/* 04 — Brief */}
-      <fieldset className="border-t border-hairline pt-8">
+      <fieldset className="border-t border-canvas/20 pt-8">
         <Legend index="04">The brief *</Legend>
 
         <label className="block">
-          <span className="meta text-ink/40">
+          <span className="meta text-canvas/50">
             What are you building, and what operational bottleneck are you trying to solve?
           </span>
           <textarea
@@ -244,12 +244,13 @@ export default function ContactForm() {
       </fieldset>
 
       {/* Submit */}
-      <div className="flex flex-wrap items-center justify-between gap-8 border-t border-hairline pt-8">
+      <div className="flex flex-wrap items-center justify-between gap-8 border-t border-canvas/20 pt-8">
         <div>
           <BracketLink
             type="submit"
             variant="solid"
             size="lg"
+            tone="dark"
             disabled={status === "submitting"}
           >
             {status === "submitting" ? "Sending…" : "Send brief"}
@@ -262,7 +263,7 @@ export default function ContactForm() {
           ) : null}
         </div>
 
-        <p className="meta max-w-xs text-ink/35">We reply within 24 hours.</p>
+        <p className="meta max-w-xs text-canvas/40">We reply within 24 hours.</p>
       </div>
     </form>
   );

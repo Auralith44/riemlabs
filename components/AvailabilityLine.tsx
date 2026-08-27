@@ -23,7 +23,7 @@ export default function AvailabilityLine() {
   }, []);
 
   return (
-    <p className="mt-4 text-sm leading-relaxed text-ink/55">
+    <p className="mt-4 text-sm leading-relaxed text-canvas/60">
       <span suppressHydrationWarning>{label}</span> — slots open.
     </p>
   );
