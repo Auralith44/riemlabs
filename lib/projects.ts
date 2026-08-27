@@ -15,8 +15,10 @@ export type Project = {
   summary: string;
   role: string[];
   stack: string[];
-  /** Drives the generated cover art — see components/ProjectVisual.tsx */
-  visual: "grid" | "arc" | "stack" | "orbit" | "rule" | "column";
+  /** Real homepage screenshot, in public/work/ — path, not a static import,
+   *  since these are only ever rendered with next/image's `fill` mode into
+   *  a fixed-aspect-ratio box, so no build-time width/height is needed. */
+  image: string;
   /** Deployed site — external, opened in a new tab from the card. */
   href: string;
   featured: boolean;
@@ -38,7 +40,7 @@ export const projects: Project[] = [
       "A distribution catalogue built for people who arrive knowing exactly what they need. Product data, safety documentation and enquiry routing in one structure a small team can keep current.",
     role: ["Web systems", "Design system", "Front-end"],
     stack: ["Next.js", "TypeScript", "Tailwind"],
-    visual: "grid",
+    image: "/work/oracle-chemicals.jpg",
     href: "https://oraclechemicals.netlify.app",
     featured: true,
     status: "template",
@@ -54,7 +56,7 @@ export const projects: Project[] = [
       "A clinic site that answers the questions a prospective patient actually has — what it costs, how long it takes, who is doing it — and turns the answer into a booking.",
     role: ["Visual direction", "Web systems", "Front-end"],
     stack: ["Next.js", "Tailwind", "Sanity"],
-    visual: "arc",
+    image: "/work/elfi-dental-care.jpg",
     href: "https://elfidentalcare.netlify.app",
     featured: true,
     status: "template",
@@ -70,7 +72,7 @@ export const projects: Project[] = [
       "Menu, hours and reservations, held in a layout that survives a kitchen changing its mind weekly. Photography carries the room; the type stays out of its way.",
     role: ["Art direction", "Web systems", "Front-end"],
     stack: ["Next.js", "Tailwind", "GSAP"],
-    visual: "stack",
+    image: "/work/the-village-restaurant.jpg",
     href: "https://thevillagerestaurant.netlify.app",
     featured: true,
     status: "template",
@@ -86,7 +88,7 @@ export const projects: Project[] = [
       "A studio site for a studio — the hardest brief there is. Case work in front, capability behind it, and a system their own team extends without calling us.",
     role: ["Design system", "Web systems", "Front-end"],
     stack: ["Next.js", "TypeScript", "GSAP", "Lenis"],
-    visual: "orbit",
+    image: "/work/the-clicq.jpg",
     href: "https://clicq.netlify.app",
     featured: true,
     status: "template",
@@ -102,7 +104,7 @@ export const projects: Project[] = [
       "A specification-first catalogue for a performance-import dealer, built for buyers who already know the model and want the numbers. Inventory, provenance and enquiry routing held in one structure that updates as fast as stock turns over.",
     role: ["Web systems", "Design system", "Front-end"],
     stack: ["Next.js", "TypeScript", "Tailwind"],
-    visual: "rule",
+    image: "/work/kyra-platinum.jpg",
     href: "https://kyraimports.netlify.app",
     // Not featured — the home page's own 03/Work list is a curated 4, with
     // its glyph choreography pool sized exactly for those 4 (see
@@ -123,7 +125,7 @@ export const projects: Project[] = [
       "A second restaurant site built on the same instinct as the first: menu and reservations up front, atmosphere carried by photography, nothing fighting for attention. Location and hours tuned for a mall address rather than a standalone building.",
     role: ["Art direction", "Web systems", "Front-end"],
     stack: ["Next.js", "Tailwind", "GSAP"],
-    visual: "column",
+    image: "/work/the-aura-restaurant.jpg",
     href: "https://theaurarestaurant.netlify.app",
     featured: false,
     status: "template",

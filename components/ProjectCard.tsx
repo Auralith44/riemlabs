@@ -1,8 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { useRef, useState } from "react";
 import Glyph, { type GlyphColor, type GlyphHandle } from "@/components/Glyph";
-import ProjectVisual from "@/components/ProjectVisual";
 import type { Choreography } from "@/lib/glyphChoreographies";
 import type { Project } from "@/lib/projects";
 
@@ -90,7 +90,7 @@ export default function ProjectCard({
           aria-hidden="true"
           className="pointer-events-none absolute right-gutter top-1/2 hidden h-28 w-40 -translate-y-1/2 overflow-hidden border border-hairline opacity-0 [clip-path:inset(50%_0%)] transition-all duration-800 ease-expo group-hover:opacity-100 group-hover:[clip-path:inset(0%_0%)] lg:block"
         >
-          <ProjectVisual variant={project.visual} className="h-full w-full" />
+          <Image src={project.image} alt="" fill sizes="160px" className="object-cover" />
         </div>
       </article>
     );
@@ -99,7 +99,13 @@ export default function ProjectCard({
   const plate = (
     <>
       <div className="absolute inset-0 [clip-path:inset(7%)] transition-[clip-path,transform] duration-800 ease-expo group-hover:scale-[1.02] group-hover:[clip-path:inset(0%)]">
-        <ProjectVisual variant={project.visual} className="h-full w-full" />
+        <Image
+          src={project.image}
+          alt={`${project.title} homepage`}
+          fill
+          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+          className="object-cover"
+        />
       </div>
 
       <span className="meta absolute left-4 top-4 bg-canvas px-2 py-1 text-ink/60">

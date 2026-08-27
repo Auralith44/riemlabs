@@ -1,9 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import BracketLink from "@/components/BracketLink";
-import ProjectVisual from "@/components/ProjectVisual";
 import { useSmoothScroll } from "@/components/SmoothScrollProvider";
 import { EASE, gsap } from "@/lib/gsap";
 import type { Project } from "@/lib/projects";
@@ -102,9 +102,15 @@ export default function ProjectPreview({ project, onClose }: ProjectPreviewProps
         <div className="grid lg:grid-cols-2">
           <div
             data-preview-item
-            className="aspect-[4/3] overflow-hidden border-b border-hairline lg:border-b-0 lg:border-r"
+            className="relative aspect-[4/3] overflow-hidden border-b border-hairline lg:border-b-0 lg:border-r"
           >
-            <ProjectVisual variant={project.visual} className="h-full w-full" />
+            <Image
+              src={project.image}
+              alt={`${project.title} homepage`}
+              fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              className="object-cover"
+            />
           </div>
 
           <div className="flex flex-col gap-8 p-6 lg:p-10">
