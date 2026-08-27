@@ -157,6 +157,16 @@ export default function Footer() {
                   </Link>
                 </li>
               ))}
+              {/* Mobile only — the same "Back to top" control already in the
+                  status bar below, just reachable here too: on a narrow
+                  screen the nav columns wrap well above the copyright bar,
+                  making the original one the least visible spot on the
+                  page for it. Reuses scrollTo(0) rather than a new control. */}
+              <li className="pt-1 lg:hidden">
+                <BracketLink onClick={() => scrollTo(0)} size="sm">
+                  Back to top
+                </BracketLink>
+              </li>
             </Column>
           </div>
         </div>

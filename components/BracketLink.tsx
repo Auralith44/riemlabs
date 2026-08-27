@@ -79,6 +79,11 @@ export default function BracketLink({
   const dark = tone === "dark";
   const reveal = tone === "reveal";
   const boxed = variant === "boxed";
+  // `solid` always carries `cta-corners` too (see `base` below) — the
+  // literal `[`/`]` spans were stacking a second bracket treatment on top
+  // of that decorative corner accent. `boxed` never had them; `solid`
+  // shouldn't either, for the same reason.
+  const noLiteralBrackets = boxed || variant === "solid";
 
   /**
    * Writes the offsets the .magnetic rules in globals.css read from.
@@ -182,7 +187,7 @@ export default function BracketLink({
     ? ""
     : "transition-transform duration-400 ease-expo";
 
-  const inner = boxed ? (
+  const inner = noLiteralBrackets ? (
     children
   ) : (
     <>

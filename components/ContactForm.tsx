@@ -243,8 +243,10 @@ export default function ContactForm() {
         </label>
       </fieldset>
 
-      {/* Submit */}
-      <div className="flex flex-wrap items-center justify-between gap-8 border-t border-canvas/20 pt-8">
+      {/* Submit — no border-t/pt-8 here: the form's own space-y-20 already
+          gives this the same rhythm every other section gets, and the line
+          was purely decorative on top of that, not load-bearing spacing. */}
+      <div className="flex flex-wrap items-center justify-between gap-8">
         <div>
           <BracketLink
             type="submit"

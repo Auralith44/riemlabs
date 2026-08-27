@@ -629,10 +629,21 @@
     top: 0;
     right: 0;
     bottom: 0;
-    width: min(100vw, 25rem);
+    /* Full-bleed on every phone-sized viewport, not just ones under 400px
+       — min(100vw, 25rem) meant a phone wider than exactly 400px (e.g.
+       most current large phones) still got capped at 400px, leaving a
+       real sliver of the page visible on the left edge behind the panel.
+       The cap only applies from md up, where this reads as an actual
+       drawer rather than the whole screen. */
+    width: 100vw;
     transform: translate3d(100%, 0, 0);
     will-change: transform;
     transition: transform 0.52s var(--ease-expo);
+  }
+  @media (min-width: 48rem) {
+    .site-overlay__panel {
+      width: 25rem;
+    }
   }
   .site-overlay[data-overlay-state="open"] .site-overlay__panel {
     transform: translateZ(0);
