@@ -150,23 +150,37 @@ export default function Footer() {
             </Column>
 
             <Column title="Legal">
-              {legalLinks.map((link) => (
-                <li key={link.href}>
+              {legalLinks.map((link, i) => {
+                const isLast = i === legalLinks.length - 1;
+                const anchor = (
                   <Link href={link.href} className={linkClass}>
                     {link.label}
                   </Link>
-                </li>
-              ))}
-              {/* Mobile only — the same "Back to top" control already in the
-                  status bar below, just reachable here too: on a narrow
-                  screen the nav columns wrap well above the copyright bar,
-                  making the original one the least visible spot on the
-                  page for it. Reuses scrollTo(0) rather than a new control. */}
-              <li className="pt-1 lg:hidden">
-                <BracketLink onClick={() => scrollTo(0)} size="sm">
-                  Back to top
-                </BracketLink>
-              </li>
+                );
+
+                if (!isLast) return <li key={link.href}>{anchor}</li>;
+
+                // Mobile only — the same "Back to top" control already in
+                // the status bar below, just reachable here too: on a
+                // narrow screen the nav columns wrap well above the
+                // copyright bar, making the original one the least visible
+                // spot on the page for it. Reuses scrollTo(0) rather than a
+                // new control. Inline with the last link (space-y-2.5 on
+                // the <ul> stacks separate <li>s vertically, which is why
+                // this has to share Refund Policy's own row instead of
+                // being its own item — that landed it in a second row
+                // below Refund Policy, not beside it).
+                return (
+                  <li key={link.href} className="flex items-center justify-between gap-3">
+                    {anchor}
+                    <span className="lg:hidden">
+                      <BracketLink onClick={() => scrollTo(0)} size="sm">
+                        Back to top
+                      </BracketLink>
+                    </span>
+                  </li>
+                );
+              })}
             </Column>
           </div>
         </div>

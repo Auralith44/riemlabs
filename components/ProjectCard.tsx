@@ -167,6 +167,11 @@ export default function ProjectCard({
             {tag}
           </li>
         ))}
+        {/* Status flag, not a tech tag — filled solid instead of outlined so
+            it reads as distinct from the stack row it shares. */}
+        <li className="micro bg-accent px-2 py-1 text-canvas">
+          {project.status === "live" ? "Live" : "Template"}
+        </li>
       </ul>
     </article>
   );

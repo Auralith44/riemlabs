@@ -136,6 +136,9 @@ export default function ProjectPreview({ project, onClose }: ProjectPreviewProps
                       {s}
                     </li>
                   ))}
+                  <li className="micro bg-accent px-2 py-1 text-canvas">
+                    {project.status === "live" ? "Live" : "Template"}
+                  </li>
                 </ul>
               </div>
             </div>

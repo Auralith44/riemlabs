@@ -66,6 +66,7 @@ export default function Header() {
   const toggleRef = useRef<HTMLButtonElement>(null);
   const goneRef = useRef(false);
   const atTopRef = useRef(true);
+  const scrollLockY = useRef(0);
 
   /**
    * The only way out of the open state.
@@ -89,32 +90,54 @@ export default function Header() {
    *
    * `data-menu-open` does double duty: both reveal layers key off it to
    * suppress themselves, so nothing is left tracking the pointer or sweeping
-   * behind the scrim while the drawer is up, and globals.css turns it into
-   * `overflow: hidden` — which is what actually prevents native scroll (wheel
-   * capture alone doesn't stop keyboard or scrollbar-drag scrolling). That's
-   * this component's own flag rather than Lenis's `lenis-stopped` class
-   * because Lenis is never instantiated under `prefers-reduced-motion`, and a
-   * class only Lenis manages would never appear for those visitors — the lock
-   * has to hold whether or not Lenis exists. `stop()` still runs alongside it,
-   * for the wheel/touch interception Lenis itself owns.
+   * behind the scrim while the drawer is up, and it's what the CSS keys the
+   * `.reveal-clip` suppression rule on. The actual scroll lock is done here
+   * directly, as inline styles on <body>, rather than through a CSS rule —
+   * `position: fixed` takes body out of flow entirely, which leaves nothing
+   * for <html> to scroll and needs no `overflow: hidden` of its own. That's
+   * a deliberate swap from an earlier `overflow: hidden` +
+   * `padding-right: var(--scrollbar-width)` compensation technique: that
+   * depended on accurately measuring a real, layout-consuming scrollbar,
+   * which desktop browsers have and touch-device ones normally don't —
+   * a stale or nonzero measurement on a device with no scrollbar to
+   * compensate for shifted the page sideways the instant the menu opened.
+   * Position-fixed doesn't measure or compensate for anything, so it
+   * behaves the same regardless of what kind of scrollbar (or none) the
+   * device has. This is this component's own flag rather than Lenis's
+   * `lenis-stopped` class because Lenis is never instantiated under
+   * `prefers-reduced-motion`, and a class only Lenis manages would never
+   * appear for those visitors — the lock has to hold whether or not Lenis
+   * exists. `stop()` still runs alongside it, for the wheel/touch
+   * interception Lenis itself owns.
    *
    * Layout effect, not a plain effect: a plain `useEffect` runs after the
    * browser has already painted the `data-overlay-state="open"` commit, so
-   * the panel's slide transition would start a frame before this lock lands
-   * — exactly the window the scrollbar would disappear in, mid-transition.
-   *
-   * `--scrollbar-width`, measured once in SmoothScrollProvider and consumed
-   * by the same rule as a `padding-right`, is what keeps that overflow
-   * change from shifting the page by the scrollbar's own width.
+   * the panel's slide transition would start a frame before this lock lands.
    */
   useIsomorphicLayoutEffect(() => {
     if (!open) {
       delete document.documentElement.dataset.menuOpen;
+      const y = scrollLockY.current;
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.style.width = "";
+      // start() before the restore: Lenis re-syncs from wherever native
+      // scroll actually is via its own scroll listener, the same path
+      // ordinary scrolling takes.
       start();
+      window.scrollTo(0, y);
       return;
     }
 
     document.documentElement.dataset.menuOpen = "true";
+    scrollLockY.current = window.scrollY;
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollLockY.current}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.width = "100%";
     stop();
 
     const onKey = (e: KeyboardEvent) => {

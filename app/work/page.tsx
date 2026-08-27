@@ -6,7 +6,7 @@ import RevealSection from "@/components/RevealSection";
 import SectionHeader from "@/components/SectionHeader";
 import WorkGallery from "@/components/WorkGallery";
 import { CHOREO_OFFSETS, choreographyPool } from "@/lib/glyphChoreographies";
-import { projects } from "@/lib/projects";
+import { categories, projects } from "@/lib/projects";
 
 export const metadata: Metadata = {
   title: "Work",
@@ -29,7 +29,7 @@ export default function WorkPage() {
         meta={[
           { label: "Projects", value: `${projects.length} in the public index` },
           { label: "Span", value: span },
-          { label: "Categories", value: "5 disciplines" },
+          { label: "Categories", value: `${categories.length} disciplines` },
           { label: "Status", value: "All in production" },
         ]}
       />

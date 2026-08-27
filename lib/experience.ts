@@ -1,4 +1,4 @@
-import { featuredProjects } from "@/lib/projects";
+import { projects } from "@/lib/projects";
 
 export type TimelineEntry = {
   year: string;
@@ -83,14 +83,21 @@ const PLACEHOLDER: TimelineEntry[] = [
   },
 ];
 
-/** 2026 — the real Work entries, marked current rather than historical. */
-const CURRENT: TimelineEntry[] = featuredProjects.map((p) => ({
-  year: p.year,
-  title: p.title,
-  subtitle: p.category,
-  description: p.summary,
-  tags: p.role,
-  current: true,
-}));
+/** 2026 — every real Work entry, marked current rather than historical.
+ *  Sourced from the full project list, not `featuredProjects` — the two are
+ *  different concerns that happen to have coincided before: `featured`
+ *  gates the home page's own separate curated 4-project list (with a glyph
+ *  choreography pool sized exactly for those 4), while this is "everything
+ *  actually live in 2026," which now includes two non-featured projects too. */
+const CURRENT: TimelineEntry[] = projects
+  .filter((p) => p.year === "2026")
+  .map((p) => ({
+    year: p.year,
+    title: p.title,
+    subtitle: p.category,
+    description: p.summary,
+    tags: p.role,
+    current: true,
+  }));
 
 export const experience: TimelineEntry[] = [...PLACEHOLDER, ...CURRENT];

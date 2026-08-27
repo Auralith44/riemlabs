@@ -27,20 +27,18 @@ export default function ContactPage() {
           column, full-width text-display treatment About/Work/Services
           use, with the lede flowing directly beneath at the site's normal
           spacing. The canvas and every narrow-column/height-sync fix that
-          existed to make a side-by-side layout work are gone with it.
-          `dark` switches this hero to the site's existing bg-ink theme —
-          the same one CTABanner already uses, not a new color. */}
+          existed to make a side-by-side layout work are gone with it. The
+          dark theme (batch 6 Part 23) has been reverted — light again. */}
       <PageIntro
         index="05"
         label="Contact"
         lines={["Scope your roadmap", "with our engineering team."]}
         lede="Whether you need a high-conversion platform, custom business automation, or a legacy codebase audit, tell us where your infrastructure stands today and we'll outline a structured roadmap forward."
         showClock={false}
-        dark
       />
 
       {/* ── 04.1 / Inquiry ─────────────────────────────────────────── */}
-      <RevealSection className="bg-ink text-canvas">
+      <RevealSection className="bg-canvas">
         <div className="shell pb-section">
           <div className="grid gap-x-gutter gap-y-16 lg:grid-cols-12">
             <div className="lg:col-span-7">
@@ -49,10 +47,10 @@ export default function ContactPage() {
 
             {/* Direct contact metadata */}
             <aside className="lg:col-span-4 lg:col-start-9">
-              <div className="border-t border-canvas/15 pt-8 lg:sticky lg:top-[calc(var(--header-h)+3rem)]">
+              <div className="border-t border-hairline pt-8 lg:sticky lg:top-[calc(var(--header-h)+3rem)]">
                 <p className="meta flex items-baseline gap-2">
                   <span className="tnum text-accent">06</span>
-                  <span className="text-canvas/25">/</span>
+                  <span className="text-ink/25">/</span>
                   <span>Direct</span>
                 </p>
 
@@ -65,11 +63,11 @@ export default function ContactPage() {
                       page, so the two addresses never appear side by side
                       to read as inconsistent. */}
                   <Fade>
-                    <dt className="meta text-canvas/60">Email</dt>
+                    <dt className="meta text-ink/60">Email</dt>
                     <dd className="mt-2">
                       <a
                         href={`mailto:${CONTACT_EMAIL}`}
-                        className="link-wipe text-lede text-canvas"
+                        className="link-wipe text-lede text-ink"
                       >
                         {CONTACT_EMAIL}
                       </a>
@@ -81,11 +79,11 @@ export default function ContactPage() {
                       and is what the Elsewhere row's shared WhatsApp link
                       below points to. */}
                   <Fade>
-                    <dt className="meta text-canvas/60">Telephone</dt>
+                    <dt className="meta text-ink/60">Telephone</dt>
                     <dd className="mt-2">
                       <a
                         href={`tel:${site.phone.replace(/\s/g, "")}`}
-                        className="link-wipe text-sm text-canvas"
+                        className="link-wipe text-sm text-ink"
                       >
                         {site.phone}
                       </a>
@@ -93,7 +91,7 @@ export default function ContactPage() {
                     <dd className="mt-2">
                       <a
                         href={`tel:${SECONDARY_PHONE.replace(/\s/g, "")}`}
-                        className="link-wipe text-sm text-canvas"
+                        className="link-wipe text-sm text-ink"
                       >
                         {SECONDARY_PHONE}
                       </a>
@@ -101,17 +99,17 @@ export default function ContactPage() {
                   </Fade>
 
                   <Fade>
-                    <dt className="meta text-canvas/60">Studio</dt>
-                    <dd className="mt-2 text-sm text-canvas/70">
+                    <dt className="meta text-ink/60">Studio</dt>
+                    <dd className="mt-2 text-sm text-ink/70">
                       {site.city}, {site.country}
                     </dd>
                     <dd className="mt-3">
-                      <LiveClock seconds label="Local time" tone="reveal" />
+                      <LiveClock seconds label="Local time" />
                     </dd>
                   </Fade>
 
                   <Fade>
-                    <dt className="meta text-canvas/60">Elsewhere</dt>
+                    <dt className="meta text-ink/60">Elsewhere</dt>
                     <dd className="mt-3 flex flex-wrap gap-x-5 gap-y-2">
                       {socials.map((s) => (
                         <a
@@ -119,7 +117,7 @@ export default function ContactPage() {
                           href={s.href}
                           target="_blank"
                           rel="noreferrer noopener"
-                          className="text-sm text-canvas/70 transition-colors duration-400 ease-expo hover:text-accent"
+                          className="text-sm text-ink/70 transition-colors duration-400 ease-expo hover:text-accent"
                         >
                           {s.label}
                         </a>
@@ -128,8 +126,8 @@ export default function ContactPage() {
                   </Fade>
                 </dl>
 
-                <Fade className="mt-12 border border-canvas/20 p-6">
-                  <p className="meta flex items-center gap-2 text-canvas/60">
+                <Fade className="mt-12 border border-hairline p-6">
+                  <p className="meta flex items-center gap-2 text-ink/60">
                     <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse-dot" />
                     Available for hire
                   </p>
