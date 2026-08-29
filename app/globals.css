@@ -121,6 +121,13 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    /* Defensive backstop, not the fix for any specific bug — a stray
+       element wider than the viewport (the footer headline was one, see
+       its own comment) forces the whole page to side-scroll unless
+       something upstream clips it. This doesn't address why an element
+       might overflow, only stops that overflow from becoming a visible
+       page-level scroll if it happens again. */
+    overflow-x: hidden;
   }
 
   /* Lenis drives scroll position; the native smooth behaviour must stay off. */
@@ -148,6 +155,7 @@
   body {
     @apply bg-canvas text-ink font-sans antialiased;
     font-feature-settings: "ss01" 1, "cv05" 1, "tnum" 1;
+    overflow-x: hidden;
   }
 
   ::selection {

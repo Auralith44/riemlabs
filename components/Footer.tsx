@@ -24,12 +24,16 @@ import { legalLinks, navigation, site, socials } from "@/lib/site";
 function Column({
   title,
   children,
+  navClassName = "w-40 shrink-0 sm:w-48",
 }: {
   title: string;
   children: React.ReactNode;
+  /** Legal overrides this to grow past the fixed 160/192px width through
+   *  `lg:` — see its own call site for why. */
+  navClassName?: string;
 }) {
   return (
-    <nav aria-label={title} className="w-40 shrink-0 sm:w-48">
+    <nav aria-label={title} className={navClassName}>
       <p className="font-mono text-[13px] uppercase tracking-[0.14em] text-ink/35">{title}</p>
       <ul className="mt-5 space-y-2.5">{children}</ul>
     </nav>
@@ -96,9 +100,12 @@ export default function Footer() {
                   `hyphens-none break-keep` stops CSS's automatic
                   hyphenation, but the "-" already sitting inside
                   "performance-obsessed." is a real character, not a
-                  hyphenation point — browsers treat it as a soft-wrap
-                  opportunity regardless, so that line also gets its own
-                  `whitespace-nowrap`.
+                  hyphenation point, so it's still a valid soft-wrap
+                  opportunity at narrow widths — a `whitespace-nowrap` here
+                  used to suppress that too, which on a narrow phone forced
+                  the line (and the whole page) 52px wider than its own
+                  container. Left to wrap normally, it reads as three lines
+                  at that width: "...the" / "performance-" / "obsessed."
 
                   Sized as an arbitrary value rather than jumping a full
                   Tailwind step (5xl → 6xl is 48px → 60px, a 25% jump) — a
@@ -106,7 +113,7 @@ export default function Footer() {
                   row actually has left after widening the nav columns. */}
               <h2 className="mt-5 text-[2.375rem] font-medium leading-none tracking-[-0.035em] hyphens-none break-keep lg:text-[3.25rem]">
                 <span className="block">Engineered systems for the</span>
-                <span className="block whitespace-nowrap">performance-obsessed.</span>
+                <span className="block">performance-obsessed.</span>
               </h2>
 
               {/* Pure marks, no bounding box — resting a fixed distance
@@ -149,7 +156,16 @@ export default function Footer() {
               ))}
             </Column>
 
-            <Column title="Legal">
+            {/* w-auto through lg:, back to the shared w-48 once the button
+                below is hidden — Legal's own fixed 160px column had no room
+                left for "[ Back to top ]" (118px) next to "Refund Policy"
+                (64px) in a 12px gap, so it wrapped to two lines. Growing the
+                nav itself, rather than trying to fit the button inside a
+                width that was never going to hold both, uses the real open
+                space the row already has once Legal wraps onto its own
+                line at this width — no absolute positioning, no guessing
+                Refund Policy's exact vertical offset to match against. */}
+            <Column title="Legal" navClassName="w-auto shrink-0 lg:w-48">
               {legalLinks.map((link, i) => {
                 const isLast = i === legalLinks.length - 1;
                 const anchor = (
@@ -165,13 +181,9 @@ export default function Footer() {
                 // narrow screen the nav columns wrap well above the
                 // copyright bar, making the original one the least visible
                 // spot on the page for it. Reuses scrollTo(0) rather than a
-                // new control. Inline with the last link (space-y-2.5 on
-                // the <ul> stacks separate <li>s vertically, which is why
-                // this has to share Refund Policy's own row instead of
-                // being its own item — that landed it in a second row
-                // below Refund Policy, not beside it).
+                // new control.
                 return (
-                  <li key={link.href} className="flex items-center justify-between gap-3">
+                  <li key={link.href} className="flex items-center gap-6">
                     {anchor}
                     <span className="lg:hidden">
                       <BracketLink onClick={() => scrollTo(0)} size="sm">
