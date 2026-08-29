@@ -108,10 +108,6 @@ export default function ProjectCard({
         />
       </div>
 
-      <span className="meta absolute left-4 top-4 bg-canvas px-2 py-1 text-ink/60">
-        {project.category}
-      </span>
-
       <span className="meta absolute bottom-4 right-4 translate-y-3 bg-accent px-2.5 py-1.5 text-canvas opacity-0 transition-all duration-600 ease-expo group-hover:translate-y-0 group-hover:opacity-100">
         {onPreview ? "Preview" : "View ↗"}
       </span>
