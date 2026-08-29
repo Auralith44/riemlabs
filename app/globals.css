@@ -56,6 +56,12 @@
     --status: #22c55e;
     --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
     --ease-magnet: cubic-bezier(0.2, 0.7, 0.2, 1);
+    /* Same formula as tailwind.config.ts's `spacing.gutter` — that token
+       only exists as inlined values in each generated utility (right-gutter,
+       px-gutter, ...), not as a reusable CSS property, so anywhere that
+       needs to build on top of the gutter value in a calc() needs its own
+       copy of the same clamp() published here. */
+    --gutter: clamp(1.5rem, 0.607rem + 3.214vw, 3.5rem);
 
     /* Hero type scale */
     --hero-headline-size: clamp(2.5rem, 0.75rem + 9.1vw, 5.25rem);

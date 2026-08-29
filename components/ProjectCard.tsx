@@ -88,7 +88,7 @@ export default function ProjectCard({
         {/* Hover plate — clipped open from the centre. */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute right-gutter top-1/2 hidden h-28 aspect-video -translate-y-1/2 overflow-hidden border border-hairline opacity-0 [clip-path:inset(50%_0%)] transition-all duration-800 ease-expo group-hover:opacity-100 group-hover:[clip-path:inset(0%_0%)] lg:block"
+          className="pointer-events-none absolute right-[calc(var(--gutter)+4.5rem)] top-1/2 hidden h-28 aspect-video -translate-y-1/2 overflow-hidden border border-hairline opacity-0 [clip-path:inset(50%_0%)] transition-all duration-800 ease-expo group-hover:opacity-100 group-hover:[clip-path:inset(0%_0%)] lg:block"
         >
           <Image src={project.image} alt="" fill sizes="160px" className="object-cover" />
         </div>
@@ -98,7 +98,7 @@ export default function ProjectCard({
 
   const plate = (
     <>
-      <div className="absolute inset-0 [clip-path:inset(7%)] transition-[clip-path,transform] duration-800 ease-expo group-hover:scale-[1.02] group-hover:[clip-path:inset(0%)]">
+      <div className="absolute inset-0 transition-transform duration-800 ease-expo group-hover:scale-[1.02]">
         <Image
           src={project.image}
           alt={`${project.title} homepage`}
