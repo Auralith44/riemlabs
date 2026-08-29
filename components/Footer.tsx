@@ -95,8 +95,11 @@ export default function Footer() {
                   reveal headings use elsewhere (see README). A width-driven
                   wrap can land the break wherever the container happens to
                   be at a given viewport; this pins it at "the" every time —
-                  but only once the wrapper is actually wide enough to hold
-                  "Engineered systems for the" on one line at this size.
+                  which needs `text-3xl` at mobile sizes specifically, not
+                  the larger arbitrary value this used to carry: at that
+                  size "Engineered systems for the" was itself too wide for
+                  a narrow column and wrapped a second time on its own,
+                  4 lines total instead of the intended 3.
                   `hyphens-none break-keep` stops CSS's automatic
                   hyphenation, but the "-" already sitting inside
                   "performance-obsessed." is a real character, not a
@@ -111,7 +114,7 @@ export default function Footer() {
                   Tailwind step (5xl → 6xl is 48px → 60px, a 25% jump) — a
                   smaller, deliberate bump that stays clear of the width this
                   row actually has left after widening the nav columns. */}
-              <h2 className="mt-5 text-[2.375rem] font-medium leading-none tracking-[-0.035em] hyphens-none break-keep lg:text-[3.25rem]">
+              <h2 className="mt-5 text-3xl font-medium leading-none tracking-[-0.035em] hyphens-none break-keep lg:text-[3.25rem]">
                 <span className="block">Engineered systems for the</span>
                 <span className="block">performance-obsessed.</span>
               </h2>
